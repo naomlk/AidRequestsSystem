@@ -2,111 +2,99 @@
 -- VOLUNTEER MANAGEMENT SYSTEM DATABASE SCRIPT
 -- ============================================================
 
--- 1. Reference Tables (Statuses and Skills)
-CREATE TABLE application_statuses (
+-- 1. Reference Tables (Configuration)
+CREATE TABLE request_types (
+    type_id SERIAL PRIMARY KEY,
+    type_name VARCHAR(100) NOT NULL -- e.g., 'Battery', 'Flat Tire', 'Locked Car'
+);
+
+CREATE TABLE statuses (
     status_id SERIAL PRIMARY KEY,
-    status_label VARCHAR(50) UNIQUE NOT NULL -- 'Pending', 'Approved', 'Rejected', 'Withdrawn', 'Completed'
+    status_label VARCHAR(50) NOT NULL -- 'Pending', 'Assigned', 'In Progress', 'Completed'
 );
 
-CREATE TABLE skills (
-    skill_id SERIAL PRIMARY KEY,
-    skill_name VARCHAR(100) UNIQUE NOT NULL -- 'First Aid', 'IT Support', 'Teaching', 'Cooking', etc.
+-- 2. Locations
+-- Centralized table for tracking where the help is needed
+CREATE TABLE locations (
+    location_id SERIAL PRIMARY KEY,
+    city VARCHAR(100) NOT NULL,
+    street VARCHAR(150),
+    neighborhood VARCHAR(100),
+    latitude DECIMAL(9,6), 
+    longitude DECIMAL(9,6)
 );
 
--- 2. User Management
--- Base table for login credentials
-CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    phone_number VARCHAR(20),
-    address TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_type VARCHAR(20) CHECK (user_type IN ('VOLUNTEER', 'ORGANIZATION', 'ADMIN'))
+-- 3. Organizations & Volunteers
+CREATE TABLE organizations (
+    organization_id SERIAL PRIMARY KEY,
+    org_name VARCHAR(200) DEFAULT 'Yedidim',
+    branch_region VARCHAR(100), -- e.g., 'Jerusalem District', 'Tel Aviv'
+    contact_phone VARCHAR(20)
 );
 
--- Profile specific to Volunteers
 CREATE TABLE volunteers (
-    volunteer_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    volunteer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    date_of_birth DATE,
-    availability_notes TEXT, -- e.g., 'Weekends only', 'Evenings'
-    bio TEXT
-);
-
--- Profile specific to Organizations (NGOs, Charities)
-CREATE TABLE organizations (
-    organization_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
-    organization_name VARCHAR(200) NOT NULL,
-    description TEXT,
-    website_url VARCHAR(255),
-    verification_status BOOLEAN DEFAULT FALSE
-);
-
--- 3. Missions (Opportunities)
-CREATE TABLE missions (
-    mission_id SERIAL PRIMARY KEY,
-    organization_id INT NOT NULL REFERENCES organizations(organization_id) ON DELETE CASCADE,
-    title VARCHAR(200) NOT NULL,
-    description TEXT NOT NULL,
-    location VARCHAR(150),
-    start_date DATE NOT NULL,
-    end_date DATE,
-    volunteers_needed INT DEFAULT 1,
+    phone_number VARCHAR(20) UNIQUE NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    equipment_notes TEXT -- e.g., 'Has jack and professional booster'
 );
 
--- 4. Junction Tables (Skill Matching)
-CREATE TABLE volunteer_skills (
-    volunteer_id INT REFERENCES volunteers(volunteer_id) ON DELETE CASCADE,
-    skill_id INT REFERENCES skills(skill_id) ON DELETE CASCADE,
-    proficiency_level VARCHAR(50), -- 'Beginner', 'Intermediate', 'Expert'
-    PRIMARY KEY (volunteer_id, skill_id)
+-- 4. Families / Citizens (The Requesters)
+CREATE TABLE families (
+    family_id SERIAL PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    is_vulnerable BOOLEAN DEFAULT FALSE -- High priority for elderly or kids in car
 );
 
-CREATE TABLE mission_requirements (
-    mission_id INT REFERENCES missions(mission_id) ON DELETE CASCADE,
-    skill_id INT REFERENCES skills(skill_id) ON DELETE CASCADE,
-    is_mandatory BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (mission_id, skill_id)
-);
-
--- 5. THE CORE: Volunteer Applications (Requests Management)
-CREATE TABLE applications (
-    application_id SERIAL PRIMARY KEY,
-    volunteer_id INT NOT NULL REFERENCES volunteers(volunteer_id) ON DELETE CASCADE,
-    mission_id INT NOT NULL REFERENCES missions(mission_id) ON DELETE CASCADE,
-    status_id INT NOT NULL DEFAULT 1 REFERENCES application_statuses(status_id),
-    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    motivation_letter TEXT,
-    org_feedback TEXT, -- Internal notes from the organization
-    processed_at TIMESTAMP, -- When the status was last updated by the org
+-- 5. THE CORE: Assistance Requests
+-- This table links the person in need to the specific problem and location
+CREATE TABLE requests (
+    request_id SERIAL PRIMARY KEY,
+    family_id INT NOT NULL REFERENCES families(family_id) ON DELETE CASCADE,
+    type_id INT NOT NULL REFERENCES request_types(type_id),
+    status_id INT NOT NULL DEFAULT 1 REFERENCES statuses(status_id),
+    location_id INT NOT NULL REFERENCES locations(location_id),
+    organization_id INT REFERENCES organizations(organization_id),
     
-    -- Constraint: A volunteer cannot apply to the same mission twice
-    CONSTRAINT unique_application UNIQUE (volunteer_id, mission_id)
+    vehicle_info VARCHAR(255), -- e.g., 'Blue Mazda 3, Plate 12-345-67'
+    incident_description TEXT,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 6. Audit Trail (History of status changes)
-CREATE TABLE application_history (
-    history_id SERIAL PRIMARY KEY,
-    application_id INT REFERENCES applications(application_id) ON DELETE CASCADE,
-    old_status_id INT REFERENCES application_statuses(status_id),
-    new_status_id INT REFERENCES application_statuses(status_id),
-    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    changed_by_user_id INT REFERENCES users(user_id)
+-- 6. Interventions (Deliveries of Help)
+-- Tracks which volunteer handled which request
+CREATE TABLE deliveries (
+    delivery_id SERIAL PRIMARY KEY,
+    request_id INT NOT NULL REFERENCES requests(request_id) ON DELETE CASCADE,
+    volunteer_id INT NOT NULL REFERENCES volunteers(volunteer_id),
+    
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    arrival_time TIMESTAMP,
+    completion_time TIMESTAMP,
+    
+    outcome_summary TEXT, -- e.g., 'Fixed on site', 'Referred to mechanic'
+    
+    CONSTRAINT unique_active_delivery UNIQUE (request_id, volunteer_id)
 );
 
 -- ============================================================
--- INITIAL DATA SEEDING (Example Data)
+-- INITIAL DATA SEEDING (English)
 -- ============================================================
 
-INSERT INTO application_statuses (status_label) VALUES 
-('Pending'), ('Approved'), ('Rejected'), ('Withdrawn'), ('Completed');
+INSERT INTO statuses (status_label) VALUES 
+('Pending'), ('Assigned'), ('In Progress'), ('Completed'), ('Cancelled');
 
-INSERT INTO skills (skill_name) VALUES 
-('Logistics'), ('Medical Care'), ('Translation'), ('Social Media'), ('Event Planning');
+INSERT INTO request_types (type_name) VALUES 
+('Battery Jumpstart'), ('Flat Tire (Puncture)'), ('Locked Car (Child Inside)'), 
+('Locked Car (Keys Inside)'), ('Out of Fuel'), ('Stuck Elevator');
+
+INSERT INTO organizations (org_name, branch_region) VALUES 
+('Yedidim', 'Jerusalem District'), ('Yedidim', 'Central District');
 
 -- ============================================================
 -- USEFUL QUERIES

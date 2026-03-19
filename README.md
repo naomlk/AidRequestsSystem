@@ -1,9 +1,11 @@
 # AidRequestsSystem
 <img width="3744" height="1605" alt="erdplus (1)" src="https://github.com/user-attachments/assets/f1d8bf34-7a8c-49ef-bec0-cdeac1342473" />
 
+<img width="1918" height="874" alt="image" src="https://github.com/user-attachments/assets/56e186fa-1aa2-4d56-b0d1-a74ae6dec616" />
+<img width="1919" height="865" alt="image" src="https://github.com/user-attachments/assets/75ed4896-9e63-49b0-95ff-03be5448e482" />
+<img width="1913" height="874" alt="image" src="https://github.com/user-attachments/assets/60273847-0ea7-4c43-8cac-0be7eab27510" />
+<img width="1919" height="870" alt="image" src="https://github.com/user-attachments/assets/78478b7f-0eb5-4c40-9b32-a343f18878a8" />
+<img width="1919" height="831" alt="image" src="https://github.com/user-attachments/assets/cda3d205-c4e1-43c8-a01b-dc6044be96fe" />
 
-![מסך 1](https://github.com/user-attachments/assets/bbb2b44d-b938-48ed-a3fb-c9176e0eed4e)
-![מסך 2](https://github.com/user-attachments/assets/71f1bede-3c3d-4a57-9645-55c83d1a251a)
-![מסך 3](https://github.com/user-attachments/assets/7884354d-c33b-40cb-a946-b3b7b3f6a7cd)
-![מסך 4](https://github.com/user-attachments/assets/4ed7f457-f7c4-452a-97ad-ab2c01fc9f5b)
-![מסך 5](https://github.com/user-attachments/assets/9cfc6fea-23f3-44da-9257-b1016db3851b)
+
+

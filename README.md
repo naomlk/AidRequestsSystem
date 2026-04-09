@@ -1,5 +1,7 @@
 # AidRequestsSystem
-<img width="3744" height="1605" alt="erdplus (2)" src="https://github.com/user-attachments/assets/10f18b6f-b198-482b-afc4-eff3a2418dce" />
+<img width="1551" height="661" alt="image" src="https://github.com/user-attachments/assets/6b37a889-39dc-445f-ab59-195addd34274" />
+
+<img width="1542" height="652" alt="image" src="https://github.com/user-attachments/assets/16a20c06-adae-4cc3-9446-7deed845a2ca" />
 
 
 <img width="1918" height="874" alt="image" src="https://github.com/user-attachments/assets/56e186fa-1aa2-4d56-b0d1-a74ae6dec616" />

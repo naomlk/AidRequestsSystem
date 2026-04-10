@@ -15,7 +15,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
+
+      - "./שלב א:/docker-entrypoint-initdb.d"
       - postgres_data:/var/lib/postgresql
     networks:
       - AidRequestsSystem_networks

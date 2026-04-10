@@ -1,7 +1,8 @@
 # AidRequestsSystem
-<img width="1551" height="661" alt="image" src="https://github.com/user-attachments/assets/6b37a889-39dc-445f-ab59-195addd34274" />
+<img width="1463" height="650" alt="image" src="https://github.com/user-attachments/assets/ae09fc86-b388-412b-b9b4-555a930a031a" />
 
-<img width="1542" height="652" alt="image" src="https://github.com/user-attachments/assets/16a20c06-adae-4cc3-9446-7deed845a2ca" />
+
+<img width="1420" height="610" alt="image" src="https://github.com/user-attachments/assets/830c1979-23df-488a-9f1f-4055ed583081" />
 
 
 <img width="1918" height="874" alt="image" src="https://github.com/user-attachments/assets/56e186fa-1aa2-4d56-b0d1-a74ae6dec616" />

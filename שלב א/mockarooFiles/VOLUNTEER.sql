@@ -1,3 +1,4 @@
+SET session_replication_role = 'replica';
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (258706748, 'Sharia', 'Van Halle', '058-8397512', true, 'Available', 548, 'Hydraulic Tools Expert', 31.922163, 35.824664);
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (248895887, 'Janis', 'Woolis', '056-2809624', true, 'Available', 246, 'Water & Medical Supply Delivery', 31.815755, 34.766653);
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (278888315, 'Inna', 'Robertazzi', '052-3752491', false, 'Busy', 701, 'Water & Medical Supply Delivery', 31.000808, 35.074777);
@@ -498,3 +499,4 @@ insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_eq
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (270222279, 'Constantino', 'Chelley', '052-8219172', false, 'Offline', 505, 'Heavy Duty Locksmith (MAMAD Specialist)', 32.925785, 34.960486);
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (314279567, 'Arden', 'Burnel', '058-6221372', false, 'Available', 31, 'Professional Plumber (Pipe Bursts)', 32.042754, 35.055393);
 insert into VOLUNTEER (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) values (321249939, 'Ibrahim', 'Gulberg', '050-0786552', false, 'Busy', 70, 'Water & Medical Supply Delivery', 32.289599, 35.944024);
+SET session_replication_role = 'origin';

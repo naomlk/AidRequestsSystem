@@ -32,7 +32,6 @@ CREATE TABLE FAMILY (
     ContactPerson_id INT PRIMARY KEY,
     ContactPerson_name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
-    address VARCHAR(255),
     -- Constraint: A family must have at least one member
     number_of_members INT CHECK (number_of_members > 0),
     special_features TEXT

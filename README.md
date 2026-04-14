@@ -1,4 +1,12 @@
 # AidRequestsSystem
+
+# דוח פרויקט: מערכת ניהול בקשות סיוע - ידידים (Yedidim)
+
+## שער
+**שמות המגישים:** נעמי מלכה ואושרית פרץ
+**מערכת:** AidRequestsSystem (מערכת לניהול קריאות סיוע לוגיסטי והומניטרי)
+**יחידה נבחרת:** סיוע למשפחות.
+
 <img width="1418" height="669" alt="image" src="https://github.com/user-attachments/assets/3ae6ce8d-b7cc-4da6-a6ee-0d385e563343" />
 
 

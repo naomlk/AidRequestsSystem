@@ -20,9 +20,9 @@ def generate_data():
             
             # 1. REQUEST
             sql_req = (f"INSERT INTO REQUEST (Request_id, date, image, incident_description, "
-                       f"prioriry_level, ContactPerson_id, Category_id, treatment_id, status_id, latitude, longitude) "
+                       f"prioriry_level, ContactPerson_id, Category_id, status_id, latitude, longitude) "
                        f"VALUES ({i}, '{date}', 'req_{i}.jpg', 'Assistance needed #{i}', {priority}, "
-                       f"{f_id}, {cat_id}, {i}, {stat_id}, {lat}, {lon});\n")
+                       f"{f_id}, {cat_id}, {stat_id}, {lat}, {lon});\n")
             f.write(sql_req)
 
             # 2.  DELIVERY (Optional)
@@ -40,15 +40,15 @@ def generate_data():
             start_hour = random.randint(7, 19)
             start_min = random.randint(0, 59)
             duration = random.randint(30, 120)
-            start_time = datetime.strptime(f"{start_hour}:{start_min}", "%H:%M")
-            end_time = start_time + timedelta(minutes=duration)
+            start_time_dt = datetime.strptime(f"{start_hour}:{start_min}", "%H:%M")
+            end_time_dt = start_time_dt + timedelta(minutes=duration)
             v_id = random.randint(200000000, 399999999)
             
             sql_treat = (f"INSERT INTO TREATMENT (treatment_id, date, start_time, completion_time, "
-                         f"feedback_notes, photo_after, delivery_id, volunteer_id) "
-                         f"VALUES ({i}, '{date}', '{start_time.strftime('%H:%M:%S')}', "
-                         f"'{end_time.strftime('%H:%M:%S')}', 'Mission #{i} completed', "
-                         f"'after_{i}.jpg', {d_id}, {v_id});\n")
+                         f"feedback_notes, photo_after, delivery_id, volunteer_id, request_id) "
+                         f"VALUES ({i}, '{date}', '{start_time_dt.strftime('%H:%M:%S')}', "
+                         f"'{end_time_dt.strftime('%H:%M:%S')}', 'Mission #{i} completed', "
+                         f"'after_{i}.jpg', {d_id}, {v_id}, {i});\n")
             f.write(sql_treat)
 
         f.write("\nSET session_replication_role = 'origin';\n")

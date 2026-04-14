@@ -1,10 +1,10 @@
-Project Report: Family Aid Request Management System - Yedidim
+**Project Report: Family Aid Request Management System - Yedidim**
 
 Submitters: Naomi Malka & Oshrit Peretz
 System: Yedidim
 Module: Family Assistance Unit
 
-Introduction
+***Introduction***
 The "Yedidim" Family Aid System is a specialized branch of the broader Yedidim organization, dedicated to providing immediate logistical and humanitarian support to families in crisis. This system centralizes the management of urgent requests, enabling efficient family registration and strategic volunteer deployment based on professional skills and real-time geographic data. By tracking every request from inception to completion, the platform ensures that vital assistance is delivered precisely where it is needed most.
 
 A core focus of this system is to support vulnerable families during times of war, national crises, or severe hardship. During these challenging periods, the system prioritizes essential maintenance and logistical aid to ensure the safety and well-being of those who lack the resources to cope with emergency infrastructure failures or supply shortages.

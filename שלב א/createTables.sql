@@ -94,7 +94,8 @@ CREATE TABLE TREATMENT (
     feedback_notes TEXT,
     photo_after VARCHAR(255),
     delivery_id INT REFERENCES DELIVERY(delivery_id),
-    volunteer_id INT REFERENCES VOLUNTEER(volunteer_id)
+    volunteer_id INT REFERENCES VOLUNTEER(volunteer_id),
+    request_id INT REFERENCES REQUEST(request_id)
 );
 
 

@@ -10,7 +10,7 @@ def generate_data():
         f.write("SET session_replication_role = 'replica';\n\n")
         
         for i in range(1, NUM_ROWS + 1):
-            date = (datetime(2026, 1, 1) + timedelta(days=random.randint(0, 100))).date()
+            date = (datetime(2024, 1, 1) + timedelta(days=random.randint(0, 850))).date()
             f_id = random.randint(200000000, 399999999) 
             cat_id = random.randint(1, 4)
             stat_id = random.randint(1, 4)
@@ -31,7 +31,6 @@ def generate_data():
                 d_id = i
                 items = random.choice(['Water Packs', 'Medical Oxygen', 'Vital Medicines', 'Food Basket'])
                 qty = random.randint(1, 5)
-                # On utilise les colonnes exactes : delivery_id, date, status, item_type, quantity, Request_id
                 sql_del = (f"INSERT INTO DELIVERY (delivery_id, date, status, item_type, quantity, Request_id) "
                            f"VALUES ({d_id}, '{date}', 'Delivered', '{items}', {qty}, {i});\n")
                 f.write(sql_del)

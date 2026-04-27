@@ -70,11 +70,11 @@ Automated Python Scripting : A custom Python script (generate_data.py) was devel
 <img width="388" height="298" alt="image" src="https://github.com/user-attachments/assets/8e07045a-cdaf-45f2-9e49-bfbfcf836d8f" />
 
 
-## Stage 1 
+## Stage 2 
 
 ## Queries Documentation 
 
-1. Top 15 Families by Number of Requests
+### 1. Top 15 Families by Number of Requests 
 Description: This query identifies the families that have requested assistance the most. It helps the organization prioritize support for families with recurring needs.
    
 <img width="1195" height="333" alt="image" src="https://github.com/user-attachments/assets/911ebd1d-33fa-47ec-b4da-0c688550b7a2" />

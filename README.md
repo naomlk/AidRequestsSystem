@@ -169,7 +169,8 @@ Description: Identifies and removes volunteers with no recorded activity in the 
 ### 2. Deleting not used locations
 Description: Purges orphaned geographic records from the LOCATION table that are no longer associated with any registered family or service request. 
 
-<img width="1158" height="307" alt="image" src="https://github.com/user-attachments/assets/6c1019ee-d23b-471f-a8e7-5cce56c0984a" />
+<img width="1204" height="345" alt="image" src="https://github.com/user-attachments/assets/a8314d60-a419-448f-9189-798aad19214b" />
+
 
 
 ## Update queries 

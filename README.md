@@ -83,9 +83,9 @@ Description: This query identifies the families that have requested assistance t
 
 Version 1 (JOIN) is much more efficient than Version 2 (Subquery).
 Speed: Version 1 processes all data in one single operation, while Version 2 repeats the search 20,000 times (once for every row).
-Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data.
+Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data. 
 
-2. Critical Pending Requests (Priority 4 & 5)
+### 2. Critical Pending Requests (Priority 4 & 5) 
 Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
 
 <img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" />
@@ -95,12 +95,12 @@ Description: A vital operational query that lists all high-priority emergency re
 Version 1 (JOIN) is generally more efficient than Version 2.
 Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
 Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
-Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name.
+Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
 
 
 
 
-3. Filtered Treatments by Specific Date Range
+### 3. Filtered Treatments by Specific Date Range 
 Description: Retrieves all completed interventions within a specific month. Useful for generating monthly activity reports.
 
 <img width="1179" height="250" alt="image" src="https://github.com/user-attachments/assets/4fcecb99-f2cf-48c6-9f3a-5122a15caca1" />
@@ -113,7 +113,7 @@ Speed: In Version 2, the database must calculate the month and year for every si
 Performance: Version 1 points directly to a specific "block" of time, while Version 2 forced the database to scan the entire table.
 
 
-4. Volunteers Without Equipment
+### 4. Volunteers Without Equipment 
 Description: Lists volunteers who do not have their own tools. This helps coordinators know who needs to be supplied with equipment before a mission.
 
 <img width="1188" height="287" alt="image" src="https://github.com/user-attachments/assets/4677707c-fb48-43f3-b2b7-08befd63428b" />
@@ -123,10 +123,10 @@ Description: Lists volunteers who do not have their own tools. This helps coordi
 Version 1 (WHERE) is much more efficient than Version 2 (EXCEPT).
 Simplicity: Version 1 performs a single, direct check on one column. Version 2 forces the database to run two separate queries and then compare the results to find differences.
 Resources: Version 1 is very fast and uses minimal memory. Version 2 is much heavier because it has to sort and "subtract" one list from another, which is unnecessary work for this task.
-Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables.
+Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
 
 
-5. Top Performing Volunteers (Above Average Activity)
+### 5. Top Performing Volunteers (Above Average Activity) 
 Description: An analytical query using a subquery to find volunteers whose number of completed missions is higher than the general average.
 
 <img width="1165" height="257" alt="image" src="https://github.com/user-attachments/assets/34378d1b-cf8b-4f22-8240-9e5535e59a19" />
@@ -134,7 +134,7 @@ Description: An analytical query using a subquery to find volunteers whose numbe
 
 
 
-6. Monthly Requests Summary
+### 6. Monthly Requests Summary 
 Description: Provides a high-level overview of the workload per month and year, allowing the organization to see seasonal trends in aid requests.
 
 <img width="1117" height="285" alt="image" src="https://github.com/user-attachments/assets/bcb74688-2990-43ba-ae12-ea2468e3ecc8" />
@@ -142,14 +142,14 @@ Description: Provides a high-level overview of the workload per month and year, 
 
 
 
-7. Geographic Distribution by City
+### 7. Geographic Distribution by City 
 Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
 
 <img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" />
 <img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
 
 
-8. Top Volunteers by Request Category
+### 8. Top Volunteers by Request Category 
 Description: An advanced query using a CTE (Common Table Expression) to identify the "lead volunteer" for each specific category (e.g., the person who did the most plumbing vs. the most logistics).
 
 <img width="974" height="593" alt="image" src="https://github.com/user-attachments/assets/dfe49e9b-61f5-4b4d-8466-658f40f0fe2a" />

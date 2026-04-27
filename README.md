@@ -4,6 +4,7 @@ Submitters: Naomi Malka & Oshrit Peretz
 System: Yedidim  
 Module: Family Assistance Unit  
 
+## Stage 1
 ## Introduction
 The "Yedidim" Family Aid System is a specialized branch of the broader Yedidim organization, dedicated to providing immediate logistical and humanitarian support to families in crisis. This system centralizes the management of urgent requests, enabling efficient family registration and strategic volunteer deployment based on professional skills and real-time geographic data. By tracking every request from inception to completion, the platform ensures that vital assistance is delivered precisely where it is needed most.
 
@@ -69,5 +70,91 @@ Automated Python Scripting : A custom Python script (generate_data.py) was devel
 <img width="388" height="298" alt="image" src="https://github.com/user-attachments/assets/8e07045a-cdaf-45f2-9e49-bfbfcf836d8f" />
 
 
+## Stage 2 
+
+## Queries Documentation 
+
+### 1. Top 15 Families by Number of Requests 
+Description: This query identifies the families that have requested assistance the most. It helps the organization prioritize support for families with recurring needs.
    
+<img width="1195" height="333" alt="image" src="https://github.com/user-attachments/assets/911ebd1d-33fa-47ec-b4da-0c688550b7a2" />
+<img width="1181" height="332" alt="image" src="https://github.com/user-attachments/assets/b98c4b9d-5076-40de-9220-5a8c8ca2bf5e" />
+<img width="611" height="264" alt="image" src="https://github.com/user-attachments/assets/a643c422-0ca2-4d88-acfc-f96e9f9c78e4" />
+
+Version 1 (JOIN) is much more efficient than Version 2 (Subquery).
+Speed: Version 1 processes all data in one single operation, while Version 2 repeats the search 20,000 times (once for every row).
+Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data. 
+
+### 2. Critical Pending Requests (Priority 4 & 5) 
+Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
+
+<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" />
+<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" />
+<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
+
+Version 1 (JOIN) is generally more efficient than Version 2.
+Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
+Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
+Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
+
+
+
+
+### 3. Filtered Treatments by Specific Date Range 
+Description: Retrieves all completed interventions within a specific month. Useful for generating monthly activity reports.
+
+<img width="1179" height="250" alt="image" src="https://github.com/user-attachments/assets/4fcecb99-f2cf-48c6-9f3a-5122a15caca1" />
+<img width="1166" height="251" alt="image" src="https://github.com/user-attachments/assets/20ee4813-73e4-4305-b0bc-b0922d45f69e" />
+<img width="713" height="275" alt="image" src="https://github.com/user-attachments/assets/362ce76e-2282-4e9b-8e81-0b66fceedebb" />
+
+Version 1 (BETWEEN) is much more efficient than Version 2 (EXTRACT).
+Indexing: Version 1 allows the database to use an Index on the date column, which makes the search nearly instant.
+Speed: In Version 2, the database must calculate the month and year for every single one of your 20,000 rows, which is much slower and uses more CPU.
+Performance: Version 1 points directly to a specific "block" of time, while Version 2 forced the database to scan the entire table.
+
+
+### 4. Volunteers Without Equipment 
+Description: Lists volunteers who do not have their own tools. This helps coordinators know who needs to be supplied with equipment before a mission.
+
+<img width="1188" height="287" alt="image" src="https://github.com/user-attachments/assets/4677707c-fb48-43f3-b2b7-08befd63428b" />
+<img width="1188" height="280" alt="image" src="https://github.com/user-attachments/assets/9196f030-042a-4cbc-8b74-c104cbeff2c1" />
+<img width="755" height="265" alt="image" src="https://github.com/user-attachments/assets/3252e5ce-9d22-4a8a-9677-3b139e12fd9d" />
+
+Version 1 (WHERE) is much more efficient than Version 2 (EXCEPT).
+Simplicity: Version 1 performs a single, direct check on one column. Version 2 forces the database to run two separate queries and then compare the results to find differences.
+Resources: Version 1 is very fast and uses minimal memory. Version 2 is much heavier because it has to sort and "subtract" one list from another, which is unnecessary work for this task.
+Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
+
+
+### 5. Top Performing Volunteers (Above Average Activity) 
+Description: An analytical query using a subquery to find volunteers whose number of completed missions is higher than the general average.
+
+<img width="1165" height="257" alt="image" src="https://github.com/user-attachments/assets/34378d1b-cf8b-4f22-8240-9e5535e59a19" />
+<img width="658" height="258" alt="image" src="https://github.com/user-attachments/assets/f755995b-8202-4b01-9660-de0ac8c37ab8" />
+
+
+
+### 6. Monthly Requests Summary 
+Description: Provides a high-level overview of the workload per month and year, allowing the organization to see seasonal trends in aid requests.
+
+<img width="1117" height="285" alt="image" src="https://github.com/user-attachments/assets/bcb74688-2990-43ba-ae12-ea2468e3ecc8" />
+<img width="476" height="268" alt="image" src="https://github.com/user-attachments/assets/0eb94255-fab7-4ebd-84ec-3d63d8c325f3" />
+
+
+
+### 7. Geographic Distribution by City 
+Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
+
+<img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" />
+<img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
+
+
+### 8. Top Volunteers by Request Category 
+Description: An advanced query using a CTE (Common Table Expression) to identify the "lead volunteer" for each specific category (e.g., the person who did the most plumbing vs. the most logistics).
+
+<img width="974" height="593" alt="image" src="https://github.com/user-attachments/assets/dfe49e9b-61f5-4b4d-8466-658f40f0fe2a" />
+<img width="700" height="269" alt="image" src="https://github.com/user-attachments/assets/33cde85a-3e65-44b1-b206-6cb1177a45a9" />
+
+
+
 

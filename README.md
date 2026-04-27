@@ -167,4 +167,12 @@ Description: Identifies and removes volunteers with no recorded activity in the 
 <img width="1562" height="295" alt="image" src="https://github.com/user-attachments/assets/5a5419d6-4117-4612-98e9-25ce75d44df6" /> 
 
 
+## Update queries 
 
+### 1. Updates the request status to Completed
+Description: Updates the request status to 3 (Completed) for all missions that have a recorded completion time in the treatment table. 
+
+<img width="1561" height="247" alt="image" src="https://github.com/user-attachments/assets/5978763b-645b-4dd0-af69-4e841ab284f8" />
+<img width="1559" height="287" alt="image" src="https://github.com/user-attachments/assets/7ef9e1fe-d2e0-453d-97f4-f782877ec5bb" />
+<img width="1240" height="434" alt="image" src="https://github.com/user-attachments/assets/837e0813-cfb7-440b-bab2-8f4076dce5db" />
+<img width="1560" height="291" alt="image" src="https://github.com/user-attachments/assets/ddecbc3e-435c-4834-9001-d73ff9819ced" />

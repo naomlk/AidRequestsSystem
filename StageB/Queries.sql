@@ -118,6 +118,35 @@ WHERE volunteer_id NOT IN (
     WHERE date > CURRENT_DATE - INTERVAL '1 year'
 );
 
+--Deleting not used locations
+DELETE FROM LOCATION
+WHERE (latitude, longitude) NOT IN (
+    SELECT latitude, longitude FROM VOLUNTEER
+)
+AND (latitude, longitude) NOT IN (
+    SELECT latitude, longitude FROM REQUEST
+);
+
+
+--Deleting cancelled requests
+DELETE FROM REQUEST
+WHERE status_id = 4
+AND Request_id NOT IN (SELECT request_id FROM TREATMENT);
+
+
+
+--Updates the request status to 3 (Completed)
+UPDATE REQUEST
+SET status_id = 3
+WHERE Request_id IN (
+    SELECT request_id 
+    FROM TREATMENT 
+    WHERE completion_time IS NOT NULL
+);
+
+
+
+
 
 /* a ajouter si on remet la base de donnees a zero
 UPDATE request r

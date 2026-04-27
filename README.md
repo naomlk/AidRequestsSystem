@@ -156,5 +156,14 @@ Description: An advanced query using a CTE (Common Table Expression) to identify
 <img width="700" height="269" alt="image" src="https://github.com/user-attachments/assets/33cde85a-3e65-44b1-b206-6cb1177a45a9" />
 
 
+## Delete queries 
+
+### 1. Removing Inactive Volunteers (No Activity for 1 Year)
+Description: Identifies and removes volunteers with no recorded activity in the last 12 months to ensure a high-quality, active database. 
+
+<img width="1566" height="306" alt="image" src="https://github.com/user-attachments/assets/9f40ab31-fed0-4790-9532-afae6e0de486" />
+<img width="1220" height="393" alt="image" src="https://github.com/user-attachments/assets/82b4624a-0c66-4e54-b8f2-e90848ec4036" />
+<img width="1562" height="295" alt="image" src="https://github.com/user-attachments/assets/5a5419d6-4117-4612-98e9-25ce75d44df6" />
+
 
 

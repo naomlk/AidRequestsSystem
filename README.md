@@ -174,7 +174,11 @@ Description: Purges orphaned geographic records from the LOCATION table that are
 <img width="1212" height="350" alt="image" src="https://github.com/user-attachments/assets/56d02deb-758c-45d4-9d6e-d6087231b534" />
 
 
-
+### 3. Deleting cancelled requests
+Description: Purges cancelled requests with no associated treatment records
+<img width="1533" height="279" alt="image" src="https://github.com/user-attachments/assets/25e37adb-bb82-4df3-ae7d-81812a01c3a4" />
+<img width="935" height="519" alt="image" src="https://github.com/user-attachments/assets/b3d04d88-9844-4668-b75d-302a8267e328" />
+<img width="1565" height="255" alt="image" src="https://github.com/user-attachments/assets/6819c5d8-f7a5-4be6-b8ac-1509846ec8c7" />
 
 ## Update queries 
 
@@ -185,3 +189,5 @@ Description: Updates the request status to 3 (Completed) for all missions that h
 <img width="1559" height="287" alt="image" src="https://github.com/user-attachments/assets/7ef9e1fe-d2e0-453d-97f4-f782877ec5bb" />
 <img width="1240" height="434" alt="image" src="https://github.com/user-attachments/assets/837e0813-cfb7-440b-bab2-8f4076dce5db" />
 <img width="1560" height="291" alt="image" src="https://github.com/user-attachments/assets/ddecbc3e-435c-4834-9001-d73ff9819ced" />
+
+

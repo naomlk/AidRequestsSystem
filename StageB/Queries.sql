@@ -146,6 +146,14 @@ WHERE Request_id IN (
 
 
 
+--update treatment's count of each volunteer
+UPDATE volunteer v
+SET counter = (
+    SELECT COUNT(*)
+    FROM treatment t
+    WHERE t.volunteer_id = v.volunteer_id
+);
+
 
 
 /* a ajouter si on remet la base de donnees a zero

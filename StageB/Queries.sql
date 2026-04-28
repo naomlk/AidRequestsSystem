@@ -55,7 +55,7 @@ ORDER BY last_name ASC;
 --version 2
 SELECT first_name, last_name, phone_number
 FROM VOLUNTEER
-EXCEPT
+EXCEPT                                              --EXCEPT = MINUS
 SELECT first_name, last_name, phone_number
 FROM VOLUNTEER
 WHERE has_equipment = true

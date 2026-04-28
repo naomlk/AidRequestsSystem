@@ -193,4 +193,7 @@ Description: Updates the request status to 3 (Completed) for all missions that h
 
 ### 2. Updates the count of treatment of volunteers
 Description: Updates each volunteer’s mission counter by calculating the total number of treatments they have completed.
+<img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/c8e89683-f75a-4906-b255-f8723a48cb07" />
+<img width="805" height="166" alt="Capture d’écran 2026-04-28 095125" src="https://github.com/user-attachments/assets/f0edf925-9208-4389-bc4e-599f00b7ee68" />
+
 

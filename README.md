@@ -191,5 +191,6 @@ Description: Updates the request status to 3 (Completed) for all missions that h
 <img width="1560" height="291" alt="image" src="https://github.com/user-attachments/assets/ddecbc3e-435c-4834-9001-d73ff9819ced" />
 
 
-### 2.Updates the count of treatment of volunteers
+### 2. Updates the count of treatment of volunteers
+Description: Updates each volunteer’s mission counter by calculating the total number of treatments they have completed.
 

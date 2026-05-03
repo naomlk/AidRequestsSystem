@@ -226,7 +226,15 @@ After ROLLBACK, they reappear.
 
 # Commit
 Description: we perform an update and use COMMIT to permanently save the changes.
+Before changes:
 
+<img width="878" height="168" alt="image" src="https://github.com/user-attachments/assets/ed2e2ee8-1aca-479e-bd12-e4abdd1a1ff2" />
+
+The UPDATE modifies the description of a category ('repairs instead of 'Repairs').
+
+<img width="819" height="210" alt="image" src="https://github.com/user-attachments/assets/07b55ac6-ecfa-4740-b6a3-8d2b9cafe918" />
+Running the query again will still show the updated value.
+<img width="910" height="297" alt="image" src="https://github.com/user-attachments/assets/c4ec49d7-5e9a-4be8-961f-8b2d4edb9567" />
 
 
 

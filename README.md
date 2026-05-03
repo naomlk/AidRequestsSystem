@@ -163,6 +163,13 @@ Description: This query retrieves all assistance requests submitted within the N
 <img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
 
 
+### 10. Elite Volunteer Service Report (>100km) 
+Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
+
+<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
+<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
+
+
 
 
 ## Delete queries 

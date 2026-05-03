@@ -126,7 +126,14 @@ Resources: Version 1 is very fast and uses minimal memory. Version 2 is much hea
 Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
 
 
-### 5. Top Performing Volunteers (Above Average Activity) 
+### 5. Elite Volunteer Service Report (>100km) 
+Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
+
+<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
+<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
+
+
+### 6. Top Performing Volunteers (Above Average Activity) 
 Description: An analytical query using a subquery to find volunteers whose number of completed missions is higher than the general average.
 
 <img width="1165" height="257" alt="image" src="https://github.com/user-attachments/assets/34378d1b-cf8b-4f22-8240-9e5535e59a19" /> 
@@ -134,7 +141,7 @@ Description: An analytical query using a subquery to find volunteers whose numbe
 
 
 
-### 6. Monthly Requests Summary 
+### 7. Monthly Requests Summary 
 Description: Provides a high-level overview of the workload per month and year, allowing the organization to see seasonal trends in aid requests.
 
 <img width="1117" height="285" alt="image" src="https://github.com/user-attachments/assets/bcb74688-2990-43ba-ae12-ea2468e3ecc8" /> 
@@ -142,32 +149,32 @@ Description: Provides a high-level overview of the workload per month and year, 
 
 
 
-### 7. Geographic Distribution by City 
+### 8. Geographic Distribution by City 
 Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
 
 <img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" /> 
 <img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
 
 
-### 8. Top Volunteers by Request Category 
-Description: An advanced query using a CTE (Common Table Expression) to identify the "lead volunteer" for each specific category (e.g., the person who did the most plumbing vs. the most logistics).
 
-<img width="974" height="593" alt="image" src="https://github.com/user-attachments/assets/dfe49e9b-61f5-4b4d-8466-658f40f0fe2a" /> 
-<img width="700" height="269" alt="image" src="https://github.com/user-attachments/assets/33cde85a-3e65-44b1-b206-6cb1177a45a9" />
 
 
 ### 9. 2026 Northern Region Service Requests 
 Description: This query retrieves all assistance requests submitted within the Northern region of Israel during the current year. It filters locations by latitude (32.3°N and above) and joins with the city database to provide a clear overview of recent emergency activity in northern urban centers.
 
 <img width="1242" height="280" alt="image" src="https://github.com/user-attachments/assets/95e05c2b-836c-4aa8-951c-e349d711e755" />
+<img width="1443" height="380" alt="image" src="https://github.com/user-attachments/assets/5fd34a6c-a0ef-44c9-a9de-9c621f646734" />
+
 <img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
 
+JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
+Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
 
-### 10. Elite Volunteer Service Report (>100km) 
-Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
+The JOIN is more efficient.
+Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
+Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
+Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
 
-<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
-<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
 
 
 

@@ -85,18 +85,22 @@ Version 1 (JOIN) is much more efficient than Version 2 (Subquery).
 Speed: Version 1 processes all data in one single operation, while Version 2 repeats the search 20,000 times (once for every row).
 Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data. 
 
-### 2. Critical Pending Requests (Priority 4 & 5) 
-Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
 
-<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
-<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
-<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
+### 2. 2026 Northern Region Service Requests 
+Description: This query retrieves all assistance requests submitted within the Northern region of Israel during the current year. It filters locations by latitude (32.3°N and above) and joins with the city database to provide a clear overview of recent emergency activity in northern urban centers.
 
-Version 1 (JOIN) is generally more efficient than Version 2.
-Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
-Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
-Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
+<img width="1242" height="280" alt="image" src="https://github.com/user-attachments/assets/95e05c2b-836c-4aa8-951c-e349d711e755" />
+<img width="1443" height="380" alt="image" src="https://github.com/user-attachments/assets/5fd34a6c-a0ef-44c9-a9de-9c621f646734" />
 
+<img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
+
+JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
+Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
+
+The JOIN is more efficient.
+Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
+Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
+Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
 
 
 
@@ -126,7 +130,14 @@ Resources: Version 1 is very fast and uses minimal memory. Version 2 is much hea
 Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
 
 
-### 5. Top Performing Volunteers (Above Average Activity) 
+### 5. Elite Volunteer Service Report (>100km) 
+Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
+
+<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
+<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
+
+
+### 6. Top Performing Volunteers (Above Average Activity) 
 Description: An analytical query using a subquery to find volunteers whose number of completed missions is higher than the general average.
 
 <img width="1165" height="257" alt="image" src="https://github.com/user-attachments/assets/34378d1b-cf8b-4f22-8240-9e5535e59a19" /> 
@@ -134,7 +145,7 @@ Description: An analytical query using a subquery to find volunteers whose numbe
 
 
 
-### 6. Monthly Requests Summary 
+### 7. Monthly Requests Summary 
 Description: Provides a high-level overview of the workload per month and year, allowing the organization to see seasonal trends in aid requests.
 
 <img width="1117" height="285" alt="image" src="https://github.com/user-attachments/assets/bcb74688-2990-43ba-ae12-ea2468e3ecc8" /> 
@@ -142,18 +153,30 @@ Description: Provides a high-level overview of the workload per month and year, 
 
 
 
-### 7. Geographic Distribution by City 
+### 8. Geographic Distribution by City 
 Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
 
 <img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" /> 
 <img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
 
 
-### 8. Top Volunteers by Request Category 
-Description: An advanced query using a CTE (Common Table Expression) to identify the "lead volunteer" for each specific category (e.g., the person who did the most plumbing vs. the most logistics).
 
-<img width="974" height="593" alt="image" src="https://github.com/user-attachments/assets/dfe49e9b-61f5-4b4d-8466-658f40f0fe2a" /> 
-<img width="700" height="269" alt="image" src="https://github.com/user-attachments/assets/33cde85a-3e65-44b1-b206-6cb1177a45a9" />
+### 9. Critical Pending Requests (Priority 4 & 5) 
+Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
+
+<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
+<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
+<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
+
+Version 1 (JOIN) is generally more efficient than Version 2.
+Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
+Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
+Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
+
+
+
+
+
 
 
 ## Delete queries 
@@ -182,7 +205,13 @@ Description: Purges cancelled requests with no associated treatment records
 
 ## Update queries 
 
-### 1. Updates the request status to Completed
+### 1. Request Priority Escalation
+Description: Increases the priority level of pending requests older than 2 days.
+<img width="1569" height="276" alt="image" src="https://github.com/user-attachments/assets/9da74140-9742-4283-bfba-4f78239914e4" />
+<img width="1249" height="320" alt="image" src="https://github.com/user-attachments/assets/94dd6066-9ecd-422e-9704-e08a67dbe8d2" />
+<img width="1497" height="286" alt="image" src="https://github.com/user-attachments/assets/a1664fc0-16a0-4c5c-b42d-2ca99c6ce6ab" />
+
+### 2. Updates the request status to Completed
 Description: Updates the request status to 3 (Completed) for all missions that have a recorded completion time in the treatment table. 
 
 <img width="1561" height="247" alt="image" src="https://github.com/user-attachments/assets/5978763b-645b-4dd0-af69-4e841ab284f8" />
@@ -191,11 +220,13 @@ Description: Updates the request status to 3 (Completed) for all missions that h
 <img width="1560" height="291" alt="image" src="https://github.com/user-attachments/assets/ddecbc3e-435c-4834-9001-d73ff9819ced" />
 
 
-### 2. Updates the count of treatment of volunteers
+### 3. Updates the count of treatment of volunteers
 Description: Updates each volunteer’s mission counter by calculating the total number of treatments they have completed.
 <img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/d0a42e80-fa60-4bde-89d6-52f4861be85a" />
 <img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/c8e89683-f75a-4906-b255-f8723a48cb07" />
 <img width="805" height="166" alt="Capture d’écran 2026-04-28 095125" src="https://github.com/user-attachments/assets/f0edf925-9208-4389-bc4e-599f00b7ee68" />
+
+
 
 ## Commit And Rollback
 The purpose of this section is to demonstrate the difference between the ROLLBACK and COMMIT commands in PostgreSQL transactions.

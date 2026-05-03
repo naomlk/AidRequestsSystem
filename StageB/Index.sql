@@ -3,7 +3,7 @@
 
 
 
---2)index sur ttes les ligne
+--1)index sur ttes les ligne
 CREATE INDEX idx_treatment_volunteer
 ON treatment(volunteer_id);
 -- important car a chaque fois ou on fait where t.volunteer_id=v.volunteer_id  alors on aura deja
@@ -15,7 +15,7 @@ ON treatment(volunteer_id);
 -- et cherhcehr ds les ligne que lindex renvoient de treatment si le volunteer_id corepond
 
 
---3)
+--2)
 CREATE INDEX idx_volunteer_status_location
 ON volunteer(availability_status, latitude, longitude);
 -- ca va nous aider pour les requetes qui cherchent des volontaires dispo ds un perimetre donne autour
@@ -27,7 +27,7 @@ ON volunteer(availability_status, latitude, longitude);
 --                                                / | \
 --          longitude:latitude                 10  45 85
 
---4)
+--3)
 CREATE INDEX idx_treatment_volunteer_date
 ON treatment(volunteer_id, date);
 

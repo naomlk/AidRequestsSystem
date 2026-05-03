@@ -1,5 +1,3 @@
--- tout focntionne (les changemet qui ont ete fait avec commit jai refait un commit deriere pour les
--- annuler et pas modifier la db)
 
 ---------------------------------------
 ------------ ROLLBACK------------------
@@ -9,7 +7,7 @@ BEGIN;
 -- Before change
 SELECT city, longitude, latitude
 FROM location
-WHERE city = 'Jerusalem' AND longitude =34.142932;   -- chsoir une ligne specifique
+WHERE city = 'Jerusalem' AND longitude =34.142932;   
 
 -- Change
 UPDATE location
@@ -100,11 +98,11 @@ AND NOT EXISTS (
 
 
 ------------------------------------
----------- COMMIT ------------------(COMMIT valide TOUS les changements depuis le dernier BEGIN)
+---------- COMMIT ------------------
 BEGIN;
 
 UPDATE requestcategory
-SET description = 'Critical Repairs like main pipe bursts or total electrical failure'    -- changer repairs to Repairs pour voir
+SET description = 'Critical Repairs like main pipe bursts or total electrical failure'   
 WHERE category_id = 1;
 
 COMMIT;

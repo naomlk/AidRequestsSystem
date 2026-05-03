@@ -4,8 +4,8 @@
 -------------------------
 -- priority level is an integer between 1 and 5
 ALTER TABLE request
-ADD CONSTRAINT chk_priority_level
-CHECK (priority_level BETWEEN 1 AND 5);
+ADD CONSTRAINT chk_prioriry_level
+CHECK (prioriry_level BETWEEN 1 AND 5);
 
 
 
@@ -16,7 +16,11 @@ CHECK (priority_level BETWEEN 1 AND 5);
 
 ALTER TABLE location
 ADD CONSTRAINT chk_coordinates
-CHECK (latitude BETWEEN -200 AND 200 AND longitude BETWEEN -380 AND 380);
+CHECK (
+    latitude BETWEEN 29.0 AND 34.0 
+    AND 
+    longitude BETWEEN 34.0 AND 36.0
+);
 
 -------------------------
 -- TREATMENT TABLE ------
@@ -36,11 +40,3 @@ CHECK (
     completion_time IS NULL OR completion_time >= start_time
 );
 
-
-ALTER TABLE treatment
-ADD CONSTRAINT chk_treatment_completed_has_completion_time
-CHECK (
-    (status_id = 3 AND completion_time IS NOT NULL)     -- completed treatment and finish time
-    OR
-    (status_id <> 3)          -- or not completed treatment and finish time is optional
-);

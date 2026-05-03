@@ -197,4 +197,32 @@ Description: Updates each volunteer’s mission counter by calculating the total
 <img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/c8e89683-f75a-4906-b255-f8723a48cb07" />
 <img width="805" height="166" alt="Capture d’écran 2026-04-28 095125" src="https://github.com/user-attachments/assets/f0edf925-9208-4389-bc4e-599f00b7ee68" />
 
+## Commit And Rollback
+The purpose of this section is to demonstrate the difference between the ROLLBACK and COMMIT commands in PostgreSQL transactions.
+
+# ROLLBACK
+Description: we perform data modifications (UPDATE and DELETE) and then use ROLLBACK to cancel these changes and restore the database to its previous state.
+
+1.Update
+<img width="613" height="129" alt="image" src="https://github.com/user-attachments/assets/94e6492a-065b-425b-bd93-bd42d2fca646" />
+<img width="946" height="473" alt="image" src="https://github.com/user-attachments/assets/3e992d26-ca30-4a93-8e06-3e989eb7b921" />
+<img width="763" height="189" alt="image" src="https://github.com/user-attachments/assets/6881fbef-b3d1-4f3a-b722-9c0840748b81" />
+Before the UPDATE, we observe the original values.After the UPDATE, the coordinates are modified.After ROLLBACK, the data returns to its original state.
+<img width="961" height="161" alt="image" src="https://github.com/user-attachments/assets/3715edd9-244a-4886-89be-6c8eaeb31950" />
+There is no line with the values we changed with Rollback because he not saved them
+
+2.Delete
+We first identify inactive volunteers.
+<img width="677" height="345" alt="image" src="https://github.com/user-attachments/assets/091daaf2-451e-480d-aff9-15d643491656" />
+Then we delete them.
+<img width="813" height="446" alt="image" src="https://github.com/user-attachments/assets/f5ffe4d6-f257-4b91-bccd-90949658d5ee" />
+
+After deletion, they no longer appear in the query.
+After ROLLBACK, they reappear.
+# COMMIT
+Description: we perform an update and use COMMIT to permanently save the changes.
+
+
+
+
 

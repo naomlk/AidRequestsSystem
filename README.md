@@ -200,7 +200,7 @@ Description: Updates each volunteer’s mission counter by calculating the total
 ## Commit And Rollback
 The purpose of this section is to demonstrate the difference between the ROLLBACK and COMMIT commands in PostgreSQL transactions.
 
-# ROLLBACK
+# Rollback
 Description: we perform data modifications (UPDATE and DELETE) and then use ROLLBACK to cancel these changes and restore the database to its previous state.
 
 1.Update
@@ -224,7 +224,7 @@ After deletion, they no longer appear in the query.
 After ROLLBACK, they reappear.
 <img width="1005" height="607" alt="image" src="https://github.com/user-attachments/assets/93b90a91-f2ed-4802-a9b4-2f0d9516b77b" />
 
-# COMMIT
+# Commit
 Description: we perform an update and use COMMIT to permanently save the changes.
 
 

@@ -85,18 +85,22 @@ Version 1 (JOIN) is much more efficient than Version 2 (Subquery).
 Speed: Version 1 processes all data in one single operation, while Version 2 repeats the search 20,000 times (once for every row).
 Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data. 
 
-### 2. Critical Pending Requests (Priority 4 & 5) 
-Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
 
-<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
-<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
-<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
+### 2. 2026 Northern Region Service Requests 
+Description: This query retrieves all assistance requests submitted within the Northern region of Israel during the current year. It filters locations by latitude (32.3°N and above) and joins with the city database to provide a clear overview of recent emergency activity in northern urban centers.
 
-Version 1 (JOIN) is generally more efficient than Version 2.
-Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
-Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
-Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
+<img width="1242" height="280" alt="image" src="https://github.com/user-attachments/assets/95e05c2b-836c-4aa8-951c-e349d711e755" />
+<img width="1443" height="380" alt="image" src="https://github.com/user-attachments/assets/5fd34a6c-a0ef-44c9-a9de-9c621f646734" />
 
+<img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
+
+JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
+Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
+
+The JOIN is more efficient.
+Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
+Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
+Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
 
 
 
@@ -157,23 +161,19 @@ Description: This query analyzes the distribution of aid requests across differe
 
 
 
+### 9. Critical Pending Requests (Priority 4 & 5) 
+Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
+
+<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
+<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
+<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
+
+Version 1 (JOIN) is generally more efficient than Version 2.
+Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
+Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
+Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
 
 
-### 9. 2026 Northern Region Service Requests 
-Description: This query retrieves all assistance requests submitted within the Northern region of Israel during the current year. It filters locations by latitude (32.3°N and above) and joins with the city database to provide a clear overview of recent emergency activity in northern urban centers.
-
-<img width="1242" height="280" alt="image" src="https://github.com/user-attachments/assets/95e05c2b-836c-4aa8-951c-e349d711e755" />
-<img width="1443" height="380" alt="image" src="https://github.com/user-attachments/assets/5fd34a6c-a0ef-44c9-a9de-9c621f646734" />
-
-<img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
-
-JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
-Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
-
-The JOIN is more efficient.
-Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
-Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
-Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
 
 
 

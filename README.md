@@ -236,6 +236,38 @@ The UPDATE modifies the description of a category ('repairs instead of 'Repairs'
 Running the query again will still show the updated value.
 <img width="910" height="297" alt="image" src="https://github.com/user-attachments/assets/c4ec49d7-5e9a-4be8-961f-8b2d4edb9567" />
 
+## Indexes
+The goal of this section is to improve query performance by adding indexes on frequently used columns, and to analyze their impact using execution time comparisons.
+
+Index 1: 
+This index improves queries that: join treatment with volunteer ,search treatments of a specific volunteer
+BEFORE
+<img width="1010" height="611" alt="image" src="https://github.com/user-attachments/assets/73ca0904-4211-4498-b039-89ae8b914d08" />
 
 
+create
+<img width="602" height="137" alt="image" src="https://github.com/user-attachments/assets/a744256a-7361-47e4-b074-53f4a670bccf" />
+after
+<img width="905" height="326" alt="image" src="https://github.com/user-attachments/assets/73ce6ca7-a044-432f-bfca-1828cd0ed4e5" />
+
+Index 2
+The purpose of this index is to improve the performance of queries that filter volunteers based on:their availability (status), their geographic position (latitude, longitude)
+Many queries involve:
+selecting available volunteers,finding volunteers close to a specific location
+before
+<img width="908" height="683" alt="image" src="https://github.com/user-attachments/assets/a39216e8-c601-40b3-9b03-bc73b6273e17" />
+
+after
+<img width="899" height="118" alt="image" src="https://github.com/user-attachments/assets/c736239c-f766-4184-a83a-ed95c7484adb" />
+<img width="845" height="65" alt="image" src="https://github.com/user-attachments/assets/4ea4a334-f25e-4554-a8d6-2a31d25f1b90" />
+
+
+Index 3:
+The purpose of this index is to improve the performance of queries that filter treatments based on: a specific volunteer (volunteer_id),a time condition (date).
+In our system, many queries involve analyzing volunteer activity over time, for example: finding treatments performed by a volunteer in a given period,identifying active or inactive volunteers,filtering treatments based on recent dates
+
+<img width="548" height="145" alt="image" src="https://github.com/user-attachments/assets/1e7ab400-698b-4ac9-89cc-033312b47518" />
+<img width="694" height="69" alt="image" src="https://github.com/user-attachments/assets/555666f2-2e6c-4181-b2ef-9a15b9776450" />
+
+<img width="529" height="119" alt="image" src="https://github.com/user-attachments/assets/196a421d-fd05-4a00-91f6-2a0efb08595f" />
 

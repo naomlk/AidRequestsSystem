@@ -241,16 +241,16 @@ The goal of this section is to improve query performance by adding indexes on fr
 
 Index 1: 
 This index improves queries that: join treatment with volunteer ,search treatments of a specific volunteer
-BEFORE
+Before saving the index:
 <img width="1010" height="611" alt="image" src="https://github.com/user-attachments/assets/73ca0904-4211-4498-b039-89ae8b914d08" />
 
-
-create
 <img width="602" height="137" alt="image" src="https://github.com/user-attachments/assets/a744256a-7361-47e4-b074-53f4a670bccf" />
-after
+Execution time is improved:
 <img width="905" height="326" alt="image" src="https://github.com/user-attachments/assets/73ce6ca7-a044-432f-bfca-1828cd0ed4e5" />
 
-Index 2
+Index 2:
+
+
 The purpose of this index is to improve the performance of queries that filter volunteers based on:their availability (status), their geographic position (latitude, longitude)
 Many queries involve:
 selecting available volunteers,finding volunteers close to a specific location
@@ -263,6 +263,7 @@ after
 
 
 Index 3:
+
 The purpose of this index is to improve the performance of queries that filter treatments based on: a specific volunteer (volunteer_id),a time condition (date).
 In our system, many queries involve analyzing volunteer activity over time, for example: finding treatments performed by a volunteer in a given period,identifying active or inactive volunteers,filtering treatments based on recent dates
 

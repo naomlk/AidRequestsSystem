@@ -204,6 +204,7 @@ The purpose of this section is to demonstrate the difference between the ROLLBAC
 Description: we perform data modifications (UPDATE and DELETE) and then use ROLLBACK to cancel these changes and restore the database to its previous state.
 
 1.Update
+
 <img width="613" height="129" alt="image" src="https://github.com/user-attachments/assets/94e6492a-065b-425b-bd93-bd42d2fca646" />
 <img width="946" height="473" alt="image" src="https://github.com/user-attachments/assets/3e992d26-ca30-4a93-8e06-3e989eb7b921" />
 <img width="763" height="189" alt="image" src="https://github.com/user-attachments/assets/6881fbef-b3d1-4f3a-b722-9c0840748b81" />
@@ -212,13 +213,17 @@ Before the UPDATE, we observe the original values.After the UPDATE, the coordina
 There is no line with the values we changed with Rollback because he not saved them
 
 2.Delete
-We first identify inactive volunteers.
+
+We first identify inactive volunteers ( volunteers that not worked 100 days ago) .
 <img width="677" height="345" alt="image" src="https://github.com/user-attachments/assets/091daaf2-451e-480d-aff9-15d643491656" />
 Then we delete them.
 <img width="813" height="446" alt="image" src="https://github.com/user-attachments/assets/f5ffe4d6-f257-4b91-bccd-90949658d5ee" />
-
 After deletion, they no longer appear in the query.
+<img width="921" height="490" alt="image" src="https://github.com/user-attachments/assets/13fba19e-322e-4f15-a8b9-095f126334ba" />
+
 After ROLLBACK, they reappear.
+<img width="1005" height="607" alt="image" src="https://github.com/user-attachments/assets/93b90a91-f2ed-4802-a9b4-2f0d9516b77b" />
+
 # COMMIT
 Description: we perform an update and use COMMIT to permanently save the changes.
 

@@ -271,3 +271,6 @@ In our system, many queries involve analyzing volunteer activity over time, for 
 
 <img width="529" height="119" alt="image" src="https://github.com/user-attachments/assets/196a421d-fd05-4a00-91f6-2a0efb08595f" />
 
+Query with index gives us the result in 1744 ms:
+<img width="687" height="69" alt="image" src="https://github.com/user-attachments/assets/fde026bc-4637-4d39-8457-92c1ac8428ff" />
+

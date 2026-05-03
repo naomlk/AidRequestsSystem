@@ -205,7 +205,13 @@ Description: Purges cancelled requests with no associated treatment records
 
 ## Update queries 
 
-### 1. Updates the request status to Completed
+### 1. Request Priority Escalation
+Description: Increases the priority level of pending requests older than 2 days.
+<img width="1569" height="276" alt="image" src="https://github.com/user-attachments/assets/9da74140-9742-4283-bfba-4f78239914e4" />
+<img width="1249" height="320" alt="image" src="https://github.com/user-attachments/assets/94dd6066-9ecd-422e-9704-e08a67dbe8d2" />
+<img width="1497" height="286" alt="image" src="https://github.com/user-attachments/assets/a1664fc0-16a0-4c5c-b42d-2ca99c6ce6ab" />
+
+### 2. Updates the request status to Completed
 Description: Updates the request status to 3 (Completed) for all missions that have a recorded completion time in the treatment table. 
 
 <img width="1561" height="247" alt="image" src="https://github.com/user-attachments/assets/5978763b-645b-4dd0-af69-4e841ab284f8" />
@@ -214,11 +220,13 @@ Description: Updates the request status to 3 (Completed) for all missions that h
 <img width="1560" height="291" alt="image" src="https://github.com/user-attachments/assets/ddecbc3e-435c-4834-9001-d73ff9819ced" />
 
 
-### 2. Updates the count of treatment of volunteers
+### 3. Updates the count of treatment of volunteers
 Description: Updates each volunteer’s mission counter by calculating the total number of treatments they have completed.
 <img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/d0a42e80-fa60-4bde-89d6-52f4861be85a" />
 <img width="1370" height="185" alt="Capture d’écran 2026-04-28 095244" src="https://github.com/user-attachments/assets/c8e89683-f75a-4906-b255-f8723a48cb07" />
 <img width="805" height="166" alt="Capture d’écran 2026-04-28 095125" src="https://github.com/user-attachments/assets/f0edf925-9208-4389-bc4e-599f00b7ee68" />
+
+
 
 ## Commit And Rollback
 The purpose of this section is to demonstrate the difference between the ROLLBACK and COMMIT commands in PostgreSQL transactions.

@@ -156,6 +156,15 @@ Description: An advanced query using a CTE (Common Table Expression) to identify
 <img width="700" height="269" alt="image" src="https://github.com/user-attachments/assets/33cde85a-3e65-44b1-b206-6cb1177a45a9" />
 
 
+### 9. 2026 Northern Region Service Requests 
+Description: This query retrieves all assistance requests submitted within the Northern region of Israel during the current year. It filters locations by latitude (32.3°N and above) and joins with the city database to provide a clear overview of recent emergency activity in northern urban centers.
+
+<img width="1242" height="280" alt="image" src="https://github.com/user-attachments/assets/95e05c2b-836c-4aa8-951c-e349d711e755" />
+<img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
+
+
+
+
 ## Delete queries 
 
 ### 1. Removing Inactive Volunteers (No Activity for 1 Year)

@@ -149,8 +149,10 @@ Description: Provides a high-level overview of the workload per month and year, 
 ### 8. Geographic Distribution by City 
 Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
 
-<img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" /> 
-<img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
+<img width="1191" height="283" alt="image" src="https://github.com/user-attachments/assets/909351f7-8a1c-4375-af64-b20184375db5" />
+
+<img width="725" height="303" alt="image" src="https://github.com/user-attachments/assets/a0bcc968-067f-4b85-976c-0dd706c0e54a" />
+
 
 
 

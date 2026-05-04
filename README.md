@@ -81,7 +81,7 @@ Description: This query identifies the families that have requested assistance t
 <img width="1181" height="332" alt="image" src="https://github.com/user-attachments/assets/b98c4b9d-5076-40de-9220-5a8c8ca2bf5e" /> 
 <img width="611" height="264" alt="image" src="https://github.com/user-attachments/assets/a643c422-0ca2-4d88-acfc-f96e9f9c78e4" />
 
-Version 1 (JOIN) is better because it processes all data in one single operation, making it much faster and more professional. Version 2 (Subquery) is inefficient because it forces the database to repeat the search 500 times—once for every family—like a slow loop. Using the JOIN version ensures the Yedidim system is scalable and follows engineering best practices for handling large amounts of data.**
+Version 1 (JOIN) is better because it processes all data in one single operation, making it much faster and more professional. Version 2 (Subquery) is inefficient because it forces the database to repeat the search 500 times (once for every family) like a slow loop. Using the JOIN version ensures the Yedidim system is scalable and follows engineering best practices for handling large amounts of data.
 
 
 ### 2. 2026 Northern Region Service Requests 

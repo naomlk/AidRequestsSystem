@@ -119,10 +119,7 @@ Description: Lists volunteers who do not have their own tools. This helps coordi
 <img width="1188" height="280" alt="image" src="https://github.com/user-attachments/assets/9196f030-042a-4cbc-8b74-c104cbeff2c1" /> 
 <img width="755" height="265" alt="image" src="https://github.com/user-attachments/assets/3252e5ce-9d22-4a8a-9677-3b139e12fd9d" />
 
-Version 1 (WHERE) is much more efficient than Version 2 (EXCEPT).
-Simplicity: Version 1 performs a single, direct check on one column. Version 2 forces the database to run two separate queries and then compare the results to find differences.
-Resources: Version 1 is very fast and uses minimal memory. Version 2 is much heavier because it has to sort and "subtract" one list from another, which is unnecessary work for this task.
-Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
+Version 1 (WHERE) is the professional choice because it performs a direct filter in a single pass over the table. Version 2 (EXCEPT) is inefficient because it forces the database to perform two separate queries—one to get everyone and one to get those with equipment—and then calculate the difference between the two sets. For the Yedidim project, Version 1 is much faster and uses far less memory than the mathematical set operation in Version 2.
 
 
 ### 5. Elite Volunteer Service Report (>100km) 

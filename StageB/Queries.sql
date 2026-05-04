@@ -87,7 +87,7 @@ SELECT DISTINCT ON (v.volunteer_id)
         cos(radians(r.latitude)) * cos(radians(v.latitude)) * 
         cos(radians(v.longitude) - radians(r.longitude)) + 
         sin(radians(r.latitude)) * sin(radians(v.latitude))
-    ))::numeric, 2) AS max_distance_km
+    ))::numeric, 2) AS distance_km
 FROM VOLUNTEER v
 JOIN TREATMENT t ON v.volunteer_id = t.volunteer_id
 JOIN REQUEST r ON t.request_id = r.request_id
@@ -125,7 +125,7 @@ FROM LOCATION l
 JOIN REQUEST r ON l.latitude = r.latitude AND l.longitude = r.longitude
 JOIN REQUESTCATEGORY c ON r.category_id = c.category_id
 GROUP BY l.city, c.category_name
-ORDER BY total_requests DESC;
+ORDER BY l.city , total_requests DESC ;
 
 
 --Critical Pending Requests (Priority 4 & 5)

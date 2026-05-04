@@ -92,14 +92,11 @@ Description: This query retrieves all assistance requests submitted within the N
 
 <img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
 
-JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
-Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
+Version 1 (JOIN) is the professional standard because it links the tables using a composite key (Latitude + Longitude) in a single, fluid operation, allowing PostgreSQL to quickly filter the Northern region and dates simultaneously.
 
-The JOIN is more efficient.
-Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
-Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
-Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
+Version 2 (Subquery) is less efficient because for every single request found in 2026, the database must stop and perform a manual search in the Location table to find the city name. This creates a "bottleneck" that slows down the system as the number of requests grows.
 
+By using Version 1, you ensure that the Yedidim system can handle high traffic in the Northern region without performance lag, following the same scalability principles as your previous queries.
 
 
 ### 3. Filtered Treatments by Specific Date Range 

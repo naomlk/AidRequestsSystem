@@ -125,7 +125,8 @@ Version 1 (WHERE) is the professional choice because it performs a direct filter
 ### 5. Elite Volunteer Service Report (>100km) 
 Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
 
-<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
+<img width="1211" height="679" alt="image" src="https://github.com/user-attachments/assets/d5f0d698-2d72-4828-a2ea-2be8b8767912" />
+
 <img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
 
 

@@ -81,9 +81,7 @@ Description: This query identifies the families that have requested assistance t
 <img width="1181" height="332" alt="image" src="https://github.com/user-attachments/assets/b98c4b9d-5076-40de-9220-5a8c8ca2bf5e" /> 
 <img width="611" height="264" alt="image" src="https://github.com/user-attachments/assets/a643c422-0ca2-4d88-acfc-f96e9f9c78e4" />
 
-Version 1 (JOIN) is much more efficient than Version 2 (Subquery).
-Speed: Version 1 processes all data in one single operation, while Version 2 repeats the search 20,000 times (once for every row).
-Performance: PostgreSQL is optimized to handle JOINs much faster, making it the professional choice for projects with Massive Data. 
+Version 1 (JOIN) is better because it processes all data in one single operation, making it much faster and more professional. Version 2 (Subquery) is inefficient because it forces the database to repeat the search 500 times (once for every family) like a slow loop. Using the JOIN version ensures the Yedidim system is scalable and follows engineering best practices for handling large amounts of data.
 
 
 ### 2. 2026 Northern Region Service Requests 
@@ -94,14 +92,11 @@ Description: This query retrieves all assistance requests submitted within the N
 
 <img width="992" height="373" alt="image" src="https://github.com/user-attachments/assets/fc0dda1e-7f70-4845-bbc3-e80548889a06" />
 
-JOIN (Version 1): This method combines the REQUEST and LOCATION tables in a single operation. It treats them as a single dataset linked by coordinates.
-Subquery (Version 2): This method pulls data from the REQUEST table first, then performs a separate "lookup" for the city name in the LOCATION table for every single row found.
+Version 1 (JOIN) is the professional standard because it links the tables using a composite key (Latitude + Longitude) in a single, fluid operation, allowing PostgreSQL to quickly filter the Northern region and dates simultaneously.
 
-The JOIN is more efficient.
-Speed: SQL engines are optimized to process JOINs in bulk, making them much faster for large databases.
-Workload: A subquery in the SELECT clause can force the database to run a new search for every line, which wastes processing power.
-Standard Practice: JOINs are the professional standard for linking related tables because the code is cleaner and easier to maintain.
+Version 2 (Subquery) is less efficient because for every single request found in 2026, the database must stop and perform a manual search in the Location table to find the city name. This creates a "bottleneck" that slows down the system as the number of requests grows.
 
+By using Version 1, you ensure that the Yedidim system can handle high traffic in the Northern region without performance lag, following the same scalability principles as your previous queries.
 
 
 ### 3. Filtered Treatments by Specific Date Range 
@@ -124,16 +119,14 @@ Description: Lists volunteers who do not have their own tools. This helps coordi
 <img width="1188" height="280" alt="image" src="https://github.com/user-attachments/assets/9196f030-042a-4cbc-8b74-c104cbeff2c1" /> 
 <img width="755" height="265" alt="image" src="https://github.com/user-attachments/assets/3252e5ce-9d22-4a8a-9677-3b139e12fd9d" />
 
-Version 1 (WHERE) is much more efficient than Version 2 (EXCEPT).
-Simplicity: Version 1 performs a single, direct check on one column. Version 2 forces the database to run two separate queries and then compare the results to find differences.
-Resources: Version 1 is very fast and uses minimal memory. Version 2 is much heavier because it has to sort and "subtract" one list from another, which is unnecessary work for this task.
-Best Practice: Using a simple filter (WHERE) is the standard way to retrieve data based on a condition. EXCEPT is usually reserved for more complex comparisons between different tables. 
+Version 1 (WHERE) is the professional choice because it performs a direct filter in a single pass over the table. Version 2 (EXCEPT) is inefficient because it forces the database to perform two separate queries (one to get everyone and one to get those with equipment) and then calculate the difference between the two sets. For the Yedidim project, Version 1 is much faster and uses far less memory than the mathematical set operation in Version 2.
 
 
 ### 5. Elite Volunteer Service Report (>100km) 
 Description: This query lists unique volunteers who have completed high-effort missions exceeding 100km.
 
-<img width="1244" height="652" alt="image" src="https://github.com/user-attachments/assets/718e2d8c-9833-4640-a981-bf7aabe2b43a" />
+<img width="1211" height="679" alt="image" src="https://github.com/user-attachments/assets/d5f0d698-2d72-4828-a2ea-2be8b8767912" />
+
 <img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
 
 
@@ -156,8 +149,10 @@ Description: Provides a high-level overview of the workload per month and year, 
 ### 8. Geographic Distribution by City 
 Description: This query analyzes the distribution of aid requests across different cities. By joining the LOCATION, REQUEST, and REQUESTCATEGORY tables, it displays the volume of requests for specific types of aid in each urban area.
 
-<img width="1048" height="274" alt="image" src="https://github.com/user-attachments/assets/3322b86d-3b74-4bfa-93eb-5feb56ad7483" /> 
-<img width="718" height="262" alt="image" src="https://github.com/user-attachments/assets/5fc36b03-bfef-4b31-983b-e725ffabfa45" />
+<img width="1191" height="283" alt="image" src="https://github.com/user-attachments/assets/909351f7-8a1c-4375-af64-b20184375db5" />
+
+<img width="725" height="303" alt="image" src="https://github.com/user-attachments/assets/a0bcc968-067f-4b85-976c-0dd706c0e54a" />
+
 
 
 

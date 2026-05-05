@@ -318,3 +318,13 @@ The `request` table now has a constraint that verifies that the priority level i
 ALTER TABLE request
 ADD CONSTRAINT chk_prioriry_level
 CHECK (prioriry_level BETWEEN 1 AND 5);
+
+
+```sql
+
+INSERT INTO request (request_id,date,image,incident_description, prioriry_level,contactperson_id,category_id,status_id,
+latitude,longitude)
+
+VALUES (0,'2025-10-10',null,'not',9,0,1,1,10,10);
+
+<img width="727" height="133" alt="image" src="https://github.com/user-attachments/assets/f80b60c9-6089-43e4-b0a1-e149bdf57e5c" />

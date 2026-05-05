@@ -127,7 +127,8 @@ Description: This query lists unique volunteers who have completed high-effort m
 
 <img width="1211" height="679" alt="image" src="https://github.com/user-attachments/assets/d5f0d698-2d72-4828-a2ea-2be8b8767912" />
 
-<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
+<img width="895" height="298" alt="image" src="https://github.com/user-attachments/assets/cc604c0d-125b-44b6-a913-9904717209a1" />
+
 
 
 ### 6. Top Performing Volunteers (Above Average Activity) 

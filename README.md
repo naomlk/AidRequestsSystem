@@ -156,18 +156,6 @@ Description: This query analyzes the distribution of aid requests across differe
 
 
 
-### 9. Critical Pending Requests (Priority 4 & 5) 
-Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
-
-<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
-<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
-<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
-
-Version 1 (JOIN) is generally more efficient than Version 2.
-Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
-Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
-Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
-
 
 
 

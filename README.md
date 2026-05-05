@@ -272,6 +272,12 @@ selecting available volunteers,finding volunteers close to a specific location
 before
 <img width="908" height="683" alt="image" src="https://github.com/user-attachments/assets/a39216e8-c601-40b3-9b03-bc73b6273e17" />
 
+
+```sql
+CREATE INDEX idx_volunteer_status_location
+ON volunteer(availability_status, latitude, longitude);
+
+```
 after
 <img width="899" height="118" alt="image" src="https://github.com/user-attachments/assets/c736239c-f766-4184-a83a-ed95c7484adb" />
 <img width="845" height="65" alt="image" src="https://github.com/user-attachments/assets/4ea4a334-f25e-4554-a8d6-2a31d25f1b90" />

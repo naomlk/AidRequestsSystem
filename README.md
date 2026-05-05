@@ -308,7 +308,7 @@ For each constraint, we describe the change and then show an example of an inval
 
 ---
 
-### 1. Request priority level constraint
+## 1. Request priority level constraint
 
 #### Change made
 
@@ -318,7 +318,7 @@ The `request` table now has a constraint that verifies that the priority level i
 ALTER TABLE request
 ADD CONSTRAINT chk_prioriry_level
 CHECK (prioriry_level BETWEEN 1 AND 5);
-
+```
 
 ```sql
 
@@ -326,5 +326,48 @@ INSERT INTO request (request_id,date,image,incident_description, prioriry_level,
 latitude,longitude)
 
 VALUES (0,'2025-10-10',null,'not',9,0,1,1,10,10);
+```
 
 <img width="727" height="133" alt="image" src="https://github.com/user-attachments/assets/f80b60c9-6089-43e4-b0a1-e149bdf57e5c" />
+This insertion fails because 9 is not between 1 and 5.
+
+## 2. Location coordinates constraint
+#### Change made
+
+The location table now has a constraint that verifies that the coordinates are inside the valid range of Israel.
+```sql
+ALTER TABLE location
+ADD CONSTRAINT chk_coordinates
+CHECK (
+    latitude BETWEEN 29.0 AND 34.0 
+    AND 
+    longitude BETWEEN 34.0 AND 36.0
+);
+```
+Try insert latitude,longitude
+```sql
+INSERT INTO location (latitude,longitude,city,street,house_number)
+VALUES (0,0,'haifa','moshe',55)
+```
+<img width="686" height="130" alt="image" src="https://github.com/user-attachments/assets/bc62bd8f-8fbd-4aa5-9690-6acd42779141" />
+
+## 3. Treatment time order constraint
+#### Change made
+
+The treatment table now has a constraint that verifies that the completion time is not before the start time.
+```sql
+ALTER TABLE treatment
+ADD CONSTRAINT chk_treatment_time_order
+CHECK (
+    completion_time IS NULL OR completion_time >= start_time
+);
+```
+Invalid data test
+
+```sql
+INSERT INTO treatment(treatment_id,date,start_time,completion_time,feedback_notes,photo_after,delivery_id,volunteer_id,request_id)
+VALUES (0,'2025-05-05','08:00','07:00','no',null,0,1,0)
+```
+This insertion fails because the completion time is earlier than the start time.
+<img width="774" height="103" alt="image" src="https://github.com/user-attachments/assets/1cfeb77b-6377-4a93-b648-1d6eff585500" />
+

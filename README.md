@@ -301,3 +301,20 @@ In our system, many queries involve analyzing volunteer activity over time, for 
 Query with index gives us the result in 1744 ms:
 <img width="687" height="69" alt="image" src="https://github.com/user-attachments/assets/fde026bc-4637-4d39-8457-92c1ac8428ff" />
 
+## Constraints
+
+In this part, we added new constraints to the database using `ALTER TABLE`.
+For each constraint, we describe the change and then show an example of an invalid insertion/update that violates the constraint.
+
+---
+
+### 1. Request priority level constraint
+
+#### Change made
+
+The `request` table now has a constraint that verifies that the priority level is between 1 and 5.
+
+```sql
+ALTER TABLE request
+ADD CONSTRAINT chk_prioriry_level
+CHECK (prioriry_level BETWEEN 1 AND 5);

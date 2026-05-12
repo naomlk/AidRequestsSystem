@@ -127,7 +127,8 @@ Description: This query lists unique volunteers who have completed high-effort m
 
 <img width="1211" height="679" alt="image" src="https://github.com/user-attachments/assets/d5f0d698-2d72-4828-a2ea-2be8b8767912" />
 
-<img width="945" height="292" alt="image" src="https://github.com/user-attachments/assets/2cfa2b82-9c8e-476d-af47-31ff369aa638" />
+<img width="895" height="298" alt="image" src="https://github.com/user-attachments/assets/cc604c0d-125b-44b6-a913-9904717209a1" />
+
 
 
 ### 6. Top Performing Volunteers (Above Average Activity) 
@@ -155,18 +156,6 @@ Description: This query analyzes the distribution of aid requests across differe
 
 
 
-
-### 9. Critical Pending Requests (Priority 4 & 5) 
-Description: A vital operational query that lists all high-priority emergency requests that haven't been handled yet.
-
-<img width="1146" height="256" alt="image" src="https://github.com/user-attachments/assets/ab5f3ced-ddeb-4e8a-b3b9-815f9b175b61" /> 
-<img width="1170" height="276" alt="image" src="https://github.com/user-attachments/assets/0c8eb688-f1b3-4f97-a20a-88d6d5d28c47" /> 
-<img width="564" height="269" alt="image" src="https://github.com/user-attachments/assets/9bd64db9-8fcf-42ba-8bd4-a612e618a812" />
-
-Version 1 (JOIN) is generally more efficient than Version 2.
-Logic: Version 1 connects the two tables directly. Version 2 performs a "search within a search," which adds an extra step for the database engine.
-Execution: PostgreSQL is highly optimized for JOINs. It can find the "Pending" status and filter the requests simultaneously, making it faster for large amounts of data.
-Readability: Version 1 is the standard way to write relational queries. Version 2 is more rigid and can fail if there are ever two statuses with the same name. 
 
 
 
@@ -283,6 +272,12 @@ selecting available volunteers,finding volunteers close to a specific location
 before
 <img width="908" height="683" alt="image" src="https://github.com/user-attachments/assets/a39216e8-c601-40b3-9b03-bc73b6273e17" />
 
+
+```sql
+CREATE INDEX idx_volunteer_status_location
+ON volunteer(availability_status, latitude, longitude);
+
+```
 after
 <img width="899" height="118" alt="image" src="https://github.com/user-attachments/assets/c736239c-f766-4184-a83a-ed95c7484adb" />
 <img width="845" height="65" alt="image" src="https://github.com/user-attachments/assets/4ea4a334-f25e-4554-a8d6-2a31d25f1b90" />
@@ -300,4 +295,74 @@ In our system, many queries involve analyzing volunteer activity over time, for 
 
 Query with index gives us the result in 1744 ms:
 <img width="687" height="69" alt="image" src="https://github.com/user-attachments/assets/fde026bc-4637-4d39-8457-92c1ac8428ff" />
+
+## Constraints
+
+In this part, we added new constraints to the database using `ALTER TABLE`.
+For each constraint, we describe the change and then show an example of an invalid insertion/update that violates the constraint.
+
+---
+
+## 1. Request priority level constraint
+
+#### Change made
+
+The `request` table now has a constraint that verifies that the priority level is between 1 and 5.
+
+```sql
+ALTER TABLE request
+ADD CONSTRAINT chk_prioriry_level
+CHECK (prioriry_level BETWEEN 1 AND 5);
+```
+
+```sql
+
+INSERT INTO request (request_id,date,image,incident_description, prioriry_level,contactperson_id,category_id,status_id,
+latitude,longitude)
+
+VALUES (0,'2025-10-10',null,'not',9,0,1,1,10,10);
+```
+
+<img width="727" height="133" alt="image" src="https://github.com/user-attachments/assets/f80b60c9-6089-43e4-b0a1-e149bdf57e5c" />
+This insertion fails because 9 is not between 1 and 5.
+
+## 2. Location coordinates constraint
+#### Change made
+
+The location table now has a constraint that verifies that the coordinates are inside the valid range of Israel.
+```sql
+ALTER TABLE location
+ADD CONSTRAINT chk_coordinates
+CHECK (
+    latitude BETWEEN 29.0 AND 34.0 
+    AND 
+    longitude BETWEEN 34.0 AND 36.0
+);
+```
+Try insert latitude,longitude
+```sql
+INSERT INTO location (latitude,longitude,city,street,house_number)
+VALUES (0,0,'haifa','moshe',55)
+```
+<img width="686" height="130" alt="image" src="https://github.com/user-attachments/assets/bc62bd8f-8fbd-4aa5-9690-6acd42779141" />
+
+## 3. Treatment time order constraint
+#### Change made
+
+The treatment table now has a constraint that verifies that the completion time is not before the start time.
+```sql
+ALTER TABLE treatment
+ADD CONSTRAINT chk_treatment_time_order
+CHECK (
+    completion_time IS NULL OR completion_time >= start_time
+);
+```
+Invalid data test
+
+```sql
+INSERT INTO treatment(treatment_id,date,start_time,completion_time,feedback_notes,photo_after,delivery_id,volunteer_id,request_id)
+VALUES (0,'2025-05-05','08:00','07:00','no',null,0,1,0)
+```
+This insertion fails because the completion time is earlier than the start time.
+<img width="774" height="103" alt="image" src="https://github.com/user-attachments/assets/1cfeb77b-6377-4a93-b648-1d6eff585500" />
 

@@ -10,7 +10,7 @@ FROM location
 WHERE city = 'Jerusalem' AND longitude =34.142932;   
 
 -- Change
-UPDATE location
+UPDATE cckerlocation
 SET longitude = 40,
     latitude = -40
 WHERE city = 'Jerusalem' AND longitude =34.142932;

@@ -3,16 +3,16 @@
 
 
 
---1)index sur ttes les ligne
+--1)
 CREATE INDEX idx_treatment_volunteer
 ON treatment(volunteer_id);
--- important car a chaque fois ou on fait where t.volunteer_id=v.volunteer_id  alors on aura deja
--- un index ds la table de treatment qui va nous donner ttes les lignes par volontaires comme
+-- important car à chaque fois ou on fait where t.volunteer_id=v.volunteer_id  alors on aura deja
+-- un index ds la table de treatment qui va nous donner toutes les lignes par volontaires comme
 -- volontaire 1 = ligne 1,22,3
 -- volontaire 2 =lignes 6,9,10
 -- volontaire 3 =lignes 8,11,12
 -- et donc quand je cherche where t.volunteer_id=v.volunteer_id  alors il va psser chaaue elem,nt de v.voluntter
--- et cherhcehr ds les ligne que lindex renvoient de treatment si le volunteer_id corepond
+-- et chercher ds les ligne que lindex renvoit de treatment si le volunteer_id correspond
 
 
 --2)

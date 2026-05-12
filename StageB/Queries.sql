@@ -23,7 +23,7 @@ SELECT
     r.date
 FROM REQUEST r
 JOIN LOCATION l ON r.latitude = l.latitude AND r.longitude = l.longitude
-WHERE r.latitude >= 32.3
+WHERE r.latitude >= 32.3    -- nord
   AND r.date >= '2026-01-01'
 ORDER BY r.date DESC;
 --version 2
@@ -78,7 +78,7 @@ WHERE has_equipment = true
 ORDER BY last_name ASC;
 
 
---Elite Volunteer Service Report (>100km)
+--Elite Volunteer Service Report (>100km),volunteers that go over 100 km to a request
 SELECT DISTINCT ON (v.volunteer_id)
     v.volunteer_id,
     l_v.city AS starting_city,
@@ -109,7 +109,7 @@ WHERE counter > (SELECT AVG(counter) FROM VOLUNTEER)
 ORDER BY counter DESC;
 
 
---Monthly Requests Summary
+--Monthly Requests Summary         COUNT(*) compte les ligne vides alors que COUNT(request_id) non
 SELECT 
     TO_CHAR(date, 'Month') as month_name, 
     EXTRACT(YEAR FROM date) as year_nb, 

@@ -1,5 +1,5 @@
 #  afaire attention
-
+# penser a faire les path - shema
 
 from pathlib import Path
 
@@ -31,7 +31,7 @@ sql = input_file.read_text(encoding="utf-16")
 #REMPLACER TTES LES TABLES table->b_table  d
 
 for table in tablesGroupA:   #changer ttes les tables
-    sql = sql.replace(f"public.{table}", f"a_{table}")  #changer QUE les tables
+    sql = sql.replace(f"public.{table}", f"public.a_{table}")  #changer QUE les tables
 # mais attention ca m efait des erreur car suposons qu ejai une colonne qui sapple delivery_id alors elle deviendra a_delivery_id
 # et on ne doit pas touche aux colonnes des tables donc il faut ecrire el scritp au cas par acs en focntion
 # de la maniere dont le backuop ets ecrit
@@ -41,6 +41,8 @@ sql = sql.replace("ALTER SCHEMA public OWNER TO pg_database_owner;", "-- ALTER S
 
 
 #ETAPE 2-- INDEX ?
+
+# chaqu ecle prilaire ets uen index     lors peut etre qu emou je cree un du mem nom il faut verifier
 #ETAPE 3-- constraints ?
 output_file.write_text(sql, encoding="utf-8")   # ici il faut changer en focntion de la version du backup file
 

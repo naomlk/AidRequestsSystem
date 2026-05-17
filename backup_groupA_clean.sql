@@ -40,24 +40,24 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: a_delivery; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: delivery; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_delivery (
-    a_delivery_id integer NOT NULL,
+    delivery_id integer NOT NULL,
     date date NOT NULL,
-    a_status character varying(50),
+    status character varying(50),
     item_type character varying(100),
     quantity integer,
-    a_request_id integer,
-    CONSTRAINT a_delivery_quantity_check CHECK ((quantity > 0))
+    request_id integer,
+    CONSTRAINT delivery_quantity_check CHECK ((quantity > 0))
 );
 
 
 ALTER TABLE public.a_delivery OWNER TO ochrith;
 
 --
--- Name: a_family; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: family; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_family (
@@ -66,14 +66,14 @@ CREATE TABLE public.a_family (
     phone_number character varying(20),
     number_of_members integer,
     special_features text,
-    CONSTRAINT a_family_number_of_members_check CHECK ((number_of_members > 0))
+    CONSTRAINT family_number_of_members_check CHECK ((number_of_members > 0))
 );
 
 
 ALTER TABLE public.a_family OWNER TO ochrith;
 
 --
--- Name: a_location; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: location; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_location (
@@ -89,32 +89,32 @@ CREATE TABLE public.a_location (
 ALTER TABLE public.a_location OWNER TO ochrith;
 
 --
--- Name: a_request; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: request; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_request (
-    a_request_id integer NOT NULL,
+    request_id integer NOT NULL,
     date date NOT NULL,
     image character varying(255),
     incident_description text,
     prioriry_level integer,
     contactperson_id integer,
     category_id integer,
-    a_status_id integer,
+    status_id integer,
     latitude numeric(9,6),
     longitude numeric(9,6),
     CONSTRAINT chk_prioriry_level CHECK (((prioriry_level >= 1) AND (prioriry_level <= 5))),
-    CONSTRAINT a_request_prioriry_level_check CHECK (((prioriry_level >= 1) AND (prioriry_level <= 5)))
+    CONSTRAINT request_prioriry_level_check CHECK (((prioriry_level >= 1) AND (prioriry_level <= 5)))
 );
 
 
 ALTER TABLE public.a_request OWNER TO ochrith;
 
 --
--- Name: a_a_requestcategory; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: requestcategory; Type: TABLE; Schema: public; Owner: ochrith
 --
 
-CREATE TABLE public.a_a_requestcategory (
+CREATE TABLE public.a_requestcategory (
     category_id integer NOT NULL,
     category_name character varying(100) NOT NULL,
     description text,
@@ -122,52 +122,52 @@ CREATE TABLE public.a_a_requestcategory (
 );
 
 
-ALTER TABLE public.a_a_requestcategory OWNER TO ochrith;
+ALTER TABLE public.a_requestcategory OWNER TO ochrith;
 
 --
--- Name: a_status; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: status; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_status (
-    a_status_id integer NOT NULL,
-    a_status_label character varying(50) NOT NULL
+    status_id integer NOT NULL,
+    status_label character varying(50) NOT NULL
 );
 
 
 ALTER TABLE public.a_status OWNER TO ochrith;
 
 --
--- Name: a_treatment; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: treatment; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_treatment (
-    a_treatment_id integer NOT NULL,
+    treatment_id integer NOT NULL,
     date date NOT NULL,
     start_time time without time zone,
     completion_time time without time zone,
     feedback_notes text,
     photo_after character varying(255),
-    a_delivery_id integer,
-    a_volunteer_id integer,
-    a_request_id integer,
-    CONSTRAINT chk_a_treatment_duration CHECK (((completion_time IS NULL) OR ((completion_time - start_time) <= '24:00:00'::interval))),
-    CONSTRAINT chk_a_treatment_time_order CHECK (((completion_time IS NULL) OR (completion_time >= start_time)))
+    delivery_id integer,
+    volunteer_id integer,
+    request_id integer,
+    CONSTRAINT chk_treatment_duration CHECK (((completion_time IS NULL) OR ((completion_time - start_time) <= '24:00:00'::interval))),
+    CONSTRAINT chk_treatment_time_order CHECK (((completion_time IS NULL) OR (completion_time >= start_time)))
 );
 
 
 ALTER TABLE public.a_treatment OWNER TO ochrith;
 
 --
--- Name: a_volunteer; Type: TABLE; Schema: public; Owner: ochrith
+-- Name: volunteer; Type: TABLE; Schema: public; Owner: ochrith
 --
 
 CREATE TABLE public.a_volunteer (
-    a_volunteer_id integer NOT NULL,
+    volunteer_id integer NOT NULL,
     first_name character varying(100) NOT NULL,
     last_name character varying(100) NOT NULL,
     phone_number character varying(20),
     has_equipment boolean,
-    availability_a_status character varying(50),
+    availability_status character varying(50),
     counter integer DEFAULT 0,
     skill_type character varying(100),
     latitude numeric(9,6),
@@ -178,10 +178,10 @@ CREATE TABLE public.a_volunteer (
 ALTER TABLE public.a_volunteer OWNER TO ochrith;
 
 --
--- Data for Name: a_delivery; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: delivery; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_delivery (a_delivery_id, date, a_status, item_type, quantity, a_request_id) FROM stdin;
+COPY public.a_delivery (delivery_id, date, status, item_type, quantity, request_id) FROM stdin;
 1	2025-05-14	Delivered	Vital Medicines	2	1
 7	2025-08-05	Delivered	Food Basket	2	7
 15	2024-01-13	Delivered	Vital Medicines	4	15
@@ -5248,7 +5248,7 @@ COPY public.a_delivery (a_delivery_id, date, a_status, item_type, quantity, a_re
 
 
 --
--- Data for Name: a_family; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: family; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
 COPY public.a_family (contactperson_id, contactperson_name, phone_number, number_of_members, special_features) FROM stdin;
@@ -5262,15 +5262,15 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 275547819	Vanda Woodson	054-3463078	8	Single mother
 308732384	Liza Millwall	054-8357125	8	Isolated citizen
 335186872	Walt Jacobowitz	056-8531253	7	Low income household
-338321445	Jaquelyn Gascoigne	058-1851401	1	Evacuated a_family (Southern border)
+338321445	Jaquelyn Gascoigne	058-1851401	1	Evacuated family (Southern border)
 234800455	Ki Kasting	055-7304780	5	New immigrant (Oleh Hadash)
-348905230	Barty Elam	055-5106706	5	Reservist a_family (active duty)
+348905230	Barty Elam	055-5106706	5	Reservist family (active duty)
 268885179	Alaric Youtead	057-5087503	6	Disabled veteran
-296008431	Wood McKerron	052-8114233	2	Evacuated a_family (Northern border)
-257537902	Ivy Kalinke	052-9148002	10	Evacuated a_family (Southern border)
-305647089	Eleonora Stickens	051-2106177	4	Evacuated a_family (Northern border)
+296008431	Wood McKerron	052-8114233	2	Evacuated family (Northern border)
+257537902	Ivy Kalinke	052-9148002	10	Evacuated family (Southern border)
+305647089	Eleonora Stickens	051-2106177	4	Evacuated family (Northern border)
 229066361	Cecily Gerrey	058-0774040	7	Single mother
-251152424	Lanette Hawsby	056-8136935	6	Evacuated a_family (Northern border)
+251152424	Lanette Hawsby	056-8136935	6	Evacuated family (Northern border)
 257440337	Avrom Braunlein	053-7723291	1	Single mother
 276141957	Corey Betteson	053-6140476	5	Elderly person
 324268500	Hymie Dome	053-6411331	4	Special needs child
@@ -5280,26 +5280,26 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 334535019	Flori Braams	058-5306666	1	Holocaust survivor
 362043536	Opalina Fines	053-9061573	7	Isolated citizen
 298198242	Kimbra Kasher	052-3039533	3	Low income household
-340380775	Gianina Bayston	052-3866333	6	Evacuated a_family (Southern border)
-319280209	Rogers Trewett	058-6486704	5	Evacuated a_family (Northern border)
+340380775	Gianina Bayston	052-3866333	6	Evacuated family (Southern border)
+319280209	Rogers Trewett	058-6486704	5	Evacuated family (Northern border)
 349271525	Lydia Brettell	052-6739040	6	Temporary financial crisis
 274000579	Trumaine Eat	056-8647036	10	Temporary financial crisis
 228617010	Mair Giveen	058-2793120	7	Special needs child
-368148813	Vivi Caslin	053-2389108	2	Evacuated a_family (Northern border)
+368148813	Vivi Caslin	053-2389108	2	Evacuated family (Northern border)
 286159533	Micki Matherson	050-7342857	2	New immigrant (Oleh Hadash)
 368417737	Mozes Hopfner	053-9341931	8	Disabled veteran
 365209806	Letisha Dodell	052-9763833	3	Isolated citizen
 326251057	Dedra Wroth	051-5870447	5	Low income household
 292397938	Dulcine Beaby	058-7203621	8	New immigrant (Oleh Hadash)
 276557284	Kendell Rosenbusch	051-4219364	10	Disabled veteran
-282902689	Dominica Trolley	050-0209764	2	Reservist a_family (active duty)
+282902689	Dominica Trolley	050-0209764	2	Reservist family (active duty)
 263591413	Delphinia Edgson	053-5172671	9	Temporary financial crisis
 331169761	Caresa Judgkins	053-2012491	9	Holocaust survivor
 219487640	Putnam Giblin	058-0361703	9	Low income household
 252382882	Allister Benn	054-5500276	8	Holocaust survivor
 376795928	Paulie Elstub	055-3456930	4	Chronic medical condition
-378204917	Emmi Harbron	058-8982021	8	Evacuated a_family (Southern border)
-377651392	Falkner Whorton	053-1626028	7	Reservist a_family (active duty)
+378204917	Emmi Harbron	058-8982021	8	Evacuated family (Southern border)
+377651392	Falkner Whorton	053-1626028	7	Reservist family (active duty)
 378201703	Kendre Sprackling	058-4119013	5	Chronic medical condition
 373519709	Tim McGreal	058-6108577	3	Elderly person
 346386495	Marvin Bolter	057-2600734	8	Holocaust survivor
@@ -5313,16 +5313,16 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 359868816	Jack Stoffers	050-5274554	8	Temporary financial crisis
 383234027	Annamaria Toma	050-8620538	9	Single mother
 247258291	Jennilee Jagiela	053-9410532	8	Low income household
-388971810	Corena Turrell	050-9614624	5	Evacuated a_family (Northern border)
+388971810	Corena Turrell	050-9614624	5	Evacuated family (Northern border)
 249497522	Arlene Gauntlett	051-6089972	9	Elderly person
-207402616	Rancell Brownlea	056-8685512	10	Evacuated a_family (Southern border)
+207402616	Rancell Brownlea	056-8685512	10	Evacuated family (Southern border)
 379885764	Eydie Spaule	052-2734561	8	Elderly person
 207350844	Jeri Deble	056-2451319	7	Disabled veteran
 224684278	Patrick Hrynczyk	051-9076154	2	Single mother
 275215905	Jan Very	050-0042734	8	Temporary financial crisis
 313298204	Robby Strongitharm	057-0385151	4	Special needs child
 224950652	Nanice Sidworth	056-5614319	4	Disabled veteran
-202352457	Helli Kielty	056-6744011	8	Evacuated a_family (Southern border)
+202352457	Helli Kielty	056-6744011	8	Evacuated family (Southern border)
 270342629	Alvie Iorizzo	056-0418715	10	Chronic medical condition
 214782608	Boy Draysay	057-8555372	3	Single mother
 272090070	Ingmar Conville	058-3151743	9	Holocaust survivor
@@ -5336,22 +5336,22 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 222370903	Curcio Dykes	053-0315597	2	Disabled veteran
 361313654	Mirilla Emslie	055-8970028	4	Low income household
 389936463	Stacee Mackin	058-3647336	7	Low income household
-374369044	Wilma Umbert	055-5163853	10	Evacuated a_family (Southern border)
+374369044	Wilma Umbert	055-5163853	10	Evacuated family (Southern border)
 375207156	Bonita Jeannard	054-9621283	5	Disabled veteran
 308010607	Annamarie Godley	050-0756537	10	Disabled veteran
 310420269	Kalina Iglesiaz	057-6029295	2	Isolated citizen
 285078197	Farrah Melwall	057-1322843	8	Holocaust survivor
 284519161	Dwayne Barles	054-8434458	6	Holocaust survivor
 293240834	Chaim Ancliffe	054-5096916	9	Isolated citizen
-281866707	Charmane Doncom	055-7799970	10	Reservist a_family (active duty)
-377732010	Rickie Leades	051-4463104	3	Evacuated a_family (Southern border)
+281866707	Charmane Doncom	055-7799970	10	Reservist family (active duty)
+377732010	Rickie Leades	051-4463104	3	Evacuated family (Southern border)
 215823591	Davita Guppy	050-4606101	1	Special needs child
 242849390	Laraine Lewing	054-1676238	9	Single mother
 316086562	Nicky Gosford	050-6587576	9	Chronic medical condition
 230687119	Dyane Goodban	054-4497985	5	Chronic medical condition
 369409926	Simonne Paradine	050-7341780	9	Chronic medical condition
 303906603	Stella Hackin	053-0494777	4	Elderly person
-243426461	Cleo Hanscombe	056-6968659	2	Reservist a_family (active duty)
+243426461	Cleo Hanscombe	056-6968659	2	Reservist family (active duty)
 302823359	Jada Murfin	051-7788340	9	Temporary financial crisis
 360835912	Gualterio Hakking	050-1785662	8	Isolated citizen
 377605100	Kevan Dukes	051-1685942	10	Temporary financial crisis
@@ -5373,16 +5373,16 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 259863891	Wenda Gilman	050-5524844	6	Temporary financial crisis
 232027356	Norah Benoy	053-1442017	7	Holocaust survivor
 341328880	Constantin Bridgewater	054-0150029	3	New immigrant (Oleh Hadash)
-322514010	Fanni Melhuish	057-6766326	1	Reservist a_family (active duty)
+322514010	Fanni Melhuish	057-6766326	1	Reservist family (active duty)
 231156469	Lannie Orviss	054-6785069	7	Disabled veteran
 320519234	Abby Riehm	051-0458327	6	Elderly person
-355890737	Shawna O'Curneen	052-9611024	10	Reservist a_family (active duty)
+355890737	Shawna O'Curneen	052-9611024	10	Reservist family (active duty)
 322390212	Audy Fulford	058-1732578	6	Disabled veteran
 298997111	Lorin Banyard	056-4207141	8	Single mother
 328013043	Carena Domenget	054-4336597	10	Low income household
 250809721	Jaquelin Gerling	050-7393882	1	Temporary financial crisis
-382800376	Giacinta Crissil	054-1459166	6	Evacuated a_family (Northern border)
-330531726	Maurits Rogez	056-5243088	2	Evacuated a_family (Northern border)
+382800376	Giacinta Crissil	054-1459166	6	Evacuated family (Northern border)
+330531726	Maurits Rogez	056-5243088	2	Evacuated family (Northern border)
 350923993	Ashby Eveque	056-1989896	8	Elderly person
 226608602	Jodi Lally	057-7275703	10	Elderly person
 292652003	Elladine Dibling	054-9868593	2	Chronic medical condition
@@ -5390,33 +5390,33 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 322960578	Hetty Plews	058-8807946	4	Temporary financial crisis
 261075251	Craggie Leppington	055-5825948	6	Single mother
 330400568	Winnie Mensler	056-4437945	2	Disabled veteran
-222851492	Francoise Castell	057-0389452	6	Evacuated a_family (Northern border)
+222851492	Francoise Castell	057-0389452	6	Evacuated family (Northern border)
 202718227	Shelby Heijnen	056-1285277	9	Chronic medical condition
-351417456	Tatiania MacGeaney	050-0293562	1	Reservist a_family (active duty)
+351417456	Tatiania MacGeaney	050-0293562	1	Reservist family (active duty)
 286745796	Putnam Esplin	057-0400810	3	New immigrant (Oleh Hadash)
 209574372	Philip Maulkin	054-5267576	4	Isolated citizen
-332730971	Jorie Piggrem	051-1417776	9	Evacuated a_family (Southern border)
+332730971	Jorie Piggrem	051-1417776	9	Evacuated family (Southern border)
 276787277	Jerrine Donnison	052-3826696	2	Chronic medical condition
 244714224	Shelden Watman	050-9290451	2	Special needs child
 327157783	Dwain Hosburn	050-2921824	1	Isolated citizen
 265241679	Grover Tibols	053-3299258	8	Holocaust survivor
 225513841	Donall McCray	052-8079328	8	Elderly person
 265959211	Isaac Houlridge	056-4518791	7	Temporary financial crisis
-385494975	Pamela Brownsea	055-4687960	6	Evacuated a_family (Southern border)
+385494975	Pamela Brownsea	055-4687960	6	Evacuated family (Southern border)
 385494148	Berti Dicty	058-0378533	1	Special needs child
 229502901	Joyan Battrum	057-4066252	6	New immigrant (Oleh Hadash)
-239537579	Gerrie Lamlin	054-8689585	7	Evacuated a_family (Southern border)
+239537579	Gerrie Lamlin	054-8689585	7	Evacuated family (Southern border)
 229862036	Zeke McCahill	057-0613822	4	Isolated citizen
 377406438	Buiron Etchell	053-0391791	6	Temporary financial crisis
-200379683	Brunhilda Slym	057-2066313	10	Evacuated a_family (Northern border)
+200379683	Brunhilda Slym	057-2066313	10	Evacuated family (Northern border)
 342013356	Helenka Solleme	055-8284008	4	Single mother
 284138925	Merci Larimer	052-4095972	6	New immigrant (Oleh Hadash)
 290335951	Rudy Janowicz	050-9133888	2	Single mother
 227015981	Pammi MacAlroy	055-2930046	1	Low income household
 209775797	Wright Lydden	056-9388126	9	Elderly person
 240292429	Wilhelm Attle	053-0133185	3	Disabled veteran
-305251917	Catherina Askie	051-2449359	3	Evacuated a_family (Southern border)
-264875983	Orsola Macbeth	050-6712579	8	Evacuated a_family (Northern border)
+305251917	Catherina Askie	051-2449359	3	Evacuated family (Southern border)
+264875983	Orsola Macbeth	050-6712579	8	Evacuated family (Northern border)
 269800577	Brandy McCory	051-2726537	7	Temporary financial crisis
 250553318	Nelson Deek	057-4708195	9	Low income household
 316963984	Carolina Da Costa	055-6826560	7	Low income household
@@ -5431,21 +5431,21 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 297644900	Nobe Brelsford	050-7043994	10	Special needs child
 217991730	Flinn Sikorsky	054-9931825	7	Disabled veteran
 347109250	Nicolle Antao	052-3659719	1	Single mother
-289942557	Beatriz Kineton	052-9368326	7	Reservist a_family (active duty)
-230043941	King Ditchfield	056-4929503	8	Evacuated a_family (Northern border)
+289942557	Beatriz Kineton	052-9368326	7	Reservist family (active duty)
+230043941	King Ditchfield	056-4929503	8	Evacuated family (Northern border)
 296146386	Laney Paule	050-0273961	3	Elderly person
 259255914	Bambi Guihen	052-6890962	2	Holocaust survivor
 293055780	Thorny Barok	050-9085740	10	Special needs child
 326174916	Clement Matthisson	054-2726228	6	Disabled veteran
 341019326	Beth Avrahamof	055-7040911	8	Temporary financial crisis
-262032582	Mattie Jeckell	055-8391397	7	Evacuated a_family (Southern border)
+262032582	Mattie Jeckell	055-8391397	7	Evacuated family (Southern border)
 373474977	Adelheid Powder	050-8846418	9	Temporary financial crisis
 232102779	Elijah Chadney	052-0127374	9	Isolated citizen
 210117045	Saudra Jermyn	050-7018944	7	Isolated citizen
 272207867	Foster Borkett	056-5832011	10	Chronic medical condition
 261609350	Sabrina Alderson	051-7611454	7	Disabled veteran
 392744583	Ashla MacDonagh	050-5739752	8	Special needs child
-201830492	Maryann Brigman	054-1812508	4	Reservist a_family (active duty)
+201830492	Maryann Brigman	054-1812508	4	Reservist family (active duty)
 347078519	Cheston Mussotti	050-6027060	5	Isolated citizen
 247968831	Terry Flieger	051-8207657	4	Disabled veteran
 237989301	Ninette Crandon	052-5505647	1	Isolated citizen
@@ -5459,43 +5459,43 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 223637753	Camel Lockless	052-5274413	2	Disabled veteran
 352307930	Karlie Twell	057-0788050	10	Disabled veteran
 278320022	Kirstyn Levecque	052-3969542	4	Low income household
-261897427	Leontine Mingaye	054-5806410	2	Evacuated a_family (Northern border)
-351400509	Tallie Jackson	054-8893675	1	Evacuated a_family (Southern border)
+261897427	Leontine Mingaye	054-5806410	2	Evacuated family (Northern border)
+351400509	Tallie Jackson	054-8893675	1	Evacuated family (Southern border)
 284505737	Mychal Stillmann	057-7401488	6	Temporary financial crisis
-282451955	Hilary Skoggins	052-3806415	9	Evacuated a_family (Northern border)
+282451955	Hilary Skoggins	052-3806415	9	Evacuated family (Northern border)
 276002200	Brandice Yitzovicz	055-5265212	2	New immigrant (Oleh Hadash)
 248762318	Tildie Harpur	052-3350876	7	Single mother
 388061445	Julian Exter	052-7385576	4	Chronic medical condition
 366164918	Keenan Elham	051-0076536	6	Low income household
-210268555	Marie-ann Pepon	050-3036088	5	Evacuated a_family (Northern border)
+210268555	Marie-ann Pepon	050-3036088	5	Evacuated family (Northern border)
 228182059	Rutter Ruckhard	054-3998701	6	Holocaust survivor
 274098633	Agustin Aldington	056-1794962	10	Elderly person
 241902889	Jessie McDavitt	052-8446799	4	New immigrant (Oleh Hadash)
 339617503	Frans Trethowan	052-2370137	10	Disabled veteran
 381034627	Tiertza Keningley	058-4749054	7	Isolated citizen
-239620079	Karleen Geffe	052-6488309	9	Evacuated a_family (Southern border)
+239620079	Karleen Geffe	052-6488309	9	Evacuated family (Southern border)
 314090156	Damian Daffern	056-6457591	1	Holocaust survivor
-284341281	Gareth Eunson	050-3022628	3	Evacuated a_family (Southern border)
+284341281	Gareth Eunson	050-3022628	3	Evacuated family (Southern border)
 315600000	Leland Schroeder	054-0011452	6	Special needs child
-313740320	Janna Healing	054-6772962	1	Evacuated a_family (Northern border)
-362259420	Adams Jodlowski	058-5892418	1	Reservist a_family (active duty)
-320256546	Randi Servante	053-7536720	9	Reservist a_family (active duty)
-355992378	Yelena Mulliss	051-9541595	8	Evacuated a_family (Northern border)
+313740320	Janna Healing	054-6772962	1	Evacuated family (Northern border)
+362259420	Adams Jodlowski	058-5892418	1	Reservist family (active duty)
+320256546	Randi Servante	053-7536720	9	Reservist family (active duty)
+355992378	Yelena Mulliss	051-9541595	8	Evacuated family (Northern border)
 229462287	Beatrisa Summerhayes	056-1550451	10	Chronic medical condition
 246221061	Alphard Wissby	058-7794465	6	Isolated citizen
 215911301	Kacie Pally	055-3475383	9	Single mother
-352289352	Teodora Zorener	056-4295155	10	Evacuated a_family (Northern border)
+352289352	Teodora Zorener	056-4295155	10	Evacuated family (Northern border)
 311962037	Anthony Belshaw	055-4130854	6	Isolated citizen
 236270562	Patten Fothergill	051-1595319	2	New immigrant (Oleh Hadash)
 309277276	Mavis Kislingbury	053-7183396	2	Single mother
 295329646	Van Boddington	053-2911591	10	New immigrant (Oleh Hadash)
-240168927	Eva Esposi	055-5815207	6	Evacuated a_family (Southern border)
+240168927	Eva Esposi	055-5815207	6	Evacuated family (Southern border)
 304555663	Preston Olczyk	051-1968762	9	Low income household
 207310078	Maureene Sedgeworth	053-1072397	7	New immigrant (Oleh Hadash)
 317389835	Allie Vlasenko	052-6332801	2	Isolated citizen
 311115877	Maitilde Ruos	058-1944185	2	Special needs child
-213163546	Doralynne Darrigone	057-3497794	3	Reservist a_family (active duty)
-374268590	Veronique De Matteis	058-3543222	2	Reservist a_family (active duty)
+213163546	Doralynne Darrigone	057-3497794	3	Reservist family (active duty)
+374268590	Veronique De Matteis	058-3543222	2	Reservist family (active duty)
 204742356	Truman Maase	056-9422094	2	Chronic medical condition
 265159128	Hatti Everiss	055-5200098	3	New immigrant (Oleh Hadash)
 383603600	Sheeree Cregin	056-6642191	9	Chronic medical condition
@@ -5503,7 +5503,7 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 213633908	Chelsea Conroy	057-4628889	7	New immigrant (Oleh Hadash)
 322029391	Roderick Dawks	058-0770168	8	Elderly person
 298711073	Kimberli Coronas	054-3697435	2	Disabled veteran
-243467092	Garrik Nayer	050-1290770	4	Reservist a_family (active duty)
+243467092	Garrik Nayer	050-1290770	4	Reservist family (active duty)
 382552418	Cthrine Nairn	056-2223687	10	Elderly person
 375969303	Conny Lyddy	052-2405574	9	Special needs child
 372590216	Shirlene Hasluck	055-6188193	1	Single mother
@@ -5512,27 +5512,27 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 381393391	Avrit Sharrard	051-9805924	4	Temporary financial crisis
 351315042	Rosamond Fehely	052-6223044	6	Disabled veteran
 362074645	Gabbie Allsupp	057-4776705	2	Single mother
-241114299	Ruby Trubshaw	050-5843573	9	Evacuated a_family (Northern border)
+241114299	Ruby Trubshaw	050-5843573	9	Evacuated family (Northern border)
 226294348	Ranice Parsonage	055-7060066	1	Single mother
 387355527	Arny Sailor	053-0728805	6	Temporary financial crisis
-336769910	Cicely Kirdsch	051-8129132	9	Evacuated a_family (Northern border)
+336769910	Cicely Kirdsch	051-8129132	9	Evacuated family (Northern border)
 384476972	Ansel Downing	055-9740555	9	New immigrant (Oleh Hadash)
-205595203	Donny Holgan	055-6511297	4	Evacuated a_family (Southern border)
+205595203	Donny Holgan	055-6511297	4	Evacuated family (Southern border)
 366342956	Sayre Gilphillan	056-4582826	8	Temporary financial crisis
 249004972	Theresita Heggs	055-1470254	4	Special needs child
-265854766	Portie Asprey	050-8611302	8	Evacuated a_family (Northern border)
+265854766	Portie Asprey	050-8611302	8	Evacuated family (Northern border)
 222232918	Natalee Tieraney	051-0892192	2	New immigrant (Oleh Hadash)
 207394395	Davie Norway	058-6805512	7	Single mother
 381127999	Fulvia Rojel	054-3427643	5	Elderly person
 260153479	Kessiah Benger	056-8250049	9	Low income household
 237997078	Regen Akeherst	057-8611497	8	Special needs child
-360692308	Verena Pendrill	050-0335786	8	Evacuated a_family (Northern border)
+360692308	Verena Pendrill	050-0335786	8	Evacuated family (Northern border)
 202373420	Kendrick Robertucci	054-8804675	4	Isolated citizen
 343846716	Ellis Sharkey	053-1658131	8	Special needs child
 233526785	Amery Seabridge	052-8833837	6	New immigrant (Oleh Hadash)
 354830349	Florri Cornes	054-2835790	2	New immigrant (Oleh Hadash)
 231909517	Alfonso Prinne	055-1302218	7	Disabled veteran
-251746807	Cherida Snell	057-8390357	8	Evacuated a_family (Northern border)
+251746807	Cherida Snell	057-8390357	8	Evacuated family (Northern border)
 200998053	Calla Renish	052-2127947	5	Disabled veteran
 341741900	Ivar Goody	058-0237613	1	Low income household
 318322680	Pris Treanor	052-8704561	9	Temporary financial crisis
@@ -5541,7 +5541,7 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 214719789	Egan Edgworth	054-9861498	6	Holocaust survivor
 313307782	Lisle Hails	052-6468949	5	Isolated citizen
 237553743	Baldwin Lyenyng	058-0222147	8	Isolated citizen
-339758646	Giordano Poyner	050-4707879	7	Evacuated a_family (Northern border)
+339758646	Giordano Poyner	050-4707879	7	Evacuated family (Northern border)
 352323507	Nickolas Rayment	057-0876132	3	Low income household
 307793325	Vinny Mugford	050-7130050	3	Temporary financial crisis
 206546045	Jakie Cainey	054-0611388	5	Temporary financial crisis
@@ -5549,10 +5549,10 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 229597841	Siegfried Whitmell	058-6702432	5	Isolated citizen
 281320693	Karrah Reditt	056-9665343	8	Holocaust survivor
 351080720	Paige Merrien	057-8986722	9	Single mother
-345152543	Cristiano Routhorn	051-3915742	9	Reservist a_family (active duty)
+345152543	Cristiano Routhorn	051-3915742	9	Reservist family (active duty)
 257286296	Norah Lindmark	056-9682945	1	Chronic medical condition
-372902851	Dennie Gillespey	051-9479325	8	Reservist a_family (active duty)
-218323733	Allissa Lampet	050-4295009	5	Evacuated a_family (Northern border)
+372902851	Dennie Gillespey	051-9479325	8	Reservist family (active duty)
+218323733	Allissa Lampet	050-4295009	5	Evacuated family (Northern border)
 367335086	Cate Grigolon	055-8407297	4	Chronic medical condition
 255848248	Geneva Rayhill	058-1672133	7	Chronic medical condition
 359381039	Simona Lezemere	057-1363007	8	Chronic medical condition
@@ -5567,18 +5567,18 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 243642262	Monique Sikorsky	052-8882992	2	New immigrant (Oleh Hadash)
 359559186	Drugi Lambden	053-8261835	10	Isolated citizen
 330680373	Parsifal Pelosi	050-1156301	9	Isolated citizen
-349067557	Lorianna Mathe	056-3352411	1	Evacuated a_family (Southern border)
-318763003	Janessa Massard	056-7427120	2	Evacuated a_family (Southern border)
+349067557	Lorianna Mathe	056-3352411	1	Evacuated family (Southern border)
+318763003	Janessa Massard	056-7427120	2	Evacuated family (Southern border)
 209240029	Ryon Sebrens	058-6097324	10	Disabled veteran
 365937697	Sloan Mackley	050-9130571	2	Low income household
 258602361	Noni Yanne	055-6894152	4	New immigrant (Oleh Hadash)
 356653552	Aubry Drain	052-8254676	5	New immigrant (Oleh Hadash)
 347042222	Vin Clew	055-4344898	8	Temporary financial crisis
-203998808	Kellyann Tourot	051-4757761	8	Reservist a_family (active duty)
+203998808	Kellyann Tourot	051-4757761	8	Reservist family (active duty)
 229665035	Gareth Radbond	055-6128635	8	Single mother
 369590962	Gianina Garmey	055-5536923	9	Single mother
 283166906	Berky Sutherby	050-3012919	5	Chronic medical condition
-310221257	Kipper Falloon	055-0217476	9	Evacuated a_family (Northern border)
+310221257	Kipper Falloon	055-0217476	9	Evacuated family (Northern border)
 280685563	Raf Baudrey	054-4913840	4	Disabled veteran
 323572494	Filip Dalzell	058-3472699	5	Temporary financial crisis
 359124186	Bucky Eringey	058-0319586	6	Isolated citizen
@@ -5586,10 +5586,10 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 256704489	Brynne Igonet	053-9582013	8	Low income household
 315306373	Milena Highnam	055-0800042	5	Temporary financial crisis
 255472708	Gilbertine Portchmouth	058-7331014	10	Disabled veteran
-278882043	Elyse Simic	054-5341336	1	Reservist a_family (active duty)
+278882043	Elyse Simic	054-5341336	1	Reservist family (active duty)
 249386939	Hettie Van der Krui	053-7758154	7	Temporary financial crisis
 295761958	Christyna Antoniewski	050-0249844	3	Temporary financial crisis
-357010125	Blisse Wudeland	052-5788738	5	Evacuated a_family (Southern border)
+357010125	Blisse Wudeland	052-5788738	5	Evacuated family (Southern border)
 261631298	Daisie Terbeck	053-0049881	2	Temporary financial crisis
 279661686	Davidde Tilsley	057-4030001	2	Elderly person
 205731006	Robinetta Pieper	052-3755166	5	Low income household
@@ -5597,15 +5597,15 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 236291797	Danya Sanney	055-3376024	4	Disabled veteran
 209732989	Ash Rummer	057-2784720	10	Low income household
 217656967	Juliana Juorio	053-5424583	6	Special needs child
-370132767	Palmer Tremelling	052-2555218	5	Evacuated a_family (Southern border)
+370132767	Palmer Tremelling	052-2555218	5	Evacuated family (Southern border)
 258920040	Renell Kreutzer	054-3088019	6	Holocaust survivor
 203885361	Shayne Ginglell	052-8831615	4	Single mother
 350469124	Arman Stanlick	058-8100197	6	Isolated citizen
 240201803	Laird Hefford	050-1512981	9	Low income household
 363363851	Albertina Wife	057-5566299	6	Disabled veteran
 349340901	Kaiser Gabits	054-8073733	10	Disabled veteran
-357588735	Glynda Codron	051-3495573	5	Evacuated a_family (Southern border)
-398737058	Humphrey Brownill	057-9685127	6	Evacuated a_family (Northern border)
+357588735	Glynda Codron	051-3495573	5	Evacuated family (Southern border)
+398737058	Humphrey Brownill	057-9685127	6	Evacuated family (Northern border)
 212376930	Luciana Gouldthorpe	058-5481428	10	Low income household
 303943814	Hagen Shardlow	056-4612958	7	Temporary financial crisis
 395964237	Nikolaos Fontes	056-8100889	1	Low income household
@@ -5613,25 +5613,25 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 314358342	Tymothy Heugel	055-3896178	3	Isolated citizen
 289723837	Paloma Sandison	058-5233689	4	Disabled veteran
 210379011	Ashien Kellet	055-9468746	6	Single mother
-327188836	Quinlan Westmarland	054-3837529	3	Evacuated a_family (Southern border)
+327188836	Quinlan Westmarland	054-3837529	3	Evacuated family (Southern border)
 240023045	Andy Easbie	054-4195617	4	Temporary financial crisis
 274818129	Faina Tamlett	050-5142199	9	Temporary financial crisis
 277512108	Saree Seer	056-3995064	5	Disabled veteran
 243249881	Doralynn Iannazzi	058-0328872	2	Temporary financial crisis
-312498034	Cristen Schneider	053-7798322	5	Evacuated a_family (Northern border)
+312498034	Cristen Schneider	053-7798322	5	Evacuated family (Northern border)
 308077508	Donovan Snelman	057-4377095	5	Special needs child
-390363032	Kip Cawt	051-2580614	10	Evacuated a_family (Northern border)
+390363032	Kip Cawt	051-2580614	10	Evacuated family (Northern border)
 341231831	Mollee Piele	055-4546656	10	Temporary financial crisis
 261936982	Lem Bourrel	051-6888079	1	Chronic medical condition
 226235257	Webster Dibb	055-3301791	2	Elderly person
-326049787	Benton Jolliman	054-7036551	2	Evacuated a_family (Southern border)
-331521737	Xever Whelpton	051-5869280	4	Evacuated a_family (Southern border)
+326049787	Benton Jolliman	054-7036551	2	Evacuated family (Southern border)
+331521737	Xever Whelpton	051-5869280	4	Evacuated family (Southern border)
 208897142	Theobald Iacobacci	057-3345854	1	Single mother
 246708760	Stillmann Roseman	058-9648203	5	Elderly person
 369543752	Meggi Outerbridge	054-5374467	10	Disabled veteran
 357432754	Debby Wilmut	050-4602201	3	Chronic medical condition
 326612442	Olivia Pidgeon	056-7394117	2	Low income household
-337831560	Riordan Crannage	053-9862420	2	Reservist a_family (active duty)
+337831560	Riordan Crannage	053-9862420	2	Reservist family (active duty)
 211900209	Lizzie Abele	050-6281770	2	Low income household
 352901609	Huntington ducarme	051-5878124	7	Single mother
 355026524	Angelico Gaskin	055-9655882	10	Temporary financial crisis
@@ -5641,7 +5641,7 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 317030035	Cathe Servante	054-4749899	9	Low income household
 347063023	Thea Hertwell	053-0784472	1	Holocaust survivor
 226701743	Arron Kebbell	054-7956952	2	Low income household
-211516775	Rodrique Buntine	056-4211399	5	Evacuated a_family (Southern border)
+211516775	Rodrique Buntine	056-4211399	5	Evacuated family (Southern border)
 331406433	Mandy Brand	056-5938072	8	Single mother
 297131513	Walther Eggins	057-3509942	8	Isolated citizen
 217087241	Alano Cowhig	050-9171719	7	Single mother
@@ -5651,49 +5651,49 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 375989621	Caitlin Peckitt	055-0912775	8	Special needs child
 376995197	Melvyn Ketton	051-4743983	7	Holocaust survivor
 374963487	Susanna Woodfield	052-1274909	1	Temporary financial crisis
-220659719	Jess Conring	051-3859438	7	Evacuated a_family (Northern border)
+220659719	Jess Conring	051-3859438	7	Evacuated family (Northern border)
 305029898	Berkie Olivi	056-8178891	2	New immigrant (Oleh Hadash)
-293040792	Ulrikaumeko Croxford	053-1551574	3	Evacuated a_family (Southern border)
-238250539	Harmonia Sanger	055-5255460	4	Evacuated a_family (Southern border)
+293040792	Ulrikaumeko Croxford	053-1551574	3	Evacuated family (Southern border)
+238250539	Harmonia Sanger	055-5255460	4	Evacuated family (Southern border)
 381512358	Aleen Wrotchford	050-6328561	6	Temporary financial crisis
 342868300	Lenard Taill	058-6588807	8	Disabled veteran
 256387378	Bordy McCrann	056-5123005	8	Holocaust survivor
 280265610	Jo ann Cottill	054-3000614	7	Low income household
-241799084	Allina Berg	050-5881989	4	Reservist a_family (active duty)
+241799084	Allina Berg	050-5881989	4	Reservist family (active duty)
 326397161	Verena Texton	057-4640815	6	New immigrant (Oleh Hadash)
-219810285	Alejandro Iannuzzelli	053-6908237	9	Reservist a_family (active duty)
+219810285	Alejandro Iannuzzelli	053-6908237	9	Reservist family (active duty)
 380288542	Candie Barnewelle	057-5588572	10	Chronic medical condition
 210397985	Land Benda	058-6409854	8	New immigrant (Oleh Hadash)
 200372627	Lukas Ashness	057-9179916	8	Special needs child
 313834626	Henrieta Nursey	055-3046978	5	Temporary financial crisis
 213133363	Terri-jo Rix	050-1302714	2	Elderly person
-383063163	Robinett Gorrie	057-6280991	1	Evacuated a_family (Northern border)
+383063163	Robinett Gorrie	057-6280991	1	Evacuated family (Northern border)
 399964920	Douglas Whittlesea	050-7864007	4	Low income household
 321165034	Chandal Ruckhard	051-8938381	3	New immigrant (Oleh Hadash)
 321274223	Seward Tinn	052-9887955	4	Low income household
 373724606	Kimmie Illing	058-7548997	10	New immigrant (Oleh Hadash)
-392562459	Kristi Spuffard	057-4535113	8	Evacuated a_family (Southern border)
-388988435	Amalie Batson	053-4501562	8	Evacuated a_family (Northern border)
-234389406	Blinny Underhill	050-9729018	8	Evacuated a_family (Southern border)
+392562459	Kristi Spuffard	057-4535113	8	Evacuated family (Southern border)
+388988435	Amalie Batson	053-4501562	8	Evacuated family (Northern border)
+234389406	Blinny Underhill	050-9729018	8	Evacuated family (Southern border)
 263680357	Bess Fromont	054-1161068	3	Single mother
 223464710	Beale Falkous	050-2384080	9	Elderly person
 203754062	Dirk Shackell	055-2190211	2	Disabled veteran
 309684602	Jaquenette Van Halen	054-5827783	6	New immigrant (Oleh Hadash)
 227504540	Sibylla Feldheim	054-6362338	2	Isolated citizen
 313282030	Timmy Assiter	058-4734926	2	Chronic medical condition
-398325408	Oriana Tonbye	053-7999299	6	Reservist a_family (active duty)
-395318135	Terrel Robecon	055-5554179	1	Evacuated a_family (Southern border)
+398325408	Oriana Tonbye	053-7999299	6	Reservist family (active duty)
+395318135	Terrel Robecon	055-5554179	1	Evacuated family (Southern border)
 383852626	Waly Mayne	050-8765594	10	Disabled veteran
 287364241	Vikky Corradengo	050-4058172	7	Special needs child
 304312747	Filbert Farrier	052-1871206	3	Holocaust survivor
-396621835	Herminia Dugue	054-4348192	1	Evacuated a_family (Northern border)
+396621835	Herminia Dugue	054-4348192	1	Evacuated family (Northern border)
 272875859	Jakie Dyas	052-6248174	2	Elderly person
 398076476	Janella Mirfield	057-3269007	1	Holocaust survivor
 205511589	Gregorius Shippard	051-4230376	7	Low income household
-382202172	Vannie Winfindale	056-4051042	1	Evacuated a_family (Southern border)
+382202172	Vannie Winfindale	056-4051042	1	Evacuated family (Southern border)
 264640119	Reggy Roja	057-7075604	10	New immigrant (Oleh Hadash)
 364694798	Abbe Laxton	051-9017955	1	Holocaust survivor
-253357455	Randie Ambage	053-3197845	9	Evacuated a_family (Northern border)
+253357455	Randie Ambage	053-3197845	9	Evacuated family (Northern border)
 331105974	Crawford Shovelton	056-6469418	7	Chronic medical condition
 344801627	Bobine Zavattari	056-5453506	6	Disabled veteran
 259553501	Guillemette Torrijos	050-7944974	7	New immigrant (Oleh Hadash)
@@ -5701,13 +5701,13 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 360413078	Portie Wollard	050-7705927	7	Single mother
 312263003	Netti Thresher	054-2174752	5	Isolated citizen
 295569656	Vevay Bowes	055-6639655	8	Single mother
-267838153	Roarke MacRierie	057-4909471	6	Evacuated a_family (Northern border)
+267838153	Roarke MacRierie	057-4909471	6	Evacuated family (Northern border)
 218413948	Thebault Danher	053-9539380	1	Temporary financial crisis
 205857820	Rollo Feldklein	057-0852561	7	Low income household
 357387156	Uri Notton	055-3897518	10	Disabled veteran
 381860182	Nerte Purkess	058-8334186	8	Low income household
 339461343	Sanson Trusler	051-7994584	3	Holocaust survivor
-290117248	Evie Killigrew	058-2445417	8	Evacuated a_family (Northern border)
+290117248	Evie Killigrew	058-2445417	8	Evacuated family (Northern border)
 210904610	Patricia Rayment	055-4150824	8	Disabled veteran
 339859502	Shayne Broadwood	054-3304745	8	Special needs child
 233997166	Brade Kilban	050-1384536	7	Single mother
@@ -5715,23 +5715,23 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 385986610	Gwendolin Livesey	055-6585736	4	Chronic medical condition
 286844221	Neysa Brothwood	057-8687949	5	Isolated citizen
 236128269	Dall Bennedsen	050-6493213	10	Single mother
-241959034	Keslie Bointon	058-9204002	2	Evacuated a_family (Northern border)
+241959034	Keslie Bointon	058-9204002	2	Evacuated family (Northern border)
 263180526	Alec Gullivan	053-5703005	10	Special needs child
 216968299	Melanie Zellner	057-4656551	7	Holocaust survivor
 381862085	El Harme	054-1506402	3	Chronic medical condition
 278325316	Trumann Lugton	058-3310084	4	Isolated citizen
 370070126	Bernhard Hickisson	056-6156515	2	Chronic medical condition
-282762462	Ulrikaumeko Kaubisch	054-5912923	2	Evacuated a_family (Southern border)
+282762462	Ulrikaumeko Kaubisch	054-5912923	2	Evacuated family (Southern border)
 377532222	Lorrin Feasey	056-3970602	7	Disabled veteran
 319642361	Natala Suart	055-1927558	2	Elderly person
 278588531	Ag Dranfield	057-8738069	7	Special needs child
 309937029	Herminia Yglesia	056-0727783	5	Temporary financial crisis
-213708406	Reynolds Brewse	050-3880591	1	Evacuated a_family (Northern border)
-350854830	Clemmie Fullilove	055-1568951	6	Evacuated a_family (Southern border)
-363448614	Paolina Langthorn	057-0283539	5	Evacuated a_family (Northern border)
+213708406	Reynolds Brewse	050-3880591	1	Evacuated family (Northern border)
+350854830	Clemmie Fullilove	055-1568951	6	Evacuated family (Southern border)
+363448614	Paolina Langthorn	057-0283539	5	Evacuated family (Northern border)
 377327349	Phylis Matthiae	053-1849715	3	Disabled veteran
 367335821	Niels Brassill	051-0518055	8	Single mother
-277289335	Demetria Roe	058-1160110	2	Evacuated a_family (Southern border)
+277289335	Demetria Roe	058-1160110	2	Evacuated family (Southern border)
 319965786	Martie Ring	051-8103025	1	Special needs child
 316257365	Stanley Kristiansen	055-3273053	5	Disabled veteran
 372078128	Trescha Drever	057-7203584	9	Isolated citizen
@@ -5745,18 +5745,18 @@ COPY public.a_family (contactperson_id, contactperson_name, phone_number, number
 360256559	Vinson Bewshire	058-4257895	10	Temporary financial crisis
 385940902	Joye Gooder	052-5648196	6	Isolated citizen
 261022526	Kata Mc Grath	056-3841843	2	Temporary financial crisis
-267113439	Rae Kirvell	054-1139879	1	Reservist a_family (active duty)
+267113439	Rae Kirvell	054-1139879	1	Reservist family (active duty)
 372825198	Odie Alvey	050-6713955	4	Isolated citizen
 217549479	Vito Revelle	055-7365971	4	New immigrant (Oleh Hadash)
 399860813	Glen Gleder	050-5843254	7	Elderly person
 282062234	Estrella Stoggell	058-3069286	3	New immigrant (Oleh Hadash)
 323816253	Hoebart Swatridge	056-9437256	5	Chronic medical condition
-302032838	Mufinella Corkhill	057-6928399	7	Evacuated a_family (Northern border)
+302032838	Mufinella Corkhill	057-6928399	7	Evacuated family (Northern border)
 \.
 
 
 --
--- Data for Name: a_location; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: location; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
 COPY public.a_location (latitude, longitude, city, street, house_number) FROM stdin;
@@ -6264,10 +6264,10 @@ COPY public.a_location (latitude, longitude, city, street, house_number) FROM st
 
 
 --
--- Data for Name: a_request; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: request; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_request (a_request_id, date, image, incident_description, prioriry_level, contactperson_id, category_id, a_status_id, latitude, longitude) FROM stdin;
+COPY public.a_request (request_id, date, image, incident_description, prioriry_level, contactperson_id, category_id, status_id, latitude, longitude) FROM stdin;
 2000	2024-09-11	req_2000.jpg	Assistance needed #2000	3	334535019	3	3	32.091564	34.840469
 1500	2025-10-14	req_1500.jpg	Assistance needed #1500	4	319642361	1	3	32.091564	34.840469
 9500	2025-07-20	req_9500.jpg	Assistance needed #9500	1	217656967	4	3	32.091564	34.840469
@@ -26272,22 +26272,22 @@ COPY public.a_request (a_request_id, date, image, incident_description, prioriry
 
 
 --
--- Data for Name: a_a_requestcategory; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: requestcategory; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_a_requestcategory (category_id, category_name, description, required_skills) FROM stdin;
+COPY public.a_requestcategory (category_id, category_name, description, required_skills) FROM stdin;
 1	Rescue & Emergency	Immediate response for trapped individuals (elevators, locked rooms)	\N
 2	Shelter & MAMD Security	Maintenance and rescue related to MAMD/Shelter steel doors and windows	\N
-3	Essential Logistics	Urgent a_delivery of water packs, medical oxygen, and vital medicines	\N
+3	Essential Logistics	Urgent delivery of water packs, medical oxygen, and vital medicines	\N
 4	Urgent Home Maintenance	Critical repairs like main pipe bursts or total electrical failure	\N
 \.
 
 
 --
--- Data for Name: a_status; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: status; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_status (a_status_id, a_status_label) FROM stdin;
+COPY public.a_status (status_id, status_label) FROM stdin;
 1	Pending
 2	In Progress
 3	Completed
@@ -26296,10 +26296,10 @@ COPY public.a_status (a_status_id, a_status_label) FROM stdin;
 
 
 --
--- Data for Name: a_treatment; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: treatment; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_treatment (a_treatment_id, date, start_time, completion_time, feedback_notes, photo_after, a_delivery_id, a_volunteer_id, a_request_id) FROM stdin;
+COPY public.a_treatment (treatment_id, date, start_time, completion_time, feedback_notes, photo_after, delivery_id, volunteer_id, request_id) FROM stdin;
 1	2025-05-14	19:41:00	20:12:00	Mission #1 completed	after_1.jpg	1	346645818	1
 7	2025-08-05	13:43:00	14:48:00	Mission #7 completed	after_7.jpg	7	228043940	7
 11971	2024-10-10	11:56:00	13:23:00	Mission #11971 completed	after_11971.jpg	11971	342044944	11971
@@ -46301,10 +46301,10 @@ COPY public.a_treatment (a_treatment_id, date, start_time, completion_time, feed
 
 
 --
--- Data for Name: a_volunteer; Type: TABLE DATA; Schema: public; Owner: ochrith
+-- Data for Name: volunteer; Type: TABLE DATA; Schema: public; Owner: ochrith
 --
 
-COPY public.a_volunteer (a_volunteer_id, first_name, last_name, phone_number, has_equipment, availability_a_status, counter, skill_type, latitude, longitude) FROM stdin;
+COPY public.a_volunteer (volunteer_id, first_name, last_name, phone_number, has_equipment, availability_status, counter, skill_type, latitude, longitude) FROM stdin;
 207143500	Gradeigh	McVity	055-6282128	t	Busy	773	Hydraulic Tools Expert	32.091564	34.840469
 390239000	Towny	MacNeillie	057-0285422	t	Offline	499	Certified Electrician	32.091564	34.840469
 371952001	Alexina	Dowears	051-9718562	t	Busy	339	Certified Electrician	31.787306	35.217236
@@ -46809,160 +46809,160 @@ COPY public.a_volunteer (a_volunteer_id, first_name, last_name, phone_number, ha
 
 
 --
--- Name: a_delivery a_delivery_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: delivery delivery_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_delivery
-    ADD CONSTRAINT a_delivery_pkey PRIMARY KEY (a_delivery_id);
+    ADD CONSTRAINT delivery_pkey PRIMARY KEY (delivery_id);
 
 
 --
--- Name: a_family a_family_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: family family_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_family
-    ADD CONSTRAINT a_family_pkey PRIMARY KEY (contactperson_id);
+    ADD CONSTRAINT family_pkey PRIMARY KEY (contactperson_id);
 
 
 --
--- Name: a_location a_location_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: location location_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_location
-    ADD CONSTRAINT a_location_pkey PRIMARY KEY (latitude, longitude);
+    ADD CONSTRAINT location_pkey PRIMARY KEY (latitude, longitude);
 
 
 --
--- Name: a_request a_request_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: request request_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_request
-    ADD CONSTRAINT a_request_pkey PRIMARY KEY (a_request_id);
+    ADD CONSTRAINT request_pkey PRIMARY KEY (request_id);
 
 
 --
--- Name: a_a_requestcategory a_a_requestcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: requestcategory requestcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
-ALTER TABLE ONLY public.a_a_requestcategory
-    ADD CONSTRAINT a_a_requestcategory_pkey PRIMARY KEY (category_id);
+ALTER TABLE ONLY public.a_requestcategory
+    ADD CONSTRAINT requestcategory_pkey PRIMARY KEY (category_id);
 
 
 --
--- Name: a_status a_status_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: status status_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_status
-    ADD CONSTRAINT a_status_pkey PRIMARY KEY (a_status_id);
+    ADD CONSTRAINT status_pkey PRIMARY KEY (status_id);
 
 
 --
--- Name: a_treatment a_treatment_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: treatment treatment_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_treatment
-    ADD CONSTRAINT a_treatment_pkey PRIMARY KEY (a_treatment_id);
+    ADD CONSTRAINT treatment_pkey PRIMARY KEY (treatment_id);
 
 
 --
--- Name: a_volunteer a_volunteer_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: volunteer volunteer_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_volunteer
-    ADD CONSTRAINT a_volunteer_pkey PRIMARY KEY (a_volunteer_id);
+    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
 
 
 --
--- Name: idx_a_treatment_a_volunteer; Type: INDEX; Schema: public; Owner: ochrith
+-- Name: idx_treatment_volunteer; Type: INDEX; Schema: public; Owner: ochrith
 --
 
-CREATE INDEX idx_a_treatment_a_volunteer ON public.a_treatment USING btree (a_volunteer_id);
-
-
---
--- Name: idx_a_treatment_a_volunteer_date; Type: INDEX; Schema: public; Owner: ochrith
---
-
-CREATE INDEX idx_a_treatment_a_volunteer_date ON public.a_treatment USING btree (a_volunteer_id, date);
+CREATE INDEX idx_treatment_volunteer ON public.a_treatment USING btree (volunteer_id);
 
 
 --
--- Name: idx_a_volunteer_a_status_a_location; Type: INDEX; Schema: public; Owner: ochrith
+-- Name: idx_treatment_volunteer_date; Type: INDEX; Schema: public; Owner: ochrith
 --
 
-CREATE INDEX idx_a_volunteer_a_status_a_location ON public.a_volunteer USING btree (availability_a_status, latitude, longitude);
+CREATE INDEX idx_treatment_volunteer_date ON public.a_treatment USING btree (volunteer_id, date);
 
 
 --
--- Name: a_delivery a_delivery_a_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: idx_volunteer_status_location; Type: INDEX; Schema: public; Owner: ochrith
+--
+
+CREATE INDEX idx_volunteer_status_location ON public.a_volunteer USING btree (availability_status, latitude, longitude);
+
+
+--
+-- Name: delivery delivery_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_delivery
-    ADD CONSTRAINT a_delivery_a_request_id_fkey FOREIGN KEY (a_request_id) REFERENCES public.a_request(a_request_id);
+    ADD CONSTRAINT delivery_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.a_request(request_id);
 
 
 --
--- Name: a_request a_request_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
---
-
-ALTER TABLE ONLY public.a_request
-    ADD CONSTRAINT a_request_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.a_a_requestcategory(category_id);
-
-
---
--- Name: a_request a_request_contactperson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: request request_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_request
-    ADD CONSTRAINT a_request_contactperson_id_fkey FOREIGN KEY (contactperson_id) REFERENCES public.a_family(contactperson_id);
+    ADD CONSTRAINT request_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.a_requestcategory(category_id);
 
 
 --
--- Name: a_request a_request_latitude_longitude_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
---
-
-ALTER TABLE ONLY public.a_request
-    ADD CONSTRAINT a_request_latitude_longitude_fkey FOREIGN KEY (latitude, longitude) REFERENCES public.a_location(latitude, longitude);
-
-
---
--- Name: a_request a_request_a_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: request request_contactperson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_request
-    ADD CONSTRAINT a_request_a_status_id_fkey FOREIGN KEY (a_status_id) REFERENCES public.a_status(a_status_id);
+    ADD CONSTRAINT request_contactperson_id_fkey FOREIGN KEY (contactperson_id) REFERENCES public.a_family(contactperson_id);
 
 
 --
--- Name: a_treatment a_treatment_a_delivery_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: request request_latitude_longitude_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+--
+
+ALTER TABLE ONLY public.a_request
+    ADD CONSTRAINT request_latitude_longitude_fkey FOREIGN KEY (latitude, longitude) REFERENCES public.a_location(latitude, longitude);
+
+
+--
+-- Name: request request_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+--
+
+ALTER TABLE ONLY public.a_request
+    ADD CONSTRAINT request_status_id_fkey FOREIGN KEY (status_id) REFERENCES public.a_status(status_id);
+
+
+--
+-- Name: treatment treatment_delivery_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_treatment
-    ADD CONSTRAINT a_treatment_a_delivery_id_fkey FOREIGN KEY (a_delivery_id) REFERENCES public.a_delivery(a_delivery_id);
+    ADD CONSTRAINT treatment_delivery_id_fkey FOREIGN KEY (delivery_id) REFERENCES public.a_delivery(delivery_id);
 
 
 --
--- Name: a_treatment a_treatment_a_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
---
-
-ALTER TABLE ONLY public.a_treatment
-    ADD CONSTRAINT a_treatment_a_request_id_fkey FOREIGN KEY (a_request_id) REFERENCES public.a_request(a_request_id);
-
-
---
--- Name: a_treatment a_treatment_a_volunteer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: treatment treatment_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_treatment
-    ADD CONSTRAINT a_treatment_a_volunteer_id_fkey FOREIGN KEY (a_volunteer_id) REFERENCES public.a_volunteer(a_volunteer_id);
+    ADD CONSTRAINT treatment_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.a_request(request_id);
 
 
 --
--- Name: a_volunteer a_volunteer_latitude_longitude_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+-- Name: treatment treatment_volunteer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
+--
+
+ALTER TABLE ONLY public.a_treatment
+    ADD CONSTRAINT treatment_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.a_volunteer(volunteer_id);
+
+
+--
+-- Name: volunteer volunteer_latitude_longitude_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ochrith
 --
 
 ALTER TABLE ONLY public.a_volunteer
-    ADD CONSTRAINT a_volunteer_latitude_longitude_fkey FOREIGN KEY (latitude, longitude) REFERENCES public.a_location(latitude, longitude);
+    ADD CONSTRAINT volunteer_latitude_longitude_fkey FOREIGN KEY (latitude, longitude) REFERENCES public.a_location(latitude, longitude);
 
 
 --

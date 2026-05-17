@@ -365,8 +365,57 @@ VALUES (0,'2025-05-05','08:00','07:00','no',null,0,1,0)
 ```
 This insertion fails because the completion time is earlier than the start time.
 <img width="774" height="103" alt="image" src="https://github.com/user-attachments/assets/1cfeb77b-6377-4a93-b648-1d6eff585500" />
+
 ## Stage 3 Intgartion
 
+
+#1  Creating the Tables from the Backup
+
+To rebuild the received database, we read each `CREATE TABLE` command in the backup file.
+
+Each `CREATE TABLE` command allowed us to identify one table, its columns, the data type of each column, and the basic constraints defined on it, such as `NOT NULL`, `CHECK`, and `UNIQUE`.
+
+For example, from a `CREATE TABLE volunteer` command, we could understand that the database contains a `volunteer` table, with fields such as `volunteer_id`, `first_name`, `last_name`, `phone`, `email`, and other volunteer-related information.
+ ```sql
+CREATE TABLE public.volunteer (
+    first_name character varying(20) NOT NULL,  --    <-- constraint 
+    phone integer NOT NULL,
+    birthday date NOT NULL,
+    email text NOT NULL,
+    city character varying(30) NOT NULL,
+    volunteer_id integer NOT NULL,
+    recruitment_date date NOT NULL,
+    last_name character varying(20) NOT NULL,
+    is_active character(1) NOT NULL,    --    <-- constraint 
+    CONSTRAINT check_phone_positive CHECK ((phone > 0)),   
+    CONSTRAINT volunteer_birthday_check CHECK ((birthday < CURRENT_DATE)),   --    <-- constraint 
+    CONSTRAINT volunteer_check CHECK ((recruitment_date >= birthday)),
+    CONSTRAINT volunteer_is_active_check CHECK ((is_active = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))),
+    CONSTRAINT volunteer_recruitment_date_check CHECK ((recruitment_date <= CURRENT_DATE))
+);
+ ```
+
+
+Then, by reading the `ALTER TABLE` commands, we identified the primary keys and foreign keys of each table. This allowed us to understand the relationships between the tables and reconstruct the database structure.
+ ```sql
+ALTER TABLE ONLY public.volunteer
+    ADD CONSTRAINT volunteer_email_key UNIQUE (email);
+ ```
+
+ ```sql
+ALTER TABLE ONLY public.volunteer
+    ADD CONSTRAINT volunteer_phone_key UNIQUE (phone);
+ ```
+
+ ```sql
+ALTER TABLE ONLY public.volunteer
+    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
+ ```
+In this way, the backup was used not only to create the tables in PostgreSQL, but also to analyze the structure of the received system.
+
+
+#DSD RESULT NOEMIE MET ICI LE DSD 
+#2 backup edits
 1. code python simple for change all the nale table a_table for group and b_table for group b
 
 2.  some name conflict like for the index of the group b : volunteer_pkey

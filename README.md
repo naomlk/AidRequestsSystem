@@ -420,7 +420,14 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 ---
 
 
-##2.backup edits
+
+
+
+
+
+
+
+##2.backup edits(jai commence mais cest pour la semaien pro)
 1. code python simple for change all the nale table a_table for group and b_table for group b
 
 2.  some name conflict like for the index of the group b : volunteer_pkey

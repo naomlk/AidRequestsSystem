@@ -416,7 +416,7 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 ( PK = UNIQUE+NOT NULL
  UNIQUE = can be null) 
 
-# **DSD**:
+### DSD:
 
 <img width="1670" height="646" alt="image" src="https://github.com/user-attachments/assets/96a53e46-b243-4beb-8c93-86ef2910f9f3" />
 
@@ -424,7 +424,7 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 
 
 ---
-# **2 . Algorithm : FROM DSD to ERD**
+### 2 . Algorithm : FROM DSD to ERD**
 
 
 

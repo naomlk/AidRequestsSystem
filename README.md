@@ -429,7 +429,10 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 
 
 
+<img width="1496" height="655" alt="image" src="https://github.com/user-attachments/assets/fc87d1e9-16e0-4b7e-9683-7c573bc1b910" />
 
+### Integration
+<img width="1672" height="724" alt="image" src="https://github.com/user-attachments/assets/6d41a13a-257f-4be8-b62c-a17326e51d0c" />
 
 # **3.backup edits** (jai commence mais cest pour la semaien pro)
 1. code python simple for change all the nale table a_table for group and b_table for group b

@@ -365,4 +365,23 @@ VALUES (0,'2025-05-05','08:00','07:00','no',null,0,1,0)
 ```
 This insertion fails because the completion time is earlier than the start time.
 <img width="774" height="103" alt="image" src="https://github.com/user-attachments/assets/1cfeb77b-6377-4a93-b648-1d6eff585500" />
+## Stage 3 Intgartion
 
+1. code python simple for change all the nale table a_table for group and b_table for group b
+
+2.  some name conflict like for the index of the group b : volunteer_pkey
+In backup group A
+  ```sql
+ALTER TABLE ONLY public.a_volunteer
+    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
+  ```
+In backup group B:
+  ```sql
+ALTER TABLE ONLY public.a_volunteer
+    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
+  ```
+  So we change to : 
+   ```sql
+  ALTER TABLE ONLY public.b_volunteer
+    ADD CONSTRAINT b_volunteer_pkey PRIMARY KEY (volunteer_id);
+  ```

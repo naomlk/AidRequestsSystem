@@ -437,7 +437,16 @@ Therefore, we created a `1:N` relationship between:
 
 `volunteer` → `availability`
 <img width="568" height="236" alt="oneToMany" src="https://github.com/user-attachments/assets/29479c31-b9be-4597-ac7f-3fc94d8367c7" />
+
 To:
+<img width="1164" height="307" alt="Capture d’écran 2026-05-17 154342" src="https://github.com/user-attachments/assets/399bd6e1-2963-4c40-9cb8-ee78ec8ef52a" />
+
+
+
+
+
+
+
 
 
 

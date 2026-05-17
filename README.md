@@ -460,6 +460,10 @@ So "scheduled" become an weak entity:
 <img width="393" height="363" alt="Capture d’écran 2026-05-17 160139" src="https://github.com/user-attachments/assets/1d76b5ad-604e-43f9-ba96-2572398d6439" />
 
 
+**ERD FINAL:**
+<img width="1600" height="685" alt="erdgroupb" src="https://github.com/user-attachments/assets/e42a0454-24aa-496e-b6de-b2e172075efc" />
+
+## Adjustments Made for the Integration
 
 
 
@@ -467,7 +471,8 @@ So "scheduled" become an weak entity:
 
 
 
-### Integration
+
+
 <img width="1672" height="724" alt="image" src="https://github.com/user-attachments/assets/6d41a13a-257f-4be8-b62c-a17326e51d0c" />
 
 # **3.backup edits** (jai commence mais cest pour la semaien pro)

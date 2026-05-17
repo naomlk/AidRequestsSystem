@@ -436,14 +436,10 @@ This means that each availability record belongs to one volunteer, while one vol
 Therefore, we created a `1:N` relationship between:
 
 `volunteer` → `availability`
-<img width="1600" height="685" alt="WhatsApp Image 2026-05-17 at 13 32 44 (1)" src="https://github.com/user-attachments/assets/f14ee913-86b5-4960-8319-66763a34c504" />
+<img width="568" height="236" alt="oneToMany" src="https://github.com/user-attachments/assets/29479c31-b9be-4597-ac7f-3fc94d8367c7" />
 To:
 
 
-
-
-
-<img width="1496" height="655" alt="image" src="https://github.com/user-attachments/assets/fc87d1e9-16e0-4b7e-9683-7c573bc1b910" />
 
 ### Integration
 <img width="1672" height="724" alt="image" src="https://github.com/user-attachments/assets/6d41a13a-257f-4be8-b62c-a17326e51d0c" />

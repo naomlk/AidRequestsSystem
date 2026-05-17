@@ -421,6 +421,10 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 
 
 
+---
+#2  **Algorithm : FROM DSD to ERD**
+
+
 
 
 

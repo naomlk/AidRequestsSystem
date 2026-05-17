@@ -412,7 +412,8 @@ ALTER TABLE ONLY public.volunteer
     ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
  ```
 In this way, the backup was used not only to create the tables in PostgreSQL, but also to analyze the structure of the received system.
-
+( PK = UNIQUE+NOT NULL
+ UNIQUE = can be null) 
 
 #DSD RESULT NOEMIE MET ICI LE DSD 
 #2 backup edits

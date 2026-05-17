@@ -452,6 +452,11 @@ This means that one volunteer can have many skills, and one skill can belong to 
 Therefore, we created an `M:N` relationship between `volunteer` and `skill`.
 <img width="774" height="117" alt="Capture d’écran 2026-05-17 155536" src="https://github.com/user-attachments/assets/7453b37c-8669-4fac-9fe2-5a70ab69b89b" />
 
+3. Weak Entities
+We identified weak entities by looking for tables with a composite primary key that includes a foreign key.  
+For example, `Scheduled` depends on `training`, since its primary key includes `training_id`.
+<img width="877" height="266" alt="Capture d’écran 2026-05-17 160117" src="https://github.com/user-attachments/assets/7f8b1afe-a1cd-4720-9a82-0f901aabcc02" />
+So "scheduled" become an weak entity:<img width="393" height="363" alt="Capture d’écran 2026-05-17 160139" src="https://github.com/user-attachments/assets/0697adc3-8b3f-406d-b8c6-cecaa47bf0a4" />
 
 
 

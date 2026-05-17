@@ -426,6 +426,18 @@ In this way, the backup was used not only to create the tables in PostgreSQL, bu
 ---
 ### 2 . Algorithm : FROM DSD to ERD
 
+1.   We first analyzed the foreign key references between the tables.
+
+When a table contains a foreign key that points to another table, we used this dependency to identify the relationship between the two entities.
+
+For example, the `availability` table contains the foreign key `volunteer_id`, which references the `volunteer` table.  
+This means that each availability record belongs to one volunteer, while one volunteer can have several availability records.
+
+Therefore, we created a `1:N` relationship between:
+
+`volunteer` → `availability`
+<img width="1600" height="685" alt="WhatsApp Image 2026-05-17 at 13 32 44 (1)" src="https://github.com/user-attachments/assets/f14ee913-86b5-4960-8319-66763a34c504" />
+To:
 
 
 

@@ -463,10 +463,26 @@ So "scheduled" become an weak entity:
 **ERD FINAL:**
 <img width="1600" height="685" alt="erdgroupb" src="https://github.com/user-attachments/assets/e42a0454-24aa-496e-b6de-b2e172075efc" />
 
+
+
 ## Adjustments Made for the Integration
 
+### 1. Volunteer
 
+The `volunteer` table existed in both systems, so we removed redundant attributes.  
+The attributes `is_active` and `is_available` were removed because volunteer availability is now represented by the separate `availability` entity.  
+We also removed `city`, since location information is stored in the `location` entity and connected to volunteers through foreign keys.
 
+### 2. Call / Request
+
+The `call` table from the second system was renamed to `request`, since both tables represent the same concept: a request for help.  
+The `phone` column was removed from `request`, because in our model the phone number belongs to the requester, not to the request itself.
+
+### 3. Family / Requester
+
+In our original system, requests were created by families.  
+To integrate the roadside assistance system, we generalized `family` into a new `requester` entity.  
+This entity can represent different requester types, such as `family` or `person`, allowing the system to support both family assistance requests and individual roadside assistance requests.
 
 
 

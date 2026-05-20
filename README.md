@@ -490,22 +490,26 @@ This entity can represent different requester types, such as `family` or `person
 
 
 
-# **3.backup edits** (jai commence mais cest pour la semaien pro)
-1. code python simple for change all the nale table a_table for group and b_table for group b
+# **3.backup edits** 
 
-2.  some name conflict like for the index of the group b : volunteer_pkey
-In backup group A
-  ```sql
-ALTER TABLE ONLY public.a_volunteer
-    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
-  ```
-In backup group B:
-  ```sql
-ALTER TABLE ONLY public.a_volunteer
-    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
-  ```
-  So we change to : 
-   ```sql
-  ALTER TABLE ONLY public.b_volunteer
-    ADD CONSTRAINT b_volunteer_pkey PRIMARY KEY (volunteer_id);
-  ```
+( faire avant le create table.sql , faut genener les tables depuis le erd pour voir ou on doit arriver)
+Ensuite: 
+1-  ajouter les tables de lautre groupe quon a pas ds notre erd 
+Attention aux relations car si jajoute une table avec des clés etrangeres il fait que celle ci exite ds lautre table ! 
+2-  laisser le stables quon a ds notre backup
+3-   faire les alter +insert from select des tables pour ajouter les attributs quon a pas etc 
+Exemple ds volunteer il faut ajouter lattribut skill_type  et ensuite faire :
+INSERT INTO volunteer (
+    volunteer_id,
+    first_name,
+    last_name,
+    phone,
+    skill_type
+)
+SELECT
+    volunteer_id,
+    first_name,
+    last_name,
+    phone,
+    skill_type
+FROM volunteer_group_b;

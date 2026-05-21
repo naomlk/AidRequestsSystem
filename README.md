@@ -541,3 +541,42 @@ ORDER BY tc.table_name, tc.constraint_type, tc.constraint_name;
 
  ```
 
+
+
+
+ Les tables uqinont pas deboin de changement (selon le erd):
+ Training
+ Skill
+ Category
+ Scheduled
+ Location
+ Delivery
+ Status
+ Treatment
+Avaibality
+Family 
+
+
+  Les tables quil faut modifer
+  Volunteer - ajouter  et supprimer des attributs 
+  1-  si d’autres tables du groupe B référencent ces volontaires quon a modier ( si ces des dobles pou rles integrer a notre table), il faudra aussi mettre à jour leurs foreign keys. donc 
+  Option plus propre : créer une table de correspondance  
+
+Exemple :
+ ```sql
+CREATE TABLE volunteer_id_mapping (
+    old_volunteer_id INT,
+    new_volunteer_id INT
+);
+
+ ```
+et donc je naurai pas a toucher a ttes les tables Training
+ Skill
+ Category
+ Scheduled  etc 
+
+ 
+  RequestCategory - ajouter un attribut qui definit quel domaine de requetes ( משפחות / כבישים)
+  
+  
+  

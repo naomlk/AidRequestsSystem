@@ -167,10 +167,10 @@ CREATE TABLE public.a_volunteer (
     last_name character varying(100) NOT NULL,
     phone_number character varying(20),
     has_equipment boolean,
-    availability_status character varying(50),
+    is_active character varying(50),                  -- ic on a change el nom de availability satus
     counter integer DEFAULT 0,
     skill_type character varying(100),
-    latitude numeric(9,6),
+    latitude numeric(9,6),                     -- CAN EB NULL
     longitude numeric(9,6)
 );
 
@@ -46868,8 +46868,6 @@ ALTER TABLE ONLY public.a_treatment
 -- Name: volunteer volunteer_pkey; Type: CONSTRAINT; Schema: public; Owner: ochrith
 --
 
-ALTER TABLE ONLY public.a_volunteer
-    ADD CONSTRAINT volunteer_pkey PRIMARY KEY (volunteer_id);
 
 
 --

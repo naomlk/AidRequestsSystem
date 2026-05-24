@@ -485,8 +485,7 @@ To integrate the roadside assistance system, we generalized `family` into a new 
 This entity can represent different requester types, such as `family` or `person`, allowing the system to support both family assistance requests and individual roadside assistance requests.
 
 
-
-<img width="1557" height="707" alt="image" src="https://github.com/user-attachments/assets/0329219a-0366-429e-b533-86356274b73c" />
+<img width="1615" height="710" alt="image" src="https://github.com/user-attachments/assets/87fe51c6-e481-41ac-b745-c3eae7ab3648" />
 
 
 

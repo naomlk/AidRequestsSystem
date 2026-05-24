@@ -467,131 +467,148 @@ So "scheduled" become an weak entity:
 
 ## Adjustments Made for the Integration
 
-### 1. Volunteer
-
-The `volunteer` table existed in both systems, so we removed redundant attributes.  
-The attributes `is_active` and `is_available` were removed because volunteer availability is now represented by the separate `availability` entity.  
-We also removed `city`, since location information is stored in the `location` entity and connected to volunteers through foreign keys.
-
-### 2. Call / Request
-
-The `call` table from the second system was renamed to `request`, since both tables represent the same concept: a request for help.  
-The `phone` column was removed from `request`, because in our model the phone number belongs to the requester, not to the request itself.
-
-### 3. Family / Requester
-
-In our original system, requests were created by families.  
-To integrate the roadside assistance system, we generalized `family` into a new `requester` entity.  
-This entity can represent different requester types, such as `family` or `person`, allowing the system to support both family assistance requests and individual roadside assistance requests.
+### 1. Volunteer Table
 
 
 
-<img width="1557" height="707" alt="image" src="https://github.com/user-attachments/assets/0329219a-0366-429e-b533-86356274b73c" />
+During the integration phase, we decided to keep `a_volunteer` as the final volunteer table in the integrated database.  
+This decision was made because the volunteer entity already existed in our original system and was connected to the main entities of our project, such as requests and treatments.
 
+### 1. Keeping `is_active` instead of `availability_status`
 
+The table `a_volunteer` originally contained an `availability_status` field with values such as `Busy` and `Available`.  
+In order to match the structure received from group B, we replaced this information with the field `is_active`, which stores values as `Y` or `N`.
 
-# **3.backup edits** 
+The values were converted as follows:
 
-( faire avant le create table.sql , faut genener les tables depuis le erd pour voir ou on doit arriver)
-Ensuite: 
-1-  ajouter les tables de lautre groupe quon a pas ds notre erd 
-Attention aux relations car si jajoute une table avec des clés etrangeres il fait que celle ci exite ds lautre table ! 
-2-  laisser le stables quon a ds notre backup
-3-   faire les alter +insert from select des tables pour ajouter les attributs quon a pas etc 
-Exemple ds volunteer il faut ajouter lattribut skill_type  et ensuite faire :
-INSERT INTO volunteer (
+- `Busy` became `Y`
+- `Available` became `N`
+
+After the conversion, the column `availability_status` was removed from `a_volunteer`.
+
+### 2. Adding missing volunteer attributes
+
+The table `b_volunteer` contained additional volunteer information that did not exist in our original `a_volunteer` table.  
+Therefore, we added the following columns to `a_volunteer`:
+
+```sql
+ALTER TABLE public.a_volunteer
+ADD COLUMN recruitment_date DATE;
+
+ALTER TABLE public.a_volunteer
+ADD COLUMN email VARCHAR(20);
+
+ALTER TABLE public.a_volunteer
+ADD COLUMN is_active VARCHAR(1);
+````
+
+The `is_active` column uses `Y` and `N`, following the representation used in the database of group B.
+
+### 3. Defining `volunteer_id` as the main identifier
+
+Since `a_volunteer` became the final volunteer table, its `volunteer_id` had to be used as the official identifier of volunteers in the integrated database.
+For that reason, we added a primary key constraint on `volunteer_id`:
+
+```sql
+ALTER TABLE public.a_volunteer
+ADD CONSTRAINT a_volunteer_pkey
+PRIMARY KEY (volunteer_id);
+```
+
+This was necessary because other tables from group B, such as `b_volunteer_skill`, `b_volunteer_training`, and `b_availability`, needed to reference the final volunteer table.
+
+### 4. Transferring volunteers from `b_volunteer` to `a_volunteer`
+
+After checking that there were no duplicate `volunteer_id` values between the two tables, we copied the volunteers from `b_volunteer` into `a_volunteer`.
+
+Only volunteers that did not already exist in `a_volunteer` were inserted:
+
+```sql
+INSERT INTO public.a_volunteer (
     volunteer_id,
     first_name,
     last_name,
-    phone,
-    skill_type
+    email,
+    recruitment_date,
+    is_active
 )
 SELECT
-    volunteer_id,
-    first_name,
-    last_name,
-    phone,
-    skill_type
-FROM volunteer_group_b;
-
-
-
-
-Commande pour recupererttes les constraintes existantes ds ma base :
-
- ```sql
-
-SELECT
-    tc.table_name,
-    tc.constraint_name,
-    tc.constraint_type,
-    kcu.column_name,
-    ccu.table_name AS foreign_table_name,
-    ccu.column_name AS foreign_column_name
-FROM information_schema.table_constraints tc
-LEFT JOIN information_schema.key_column_usage kcu
-    ON tc.constraint_name = kcu.constraint_name
-   AND tc.table_schema = kcu.table_schema
-LEFT JOIN information_schema.constraint_column_usage ccu
-    ON ccu.constraint_name = tc.constraint_name
-   AND ccu.table_schema = tc.table_schema
-WHERE tc.table_schema = 'public'
-ORDER BY tc.table_name, tc.constraint_type, tc.constraint_name;
-
-
- ```
-
-
-
-
- Les tables uqinont pas deboin de changement (selon le erd):
- Training
- 
- Skill
- 
- Category
- 
- Scheduled
-
- 
- Location
- 
- Delivery
- 
- Status
- 
- Treatment
- 
-Avaibality
-
-Family 
-
-
-  Les tables quil faut modifer:
-  Volunteer - ajouter  et supprimer des attributs 
-  
-  1-  si d’autres tables du groupe B référencent ces volontaires quon a modier ( si ces des dobles pou rles integrer a notre table), il faudra aussi mettre à jour leurs foreign keys. donc 
-  Option plus propre : créer une table de correspondance  
-
-Exemple :
- ```sql
-CREATE TABLE volunteer_id_mapping (
-    old_volunteer_id INT,
-    new_volunteer_id INT
+    bv.volunteer_id,
+    bv.first_name,
+    bv.last_name,
+    bv.email,
+    bv.recruitment_date,
+    bv.is_active
+FROM public.b_volunteer bv
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM public.a_volunteer av
+    WHERE av.volunteer_id = bv.volunteer_id
 );
+```
 
- ```
-et donc je naurai pas a toucher a ttes les tables
-Training
+This allowed us to merge the volunteer data from both systems into one final volunteer table.
 
- Skill
- 
- Category
- 
- Scheduled  etc 
+### 5. Redirecting volunteer-related tables to `a_volunteer`
 
- 
-  RequestCategory - ajouter un attribut qui definit quel domaine de requetes ( משפחות / כבישים)
-  
-  
-  
+Some tables from group B originally referenced `b_volunteer`.
+Since `a_volunteer` became the final volunteer table, we redirected these foreign keys to reference `a_volunteer(volunteer_id)` instead.
+
+The affected tables were:
+
+* `b_volunteer_skill`
+* `b_volunteer_training`
+* `b_availability`
+
+For example, the constraint of `b_volunteer_skill` was changed from referencing `b_volunteer` to referencing `a_volunteer`:
+
+```sql
+ALTER TABLE public.b_volunteer_skill
+DROP CONSTRAINT volunteer_skill_volunteer_id_fkey;
+
+ALTER TABLE public.b_volunteer_skill
+ADD CONSTRAINT fk_b_volunteer_skill_a_volunteer
+FOREIGN KEY (volunteer_id)
+REFERENCES public.a_volunteer(volunteer_id);
+```
+
+The same logic was applied to the other volunteer-related tables.
+
+### 6. Moving volunteer skills to `b_volunteer_skill`
+
+In our original table, some volunteers had a `skill_type` field directly inside `a_volunteer`.
+In the integrated database, skills are stored in a separate table, `b_skill`, and the connection between volunteers and skills is stored in `b_volunteer_skill`.
+
+Therefore, for each volunteer with a non-empty `skill_type`, we searched for the matching skill in `b_skill` and inserted the corresponding pair into `b_volunteer_skill`:
+
+```sql
+INSERT INTO public.b_volunteer_skill (volunteer_id, skill_id)
+SELECT
+    av.volunteer_id,
+    bs.skill_id
+FROM public.a_volunteer av
+JOIN public.b_skill bs
+    ON bs.skill_name = av.skill_type
+WHERE av.skill_type IS NOT NULL
+  AND av.skill_type <> ''
+  AND NOT EXISTS (
+      SELECT 1
+      FROM public.b_volunteer_skill bvs
+      WHERE bvs.volunteer_id = av.volunteer_id
+        AND bvs.skill_id = bs.skill_id
+  );
+```
+
+After this transfer, the column `skill_type` was removed from `a_volunteer`, because the relationship between volunteers and skills is now represented properly using the relationship table `b_volunteer_skill`.
+
+### Summary
+
+To summarize, `a_volunteer` was selected as the final volunteer table in the integrated database.
+The volunteer data from `b_volunteer` was inserted into it, additional columns were added, and all volunteer-related foreign keys from group B were redirected to `a_volunteer`.
+This ensures that each volunteer appears in one central table, while skills, training, and availability remain managed through the specialized tables from group B.
+
+```
+
+Ça correspond aux changements dans ton fichier : ajout de colonnes dans `a_volunteer`, transfert de `b_volunteer` vers `a_volunteer`, redirection des contraintes de `b_volunteer_skill`, `b_volunteer_training`, `b_availability`, puis transfert des skills via `b_volunteer_skill`. :contentReference[oaicite:0]{index=0}
+```
+

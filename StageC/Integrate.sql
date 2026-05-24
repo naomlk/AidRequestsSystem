@@ -328,6 +328,94 @@ DROP CONSTRAINT family_number_of_members_check;
 
 
 
+// ajout du telephone dans volunteer pour les b 
+BEGIN;
+
+UPDATE public.a_volunteer av
+SET phone_number = CAST(bv.phone AS VARCHAR(20))
+FROM public.b_volunteer bv
+WHERE av.volunteer_id = bv.volunteer_id
+  AND (av.phone_number IS NULL OR av.phone_number = '');
+
+COMMIT;
+
+
+--
+
+
+
+INSERT INTO public.a_requestcategory (category_id, category_name, description)
+VALUES
+    (    5,  'Flat Tire Assistance', 
+        'Emergency roadside support for changing flat tires, providing a spare tire, or inflating wheels safely.'
+    ),
+    (   6,  'Locked Vehicle', 
+        'Professional locksmith assistance to safely unlock vehicles when keys are lost, damaged, or left inside.'
+    ),
+    (   7, 'Child Locked In Car', 
+        'CRITICAL EMERGENCY: Immediate rescue response for children or infants accidentally trapped inside a locked vehicle.'
+    );
+
+
+
+/*j ai ajouter les call a la liste des request avec des valeurs simples pour les attributs qui manquaient*/
+INSERT INTO public.a_family (contactperson_id, contactperson_name, phone_number, number_of_members, special_features)
+VALUES (999999, 'Clients Groupe B', '0500000000', null, null)
+ON CONFLICT (contactperson_id) DO NOTHING;
+
+
+INSERT INTO public.a_request (
+    request_id, 
+    date, 
+    incident_description, 
+    prioriry_level, 
+    contactperson_id, -- Ta clé étrangère exige une valeur valide de a_family
+    category_id, 
+    status_id, 
+    latitude,
+    longitude
+)
+SELECT 
+   
+    20005 + ROW_NUMBER() OVER (ORDER BY bc.call_date, bc.phone) AS request_id,
+    
+    bc.call_date AS date,
+    bc.description AS incident_description,
+    
+    CASE 
+        WHEN bc.description LIKE '%URGENT%' THEN 5 
+        ELSE 2 
+    END AS prioriry_level,
+    
+    999999 AS contactperson_id, -- On utilise l'ID de notre famille générique créée juste au-dessus !
+    
+    -- Équivalence stricte de tes catégories
+    CASE 
+        WHEN bc.type_id = 5 THEN 5
+        WHEN bc.type_id = 6 THEN 6
+        WHEN bc.type_id = 7 THEN 1
+        WHEN bc.type_id = 8 THEN 7
+        WHEN bc.type_id = 9 THEN 1
+        WHEN bc.type_id = 10 THEN 1
+        ELSE 1
+    END AS category_id,
+
+    -- Équivalence de tes statuts ID
+    CASE 
+        WHEN bc.status = 'Closed' THEN 3
+        WHEN bc.status = 'InProgress' THEN 2
+        WHEN bc.status = 'Cancelled' THEN 4
+        ELSE 1 
+    END AS status_id,
+    
+    31.255810 AS latitude,
+    34.816400 AS longitude
+
+FROM public.b_call bc;
+
+COMMIT;
+
+
 /* ============================================================
    11. SUPPRESSION DES TABLES DEVENUES INUTILES
    ============================================================ */
@@ -337,32 +425,6 @@ DROP TABLE b_volunteer_call;
 DROP TABLE b_call;
 
 
---
-
-
-INSERT INTO public.a_requestcategory (
-    category_id,
-    category_name,
-    description
-)
-VALUES
-    (5, 'Flat Tire Assistance', NULL),
-    (6, 'Locked Vehicle', NULL),
-    (7, 'Stuck In Elevator', NULL),
-    (8, 'Child Locked In Car', NULL),
-    (9, 'Locked Home Door', NULL),
-    (10, 'Search And Rescue', NULL);
-
-
--- surppiemr ces categiry car on les a deja ! 
-DELETE FROM public.a_requestcategory
-WHERE category_id = 7;
-
-DELETE FROM public.a_requestcategory
-WHERE category_id = 9;
-
-DELETE FROM public.a_requestcategory
-WHERE category_id = 10;
 
 
 -- avant de suppimer b_volunteer
@@ -405,3 +467,7 @@ DROP TABLE b_type;
 
 
 -- DROP TABLE b_skill_category;   --> table vide BANDE DE BOUFFONE §§§§§
+
+
+
+

@@ -382,3 +382,22 @@ DELETE FROM b_volunteer;
 
 
 DELETE FROM b_type;
+
+DROP TABLE b_volunteer_call;
+DROP TABLE b_call;
+
+
+-- 
+ALTER TABLE public.b_availability
+DROP CONSTRAINT availability_volunteer_id_fkey ;
+
+
+ALTER TABLE public.b_availability
+ADD CONSTRAINT availability_volunteer_id_fkey
+FOREIGN KEY (volunteer_id)
+REFERENCES public.a_volunteer(volunteer_id);
+
+--
+DROP TABLE b_volunteer;
+
+DROP TABLE b_type;

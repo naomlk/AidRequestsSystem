@@ -401,3 +401,7 @@ REFERENCES public.a_volunteer(volunteer_id);
 DROP TABLE b_volunteer;
 
 DROP TABLE b_type;
+
+
+
+-- DROP TABLE b_skill_category;   --> table vide BANDE DE BOUFFONE §§§§§

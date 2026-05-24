@@ -229,13 +229,3 @@ ALTER TABLE public.a_family
 DROP CONSTRAINT family_number_of_members_check;
 
 
-
-CREATE TEMP TABLE call_family_mapping (
-    call_id INTEGER PRIMARY KEY,
-    family_id INTEGER NOT NULL
-);
-INSERT INTO call_family_mapping (call_id, family_id)
-SELECT
-    bc.call_id,
-    nextval(pg_get_serial_sequence('public.a_family', 'family_id'))
-FROM public.b_call bc;

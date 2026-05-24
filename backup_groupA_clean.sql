@@ -167,7 +167,7 @@ CREATE TABLE public.a_volunteer (
     last_name character varying(100) NOT NULL,
     phone_number character varying(20),
     has_equipment boolean,
-    is_active character varying(50),                  -- ic on a change el nom de availability satus
+    availability_status character varying(50),                  -- ic on a change el nom de availability satus
     counter integer DEFAULT 0,
     skill_type character varying(100),
     latitude numeric(9,6),                     -- CAN EB NULL

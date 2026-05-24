@@ -546,14 +546,24 @@ ORDER BY tc.table_name, tc.constraint_type, tc.constraint_name;
 
  Les tables uqinont pas deboin de changement (selon le erd):
  Training
+ 
  Skill
+ 
  Category
+ 
  Scheduled
+
+ 
  Location
+ 
  Delivery
+ 
  Status
+ 
  Treatment
+ 
 Avaibality
+
 Family 
 
 

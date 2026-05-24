@@ -567,8 +567,9 @@ Avaibality
 Family 
 
 
-  Les tables quil faut modifer
+  Les tables quil faut modifer:
   Volunteer - ajouter  et supprimer des attributs 
+  
   1-  si d’autres tables du groupe B référencent ces volontaires quon a modier ( si ces des dobles pou rles integrer a notre table), il faudra aussi mettre à jour leurs foreign keys. donc 
   Option plus propre : créer une table de correspondance  
 
@@ -580,9 +581,13 @@ CREATE TABLE volunteer_id_mapping (
 );
 
  ```
-et donc je naurai pas a toucher a ttes les tables Training
+et donc je naurai pas a toucher a ttes les tables
+Training
+
  Skill
+ 
  Category
+ 
  Scheduled  etc 
 
  

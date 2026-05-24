@@ -467,7 +467,7 @@ So "scheduled" become an weak entity:
 
 ## Adjustments Made for the Integration
 
-### 1. Volunteer Table
+### POINT 1 -->  Volunteer Table
 
 
 
@@ -601,14 +601,45 @@ WHERE av.skill_type IS NOT NULL
 
 After this transfer, the column `skill_type` was removed from `a_volunteer`, because the relationship between volunteers and skills is now represented properly using the relationship table `b_volunteer_skill`.
 
-### Summary
 
-To summarize, `a_volunteer` was selected as the final volunteer table in the integrated database.
-The volunteer data from `b_volunteer` was inserted into it, additional columns were added, and all volunteer-related foreign keys from group B were redirected to `a_volunteer`.
-This ensures that each volunteer appears in one central table, while skills, training, and availability remain managed through the specialized tables from group B.
+### POINT 2 -->   `b_volunteer_training` table 
 
-```
+This table stores volunteer training information from group B.
 
-Ça correspond aux changements dans ton fichier : ajout de colonnes dans `a_volunteer`, transfert de `b_volunteer` vers `a_volunteer`, redirection des contraintes de `b_volunteer_skill`, `b_volunteer_training`, `b_availability`, puis transfert des skills via `b_volunteer_skill`. :contentReference[oaicite:0]{index=0}
-```
+### Changes made
 
+- The foreign key on `volunteer_id` was redirected.
+- It originally referenced `b_volunteer`.
+- It now references `a_volunteer`.
+
+
+
+Training records still need to exist, but they must reference the final volunteer table used in the integrated database.
+
+---
+
+### POINT 3 -->  `b_availability`  Table 
+
+This table stores volunteer availability information.
+
+
+
+- The foreign key on `volunteer_id` was redirected to `a_volunteer(volunteer_id)`.
+
+Availability is still relevant after the integration, but it must be connected to the final volunteer entity, `a_volunteer`.
+
+---
+### POINT 4 -->  `b_type Table
+
+
+The table `b_type` represented call types in group B.
+
+The IDs were shifted:
+
+```text
+1 → 5
+2 → 6
+3 → 7
+4 → 8
+5 → 9
+6 → 10

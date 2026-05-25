@@ -801,3 +801,72 @@ REFERENCES public.a_volunteer(volunteer_id);
 COMMIT;
 
 DROP TABLE public.b_volunteer;
+
+
+
+## View from Department A 
+This view, named v_my_department_requests, consolidates all operational information regarding emergency and assistance requests received by the organization. This view integrates 5 different tables using database relations (JOIN):
+
+Requests (a_request): The core table from which the request ID, incident date, problem description, and priority level are extracted.
+
+Request Categories (a_requestcategory): Used to display the explicit name of the incident type instead of a numeric ID.
+
+Statuses (a_status): Used to display the current handling state of the request in plain text.
+
+Locations (a_location): Allows mapping each request to its specific city based on geographic coordinates.
+
+Families / Contact Persons (a_family): Allows fetching the direct phone number of the applicant so that dispatchers can establish immediate contact during critical emergencies.
+
+<img width="1036" height="475" alt="image" src="https://github.com/user-attachments/assets/f59425a3-106e-4611-ae2f-0d539027dc70" />
+
+<img width="1572" height="654" alt="image" src="https://github.com/user-attachments/assets/25cb8d45-32a5-4e63-847a-cf9771c6c02f" />
+
+
+### Query 1: Critical Emergency Dispatch for the Month of April
+
+This query is designed for dispatch managers to generate a targeted report of critical requests (priority level 4 or 5) that occurred exclusively during the month of April. The query displays essential operational fields such as the incident location, problem type, and the contact phone number, sorting them from newest to oldest. This query carries significant operational value as it allows tracking severe emergencies in April.
+
+<img width="576" height="349" alt="image" src="https://github.com/user-attachments/assets/8cec5611-b7f6-45b9-8be8-5ca1a64eabf3" />
+
+<img width="1094" height="450" alt="image" src="https://github.com/user-attachments/assets/3bbf1db5-2f60-4a7c-9d4e-58e58f37d3ec" />
+
+
+### Query 2: Statistical Analysis of Requests by Day of the Week
+
+This analytical query aims to identify call volume trends and weekly workloads. It groups the data by the day of the week (ordered from Monday to Sunday) and calculates for each day: the total volume of requests, the average priority level, and the specific count of critical emergencies (levels 4 and 5) out of that day's total (utilizing a conditional COUNT CASE WHEN). This information is vital for the organization to optimize volunteer shifting and standby schedules ahead of high-demand days.
+
+<img width="1074" height="287" alt="image" src="https://github.com/user-attachments/assets/38ccdd79-9d87-4a77-9ba6-3badbfe0d782" />
+<img width="897" height="332" alt="image" src="https://github.com/user-attachments/assets/dc889bf0-5b02-4a9b-9fc6-e721b1aca6df" />
+
+
+
+## View from Department B  
+
+The view v_received_department_skills links volunteers with their skills and categories. It combines 4 different tables using JOIN:
+a_volunteer: Outlines the volunteer's full name and phone number.
+b_volunteer_skill: Relational junction table linking volunteers to their skill IDs.
+b_skill: Stores the explicit name of each technical capability.
+b_catagory: Organizes individual skills into main groups (e.g., Technical, Language).  
+
+<img width="856" height="367" alt="image" src="https://github.com/user-attachments/assets/40ecc33a-76a0-4edf-8930-22342e1772a5" />
+
+<img width="1190" height="451" alt="image" src="https://github.com/user-attachments/assets/4d317184-da66-43fb-8a54-9b315cfed485" />
+
+
+### Query 1: Contact List for Arabic-Speaking Volunteers  
+
+Description: This query extracts the phone directory of volunteers who speak Arabic. It allows dispatchers to find immediate linguistic support during fieldwork.  
+
+<img width="574" height="280" alt="image" src="https://github.com/user-attachments/assets/ad8acd83-7722-41b9-b7fb-a10f2f6b0bb8" />
+
+<img width="985" height="303" alt="image" src="https://github.com/user-attachments/assets/2d26d537-0064-4f8c-88fc-22434a2b1604" />
+
+
+
+### Query 2: Volunteer Versatility Ranking  
+
+This query counts how many technical skills each volunteer possesses, sorted from highest to lowest. It helps management identify the most highly qualified and versatile team members.
+
+<img width="612" height="200" alt="image" src="https://github.com/user-attachments/assets/cfeb83a1-7161-4c26-a75d-c75e2ed72e4b" />
+
+<img width="553" height="346" alt="image" src="https://github.com/user-attachments/assets/5b8d0c70-c30d-4e62-b6ce-b3a9a906baa1" />

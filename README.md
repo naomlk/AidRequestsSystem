@@ -460,11 +460,14 @@ So "scheduled" become an weak entity:
 <img width="393" height="363" alt="Capture d’écran 2026-05-17 160139" src="https://github.com/user-attachments/assets/1d76b5ad-604e-43f9-ba96-2572398d6439" />
 
 
-**ERD FINAL:**
+**ERD of the other group:**
 <img width="1600" height="685" alt="erdgroupb" src="https://github.com/user-attachments/assets/e42a0454-24aa-496e-b6de-b2e172075efc" />
 
 **ERD combined:**
-<img width="1602" height="718" alt="image" src="https://github.com/user-attachments/assets/def39abb-9d06-4457-839c-d20203915ad9" />
+<img width="1640" height="699" alt="image" src="https://github.com/user-attachments/assets/b02c1b52-7e37-424b-98d7-74634ac2448e" />
+
+**DSD combined:**
+<img width="1650" height="681" alt="image" src="https://github.com/user-attachments/assets/cbc3aa1e-5cb5-4997-92bb-87feaa651b7a" />
 
 
 ## Adjustments Made for the Integration

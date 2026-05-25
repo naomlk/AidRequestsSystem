@@ -645,3 +645,43 @@ The IDs were shifted:
 4 → 8
 5 → 9
 6 → 10
+
+```
+### POINT 5 --> Merging `b_skill_category` into `b_catagory`
+
+
+In the original schema, the relationship between categories and skills was stored in a separate table:
+
+- `b_catagory(catagory_id, catagory_name)`
+- `b_skill_category(skill_id, catagory_id)`
+
+To simplify the integrated database schema and avoid keeping an extra table, we decided to merge this information into `b_catagory` by adding the `skill_id` attribute directly to it.
+
+Since one category can be related to several skills, the merge was done by creating one row for each `(catagory_id, skill_id)` pair.  
+Therefore, `catagory_id` is no longer unique by itself, and the logical primary key becomes:
+
+```sql
+ALTER TABLE b_catagory
+ADD COLUMN skill_id INT;
+
+UPDATE b_catagory c
+SET skill_id = sc.skill_id
+FROM b_skill_category sc
+WHERE c.catagory_id = sc.catagory_id;
+
+
+/*   la table est vide donc ca sert a rien de le faire 
+
+INSERT INTO b_catagory (catagory_id, catagory_name, skill_id)
+SELECT 
+    c.catagory_id,
+    c.catagory_name,
+    sc.skill_id
+FROM b_catagory c
+JOIN b_skill_category sc
+    ON c.catagory_id = sc.catagory_id;   
+
+
+*/  
+DROP TABLE b_skill_category;
+```   

@@ -647,41 +647,42 @@ The IDs were shifted:
 6 → 10
 
 ```
-### POINT 5 --> Merging `b_skill_category` into `b_catagory`
+### POINT 5  --> add skill of our volunteers to  `b_volunteer_skill`
 
+After importing the new volunteers into the global `volunteer` table, we needed to connect each volunteer to the appropriate skill in the global skills table.
 
-In the original schema, the relationship between categories and skills was stored in a separate table:
+The imported volunteers contained a `skill_type` attribute, while the integrated schema uses a separate relationship table:
 
-- `b_catagory(catagory_id, catagory_name)`
-- `b_skill_category(skill_id, catagory_id)`
+- `b_skill(skill_id, skill_name)`
+- `b_volunteer_skill(volunteer_id, skill_id)`
 
-To simplify the integrated database schema and avoid keeping an extra table, we decided to merge this information into `b_catagory` by adding the `skill_id` attribute directly to it.
+To migrate the data correctly, we matched each volunteer’s `skill_type` with the corresponding `skill_name` in `b_skill`.  
+Then, we extracted the matching `skill_id` and inserted the pair `(volunteer_id, skill_id)` into `b_volunteer_skill`.
 
-Since one category can be related to several skills, the merge was done by creating one row for each `(catagory_id, skill_id)` pair.  
-Therefore, `catagory_id` is no longer unique by itself, and the logical primary key becomes:
+We also used a verification query before insertion to check which skills matched successfully, and another query to detect any `skill_type` values that did not exist in `b_skill`.
 
+This allowed us to preserve the volunteers’ skill information while adapting it to the integrated database structure.
 ```sql
-ALTER TABLE b_catagory
-ADD COLUMN skill_id INT;
-
-UPDATE b_catagory c
-SET skill_id = sc.skill_id
-FROM b_skill_category sc
-WHERE c.catagory_id = sc.catagory_id;
-
-
-/*   la table est vide donc ca sert a rien de le faire 
-
-INSERT INTO b_catagory (catagory_id, catagory_name, skill_id)
+INSERT INTO b_volunteer_skill (volunteer_id, skill_id)
 SELECT 
-    c.catagory_id,
-    c.catagory_name,
-    sc.skill_id
-FROM b_catagory c
-JOIN b_skill_category sc
-    ON c.catagory_id = sc.catagory_id;   
+    v.volunteer_id,
+    s.skill_id
+FROM volunteer v
+JOIN b_skill s
+    ON LOWER(TRIM(v.skill_type)) = LOWER(TRIM(s.skill_name))
+WHERE v.skill_type IS NOT NULL
+  AND NOT EXISTS (
+      SELECT 1
+      FROM b_volunteer_skill vs
+      WHERE vs.volunteer_id = v.volunteer_id
+        AND vs.skill_id = s.skill_id
+  );
+```
+
+Before merge: 88 rows 
+After add our 500 volunteers --> 588  שורות 
+<img width="341" height="564" alt="Capture d’écran 2026-05-25 154233" src="https://github.com/user-attachments/assets/3c6a1da3-c568-4a53-8d2d-2538d337518b" />
 
 
-*/  
-DROP TABLE b_skill_category;
+
 ```   

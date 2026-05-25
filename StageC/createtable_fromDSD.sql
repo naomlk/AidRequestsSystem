@@ -16,7 +16,7 @@ CREATE TABLE VOLUNTEER
   volunteer_id INT NOT NULL,
   phone_number INT NOT NULL,
   email INT NOT NULL,
-  current_status INT NOT NULL,
+  current_status INT NOT NULL,   -- on a mis is_active
   has_equipment INT NOT NULL,
   counter INT NOT NULL,
   recruitment_date INT NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE VOLUNTEER
   FOREIGN KEY (latitude, longitude) REFERENCES LOCATION(latitude, longitude)
 );
 
-CREATE TABLE AVAILABILITY
+CREATE TABLE AVAILABILITY    -- table of the other group is empty !!!
 (
   day_of_week INT NOT NULL,
   start_time INT NOT NULL,

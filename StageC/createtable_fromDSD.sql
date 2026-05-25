@@ -47,7 +47,7 @@ CREATE TABLE SKILL
   PRIMARY KEY (skill_id)
 );
 
-CREATE TABLE CATEGORY
+CREATE TABLE CATEGORY  --   pour ajouter skill_id en tant que fk ik fallait supprimer la table qui fait le lien b_skill_category    qui ets vide en plus de ca
 (
   category_id INT NOT NULL,
   category_name INT NOT NULL,

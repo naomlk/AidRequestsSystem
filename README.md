@@ -655,5 +655,149 @@ The IDs were shifted:
 5 → 9
 6 → 10
 
-```
 
+We also matched the other system's call types (b_type) into our categories (a_requestcategory):
+
+Adding Missing Categories: We inserted three specific emergency types from their system (Flat Tire Assistance, Locked Vehicle, and Child Locked In Car) into our table using IDs 5, 6, and 7.
+
+Category Alignment: This allowed us to successfully map every migrated call to a relevant category in our system without losing any context.
+<img width="1526" height="336" alt="image" src="https://github.com/user-attachments/assets/e72fc2c9-200c-49b9-9380-73d0b92407c2" />
+
+```
+### POINT 5 -->   b_call to a_request Integration
+The table b_call from the new system lacked many mandatory attributes that were required by our centralized a_request table. Because of this structural gap, we had to implement specific fallbacks and logical mappings during the migration:
+
+Placeholder Family Account: We created a generic family profile (ID: 999999) to link all migrated calls, ensuring no data was lost due to missing family relationships.
+
+New Request IDs: We generated unique request IDs starting at 20006 using ROW_NUMBER() to avoid any ID conflicts.
+
+Smart Priority Levels: We scanned the call descriptions; if a text contained the word 'URGENT', it was automatically set to a high priority (5), otherwise it defaulted to a normal level (2).
+
+Status & Category Mapping: We used CASE WHEN statements to translate and match the status strings (Closed, InProgress) and category IDs from their system into our active system codes.
+
+Default Locations: Standard latitude and longitude coordinates were added to satisfy the required geographic fields.
+
+INSERT INTO public.a_family (contactperson_id, contactperson_name, phone_number, number_of_members, special_features)
+VALUES (999999, 'Clients Groupe B', '0500000000', null, null)
+ON CONFLICT (contactperson_id) DO NOTHING;
+
+
+INSERT INTO public.a_request (
+    request_id, 
+    date, 
+    incident_description, 
+    prioriry_level, 
+    contactperson_id, 
+    category_id, 
+    status_id, 
+    latitude,
+    longitude
+)
+SELECT 
+   
+    20005 + ROW_NUMBER() OVER (ORDER BY bc.call_date, bc.phone) AS request_id,
+    
+    bc.call_date AS date,
+    bc.description AS incident_description,
+    
+    CASE 
+        WHEN bc.description LIKE '%URGENT%' THEN 5 
+        ELSE 2 
+    END AS prioriry_level,
+    
+    999999 AS contactperson_id, -- On utilise l'ID de notre famille générique créée juste au-dessus !
+    
+    CASE 
+        WHEN bc.type_id = 5 THEN 5
+        WHEN bc.type_id = 6 THEN 6
+        WHEN bc.type_id = 7 THEN 1
+        WHEN bc.type_id = 8 THEN 7
+        WHEN bc.type_id = 9 THEN 1
+        WHEN bc.type_id = 10 THEN 1
+        ELSE 1
+    END AS category_id,
+
+    CASE 
+        WHEN bc.status = 'Closed' THEN 3
+        WHEN bc.status = 'InProgress' THEN 2
+        WHEN bc.status = 'Cancelled' THEN 4
+        ELSE 1 
+    END AS status_id,
+    
+    31.255810 AS latitude,
+    34.816400 AS longitude
+
+FROM public.b_call bc;
+
+COMMIT;
+
+
+### POINT 6 --> Linking Skills to Categories
+We structured the skills table (b_skill) by grouping individual skills into logical categories (b_category):
+
+Structural Change: We added a category_id column to b_skill as a foreign key pointing to b_category.
+
+Smart Classification: We used UPDATE commands with LIKE and IN filters to automatically classify every skill into its correct category (e.g., matching language skills to Category 1, vehicle maintenance to Category 2, and locksmithing to Category 3).
+
+
+### POINT 7 --> Cleaning Duplicate Skills
+We noticed that some skills from both groups overlapped and meant the exact same thing. To clean up the data, we filtered and merged them:
+
+Merging Assignments: We redirected the duplicate volunteer skill links in b_volunteer_skill to the most precise skill ID (replacing 10 with 18, 22 with 16, and 8 with 12).
+
+Primary Key Safety: Before updating, we used a DELETE query to clear any pairs that would cause a duplicate primary key error.
+
+Removing Duplicates: Once all volunteer links were updated, we safely deleted the redundant skill IDs (10, 22, and 8) from the b_skill table.
+
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 10 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 18);
+
+UPDATE public.b_volunteer_skill 
+SET skill_id = 18 
+WHERE skill_id = 10;
+
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 22 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 16);
+
+UPDATE public.b_volunteer_skill 
+SET skill_id = 16 
+WHERE skill_id = 22;
+
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 8 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 12);
+
+UPDATE public.b_volunteer_skill 
+SET skill_id = 12 
+WHERE skill_id = 8;
+
+DELETE FROM public.b_skill 
+WHERE skill_id IN (10, 22, 8);
+
+
+
+### POINT 8 --> Removing Redundant Tables
+After successfully merging all the data, several tables from the other system became obsolete. We cleaned up the database by dropping them:
+
+Direct Deletions: We safely dropped b_volunteer_call, b_call, b_skill_category, and b_type since their records were already fully integrated into our core tables.
+
+DROP TABLE b_volunteer_call;
+DROP TABLE b_call;
+DROP TABLE b_skill_category;
+DROP TABLE b_type;
+
+Safely Removing b_volunteer: Before dropping the duplicate volunteer table, we rewired the training links in b_volunteer_training to point directly to our main a_volunteer table to maintain referential integrity. Once the links were updated, b_volunteer was successfully dropped.
+
+BEGIN;
+ALTER TABLE public.b_volunteer_training
+DROP CONSTRAINT IF EXISTS fk_volunteer_training_volunteer;
+
+ALTER TABLE public.b_volunteer_training
+ADD CONSTRAINT fk_b_volunteer_training_a_volunteer
+FOREIGN KEY (volunteer_id)
+REFERENCES public.a_volunteer(volunteer_id);
+COMMIT;
+
+DROP TABLE public.b_volunteer;

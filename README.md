@@ -817,7 +817,8 @@ Locations (a_location): Allows mapping each request to its specific city based o
 
 Families / Contact Persons (a_family): Allows fetching the direct phone number of the applicant so that dispatchers can establish immediate contact during critical emergencies.
 
-<img width="1036" height="475" alt="image" src="https://github.com/user-attachments/assets/f59425a3-106e-4611-ae2f-0d539027dc70" />
+<img width="1022" height="447" alt="image" src="https://github.com/user-attachments/assets/c22d1bb8-873a-4134-961e-446ac140b7b4" />
+
 
 <img width="1572" height="654" alt="image" src="https://github.com/user-attachments/assets/25cb8d45-32a5-4e63-847a-cf9771c6c02f" />
 

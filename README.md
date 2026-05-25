@@ -584,28 +584,34 @@ The same logic was applied to the other volunteer-related tables.
 In our original table, some volunteers had a `skill_type` field directly inside `a_volunteer`.
 In the integrated database, skills are stored in a separate table, `b_skill`, and the connection between volunteers and skills is stored in `b_volunteer_skill`.
 
-Therefore, for each volunteer with a non-empty `skill_type`, we searched for the matching skill in `b_skill` and inserted the corresponding pair into `b_volunteer_skill`:
 
+To migrate the data correctly, we matched each volunteer’s `skill_type` with the corresponding `skill_name` in `b_skill`.  
+Then, we extracted the matching `skill_id` and inserted the pair `(volunteer_id, skill_id)` into `b_volunteer_skill`.
+
+We also used a verification query before insertion to check which skills matched successfully, and another query to detect any `skill_type` values that did not exist in `b_skill`.
+
+This allowed us to preserve the volunteers’ skill information while adapting it to the integrated database structure.
 ```sql
-INSERT INTO public.b_volunteer_skill (volunteer_id, skill_id)
-SELECT
-    av.volunteer_id,
-    bs.skill_id
-FROM public.a_volunteer av
-JOIN public.b_skill bs
-    ON bs.skill_name = av.skill_type
-WHERE av.skill_type IS NOT NULL
-  AND av.skill_type <> ''
+INSERT INTO b_volunteer_skill (volunteer_id, skill_id)
+SELECT 
+    v.volunteer_id,
+    s.skill_id
+FROM volunteer v
+JOIN b_skill s
+    ON LOWER(TRIM(v.skill_type)) = LOWER(TRIM(s.skill_name))
+WHERE v.skill_type IS NOT NULL
   AND NOT EXISTS (
       SELECT 1
-      FROM public.b_volunteer_skill bvs
-      WHERE bvs.volunteer_id = av.volunteer_id
-        AND bvs.skill_id = bs.skill_id
+      FROM b_volunteer_skill vs
+      WHERE vs.volunteer_id = v.volunteer_id
+        AND vs.skill_id = s.skill_id
   );
 ```
 
+Before merge: 88 rows 
+After add our 500 volunteers --> 588  שורות 
+<img width="341" height="564" alt="Capture d’écran 2026-05-25 154233" src="https://github.com/user-attachments/assets/3c6a1da3-c568-4a53-8d2d-2538d337518b" />
 After this transfer, the column `skill_type` was removed from `a_volunteer`, because the relationship between volunteers and skills is now represented properly using the relationship table `b_volunteer_skill`.
-
 
 ### POINT 2 -->   `b_volunteer_training` table 
 
@@ -650,42 +656,4 @@ The IDs were shifted:
 6 → 10
 
 ```
-### POINT 5  --> add skill of our volunteers to  `b_volunteer_skill`
 
-After importing the new volunteers into the global `volunteer` table, we needed to connect each volunteer to the appropriate skill in the global skills table.
-
-The imported volunteers contained a `skill_type` attribute, while the integrated schema uses a separate relationship table:
-
-- `b_skill(skill_id, skill_name)`
-- `b_volunteer_skill(volunteer_id, skill_id)`
-
-To migrate the data correctly, we matched each volunteer’s `skill_type` with the corresponding `skill_name` in `b_skill`.  
-Then, we extracted the matching `skill_id` and inserted the pair `(volunteer_id, skill_id)` into `b_volunteer_skill`.
-
-We also used a verification query before insertion to check which skills matched successfully, and another query to detect any `skill_type` values that did not exist in `b_skill`.
-
-This allowed us to preserve the volunteers’ skill information while adapting it to the integrated database structure.
-```sql
-INSERT INTO b_volunteer_skill (volunteer_id, skill_id)
-SELECT 
-    v.volunteer_id,
-    s.skill_id
-FROM volunteer v
-JOIN b_skill s
-    ON LOWER(TRIM(v.skill_type)) = LOWER(TRIM(s.skill_name))
-WHERE v.skill_type IS NOT NULL
-  AND NOT EXISTS (
-      SELECT 1
-      FROM b_volunteer_skill vs
-      WHERE vs.volunteer_id = v.volunteer_id
-        AND vs.skill_id = s.skill_id
-  );
-```
-
-Before merge: 88 rows 
-After add our 500 volunteers --> 588  שורות 
-<img width="341" height="564" alt="Capture d’écran 2026-05-25 154233" src="https://github.com/user-attachments/assets/3c6a1da3-c568-4a53-8d2d-2538d337518b" />
-
-
-
-```   

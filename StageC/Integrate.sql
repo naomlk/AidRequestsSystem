@@ -1,10 +1,3 @@
-/* ============================================================
-   FICHIER DES CHANGEMENTS POUR L’INTÉGRATION DES BASES
-   Objectif :
-   - Adapter les tables du groupe A et du groupe B
-   - Transférer les données utiles
-   - Rediriger certaines contraintes vers les tables finales
-   ============================================================ */
 
 
 /* ============================================================
@@ -244,23 +237,22 @@ COMMIT;
 
 
 /* ============================================================
-   7. MODIFICATION DE b_availability
+   7. MODIFICATION DE b_availability (c etait pas les bonnes clés)
    ============================================================ */
-
--- Modification de la contrainte de b_availability pour référencer a_volunteer.
 
 BEGIN;
 
-ALTER TABLE public.b_availability
-DROP CONSTRAINT availability_pkey;
+ALTER TABLE public.b_availability DROP CONSTRAINT IF EXISTS availability_pkey;
+ALTER TABLE public.b_availability DROP CONSTRAINT IF EXISTS availability_volunteer_id_fkey;
 
-ALTER TABLE public.b_availability
-ADD CONSTRAINT availability_pkey
-FOREIGN KEY (volunteer_id)
-REFERENCES public.a_volunteer(volunteer_id);
+ALTER TABLE public.b_availability 
+ADD CONSTRAINT b_availability_pkey PRIMARY KEY (day_of_week, start_time, volunteer_id);
+
+ALTER TABLE public.b_availability 
+ADD CONSTRAINT b_availability_volunteer_id_fkey 
+FOREIGN KEY (volunteer_id) REFERENCES public.a_volunteer(volunteer_id);
 
 COMMIT;
-
 
 
 /* ============================================================
@@ -369,7 +361,7 @@ INSERT INTO public.a_request (
     date, 
     incident_description, 
     prioriry_level, 
-    contactperson_id, -- Ta clé étrangère exige une valeur valide de a_family
+    contactperson_id, 
     category_id, 
     status_id, 
     latitude,
@@ -416,6 +408,83 @@ FROM public.b_call bc;
 COMMIT;
 
 
+/*suppression de la colonne request_id dans delivery car ce n est plus une clé etrangere
+  (demande de la prof)*/
+ALTER TABLE public.a_delivery 
+DROP COLUMN request_id;
+
+
+/*volunteer_id dans treatment n etait pas une cle etrangere , j ai rectifié ca*/
+BEGIN;
+
+ALTER TABLE public.a_treatment
+ADD CONSTRAINT treatment_volunteer_id_fkey
+FOREIGN KEY (volunteer_id)
+REFERENCES public.a_volunteer(volunteer_id);
+
+COMMIT;    
+
+
+/*j ai arrangé les clés*/
+BEGIN;
+
+ALTER TABLE public.b_scheduled 
+DROP CONSTRAINT IF EXISTS scheduled_pkey;
+
+ALTER TABLE public.b_scheduled 
+ADD CONSTRAINT scheduled_pkey PRIMARY KEY (training_id, meeting_date);
+
+COMMIT;
+
+
+
+/*j ai ajouté la colonne category_id dans b_skill*/
+ALTER TABLE public.b_skill 
+ADD COLUMN IF NOT EXISTS category_id INTEGER;
+
+ALTER TABLE public.b_skill
+ADD CONSTRAINT skill_category_id_fkey
+FOREIGN KEY (category_id)
+REFERENCES public.b_category(category_id);
+
+
+/*j ai rempli la colonne category_id en fonction du skill_name*/
+BEGIN;
+
+-- 1. Catégorie 1 : Language (English, French, Hebrew, Arabic...)
+UPDATE public.b_skill
+SET category_id = 1
+WHERE skill_name LIKE '%speaking' 
+   OR skill_name IN ('English', 'French', 'Hebrew', 'Arabic');
+
+-- 2. Catégorie 2 : Vehicle (Tire, Mechanics, Vehicle, Hydraulic Tools Expert...)
+UPDATE public.b_skill
+SET category_id = 2
+WHERE skill_name IN ('Tire', 'Mechanics', 'Vehicle', 'Hydraulic Tools Expert', 'Water & Medical Supply Delivery');
+
+-- 3. Catégorie 3 : Locksmith (Unlock, Locksmith, Heavy Duty Locksmith...)
+UPDATE public.b_skill
+SET category_id = 3
+WHERE skill_name IN ('Unlock', 'Locksmith', 'Heavy Duty Locksmith (MAMAD Speciali...');
+
+-- 4. Catégorie 4 : Rescue (Elevator rescue, Emergency Locksmith (Elevators/Rooms)...)
+UPDATE public.b_skill
+SET category_id = 4
+WHERE skill_name IN ('Elevator', 'Elevator rescue', 'Emergency Locksmith (Elevators/Rooms)');
+
+-- 5. Catégorie 5 : Technical (Radio, Technical, Certified Electrician, Professional Plumber...)
+UPDATE public.b_skill
+SET category_id = 5
+WHERE skill_name IN ('Radio', 'Technical', 'Certified Electrician', 'Professional Plumber (Pipe Bursts)', 'General Home Maintenance', 'Navigation');
+
+-- 6. Catégorie 6 : Emergency (FirstAid, First Aid Responder, Emergency...)
+UPDATE public.b_skill
+SET category_id = 6
+WHERE skill_name IN ('FirstAid', 'First Aid Responder', 'Emergency', 'Heavy Equipment Handling');
+
+COMMIT;  
+
+
 /* ============================================================
    11. SUPPRESSION DES TABLES DEVENUES INUTILES
    ============================================================ */
@@ -424,14 +493,16 @@ DROP TABLE b_volunteer_call;
 
 DROP TABLE b_call;
 
+DROP TABLE b_skill_category;
 
+DROP TABLE b_type;
 
 
 -- avant de suppimer b_volunteer
 BEGIN;
 
 ALTER TABLE public.b_volunteer_training
-DROP CONSTRAINT volunteer_training_volunteer_id_fkey;
+DROP CONSTRAINT IF EXISTS fk_volunteer_training_volunteer;
 
 ALTER TABLE public.b_volunteer_training
 ADD CONSTRAINT fk_b_volunteer_training_a_volunteer
@@ -440,33 +511,10 @@ REFERENCES public.a_volunteer(volunteer_id);
 
 COMMIT;
 
-DELETE FROM b_volunteer;
-
-
-DELETE FROM b_type;
-
-DROP TABLE b_volunteer_call;
-DROP TABLE b_call;
-
-
--- 
-ALTER TABLE public.b_availability
-DROP CONSTRAINT availability_volunteer_id_fkey ;
-
-
-ALTER TABLE public.b_availability
-ADD CONSTRAINT availability_volunteer_id_fkey
-FOREIGN KEY (volunteer_id)
-REFERENCES public.a_volunteer(volunteer_id);
-
---
-DROP TABLE b_volunteer;
-
-DROP TABLE b_type;
+DROP TABLE public.b_volunteer;
 
 
 
--- DROP TABLE b_skill_category;   --> table vide BANDE DE BOUFFONE §§§§§
 
 
 

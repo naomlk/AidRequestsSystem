@@ -485,6 +485,51 @@ WHERE skill_name IN ('FirstAid', 'First Aid Responder', 'Emergency', 'Heavy Equi
 COMMIT;  
 
 
+
+BEGIN;
+
+
+/* suppression de skill qui se repetent*/
+
+-- 1. Remplacement de l'ID 10 par 18
+-- On supprime d'abord le 10 si le bénévole a déjà le 18 pour éviter le doublon de clé primaire
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 10 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 18);
+
+-- Puis on met à jour les autres
+UPDATE public.b_volunteer_skill 
+SET skill_id = 18 
+WHERE skill_id = 10;
+
+
+-- 2. Remplacement de l'ID 22 par 16
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 22 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 16);
+
+UPDATE public.b_volunteer_skill 
+SET skill_id = 16 
+WHERE skill_id = 22;
+
+
+-- 3. Remplacement de l'ID 8 par 12
+DELETE FROM public.b_volunteer_skill 
+WHERE skill_id = 8 
+  AND volunteer_id IN (SELECT volunteer_id FROM public.b_volunteer_skill WHERE skill_id = 12);
+
+UPDATE public.b_volunteer_skill 
+SET skill_id = 12 
+WHERE skill_id = 8;
+
+
+DELETE FROM public.b_skill 
+WHERE skill_id IN (10, 22, 8);
+
+COMMIT;
+
+
+
 /* ============================================================
    11. SUPPRESSION DES TABLES DEVENUES INUTILES
    ============================================================ */

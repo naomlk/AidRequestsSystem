@@ -18,7 +18,7 @@ UPDATE public.a_volunteer
 SET is_active = CASE
     WHEN availability_status = 'Busy' THEN 'Y'
     WHEN availability_status = 'Available' THEN 'N'
-    ELSE is_active 
+    ELSE availability_status= 'N'
 END
 WHERE availability_status IN ('Busy', 'Available');
 

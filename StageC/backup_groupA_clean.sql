@@ -46896,7 +46896,7 @@ CREATE INDEX idx_volunteer_status_location ON public.a_volunteer USING btree (av
 --
 
 ALTER TABLE ONLY public.a_delivery
-    ADD CONSTRAINT delivery_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.a_request(request_id);
+    ADD CONSTRAINT  FOREIGN KEY (request_id) REFERENCES public.a_request(request_id);
 
 
 --

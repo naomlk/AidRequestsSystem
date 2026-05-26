@@ -9,6 +9,7 @@ status_id = 2 → In Progress
 status_id = 3 → Closed
 ```
 
+
 So, when a treatment has a `completion_time`, the request should be updated to `Closed`.
 
 ---
@@ -27,6 +28,7 @@ WHERE t.completion_time IS NOT NULL
 ```
 
 **Result:** Image 1 shows completed treatments whose requests are still in progress.
+<img width="1384" height="141" alt="RESULT1" src="https://github.com/user-attachments/assets/bb43471b-8b1e-47d1-a350-7682098a0a09" />
 
 ---
 
@@ -41,6 +43,7 @@ FETCH ALL FROM completed_treatments_cursor;
 ```
 
 **Result:** Image 2 shows that the function returns the expected treatments.
+<img width="730" height="144" alt="RESULT2" src="https://github.com/user-attachments/assets/02f0c709-7027-4ad1-bf01-6826428cb0cb" />
 
 ---
 
@@ -65,6 +68,7 @@ REFCURSOR, RECORD, LOOP, FETCH, UPDATE, RAISE NOTICE, EXCEPTION
 ```
 
 **Result:** Image 3 shows that the procedure ran successfully.
+<img width="668" height="124" alt="result3 of call procedure" src="https://github.com/user-attachments/assets/77c26077-b5b2-43f6-8c3b-b0565c3a9ddb" />
 
 ---
 
@@ -79,3 +83,6 @@ CALL close_requests_from_completed_treatments();
 we run the first query again.
 
 **Result:** Image 4 shows no remaining rows, meaning all completed treatments now have their requests closed.
+
+<img width="763" height="152" alt="result 4 no result after proceure calls" src="https://github.com/user-attachments/assets/97120ce3-4762-40f7-b645-0fba42dbedbc" />
+

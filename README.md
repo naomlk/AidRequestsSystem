@@ -662,7 +662,6 @@ Category Alignment: This allowed us to successfully map every migrated call to a
 
 <img width="1526" height="336" alt="image" src="https://github.com/user-attachments/assets/e72fc2c9-200c-49b9-9380-73d0b92407c2" />
 
-```
 ### POINT 5 -->   b_call to a_request Integration
 The table b_call from the new system lacked many mandatory attributes that were required by our centralized a_request table. Because of this structural gap, we had to implement specific fallbacks and logical mappings during the migration:
 

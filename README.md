@@ -647,7 +647,6 @@ The table `b_type` represented call types in group B.
 
 The IDs were shifted:
 
-```text
 1 → 5
 2 → 6
 3 → 7
@@ -655,12 +654,12 @@ The IDs were shifted:
 5 → 9
 6 → 10
 
-
 We also matched the other system's call types (b_type) into our categories (a_requestcategory):
 
 Adding Missing Categories: We inserted three specific emergency types from their system (Flat Tire Assistance, Locked Vehicle, and Child Locked In Car) into our table using IDs 5, 6, and 7.
 
 Category Alignment: This allowed us to successfully map every migrated call to a relevant category in our system without losing any context.
+
 <img width="1526" height="336" alt="image" src="https://github.com/user-attachments/assets/e72fc2c9-200c-49b9-9380-73d0b92407c2" />
 
 ```

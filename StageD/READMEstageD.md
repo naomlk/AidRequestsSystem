@@ -89,3 +89,15 @@ we run the first query again.
 
 
 finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigger agit
+
+
+
+## EXEMPLE 1:
+
+### 1. Function check
+<img width="985" height="170" alt="image" src="https://github.com/user-attachments/assets/5ab82ddd-93ea-4288-8843-1f8681fdf9af" />
+
+<img width="957" height="371" alt="image" src="https://github.com/user-attachments/assets/4c2cf816-a4bf-40a1-a56b-d9e6806252b0" />
+
+### 2. Procedure
+

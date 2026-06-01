@@ -29,3 +29,39 @@ EXCEPTION
         RAISE EXCEPTION 'Error while opening completed treatments cursor: %', SQLERRM;
 END;
 $$;
+
+
+
+
+
+--program 2
+
+CREATE OR REPLACE FUNCTION public.get_busy_volunteers_with_no_active_treatment()
+RETURNS REFCURSOR
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    volunteer_ref_cursor REFCURSOR := 'busy_volunteers_cursor';
+BEGIN
+    OPEN volunteer_ref_cursor FOR
+        SELECT 
+            v.volunteer_id,
+            v.first_name,
+            v.last_name,
+            v.is_active
+        FROM public.a_volunteer v -- Mis à jour avec a_volunteer
+        WHERE v.is_active = 'Y'
+          AND NOT EXISTS (
+              SELECT 1 
+              FROM public.a_treatment t -- Mis à jour avec a_treatment
+              WHERE t.volunteer_id = v.volunteer_id
+                AND t.completion_time IS NULL
+          );
+
+    RETURN volunteer_ref_cursor;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Erreur lors de l''ouverture du curseur des bénévoles bloqués : %', SQLERRM;
+END;
+$$;

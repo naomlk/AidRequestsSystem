@@ -92,7 +92,7 @@ finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigge
 
 
 
-## EXEMPLE 1:
+## EXEMPLE 2:
 
 ### 1. Function check
 <img width="985" height="170" alt="image" src="https://github.com/user-attachments/assets/5ab82ddd-93ea-4288-8843-1f8681fdf9af" />

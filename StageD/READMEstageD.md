@@ -86,3 +86,6 @@ we run the first query again.
 
 <img width="763" height="152" alt="result 4 no result after proceure calls" src="https://github.com/user-attachments/assets/97120ce3-4762-40f7-b645-0fba42dbedbc" />
 
+
+
+finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigger agit

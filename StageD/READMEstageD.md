@@ -101,3 +101,7 @@ finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigge
 
 ### 2. Procedure
 
+<img width="1055" height="186" alt="image" src="https://github.com/user-attachments/assets/ed426cd5-9dd4-41a1-9e17-f40ce5399127" />
+
+<img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />
+

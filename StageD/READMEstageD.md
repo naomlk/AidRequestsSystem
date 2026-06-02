@@ -102,7 +102,7 @@ This function acts as the detector. It opens an explicit reference cursor (REFCU
 This function uses:
 REFCURSOR, EXPLICIT CURSOR, SELECT NOT EXISTS, EXCEPTION  
 
-
+```sql
 CREATE OR REPLACE FUNCTION public.get_busy_volunteers_with_no_active_treatment()
 RETURNS REFCURSOR
 LANGUAGE plpgsql
@@ -132,7 +132,7 @@ EXCEPTION
         RAISE EXCEPTION 'Error while opening the blocked volunteers cursor : %', SQLERRM;
 END;
 $$;  
-
+```
 
 <img width="985" height="170" alt="image" src="https://github.com/user-attachments/assets/5ab82ddd-93ea-4288-8843-1f8681fdf9af" />
 

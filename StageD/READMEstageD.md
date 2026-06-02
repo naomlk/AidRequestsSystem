@@ -158,6 +158,13 @@ When a volunteer is given a new mission (INSERT): The trigger checks if they are
 
 When a mission is finished (UPDATE): As soon as the end time (completion_time) is filled in, the trigger automatically changes the volunteer's status back to available ('N') so they can take new emergency calls.
 
+TEST 1: INSERTION EVENT 
+-- (Verify that the volunteer status automatically updates to Busy 'Y')
+
+This is the status of the volunteer before : 
+<img width="889" height="322" alt="image" src="https://github.com/user-attachments/assets/20990e2a-01d8-4ec2-a47f-163dd8a71cfb" />
+
+After that we assigned the volunteer to a specific treatment , so his status supposed to be 'Y' now 
 ```sql
 INSERT INTO public.a_treatment (
     treatment_id, 
@@ -182,12 +189,6 @@ VALUES (
     1                        
 );
 ```
-
-TEST 1: INSERTION EVENT 
--- (Verify that the volunteer status automatically updates to Busy 'Y')
-
-This is the status of the volunteer before : 
-<img width="889" height="322" alt="image" src="https://github.com/user-attachments/assets/20990e2a-01d8-4ec2-a47f-163dd8a71cfb" />
 
 <img width="925" height="205" alt="image" src="https://github.com/user-attachments/assets/cd03485e-b35f-49ff-90d2-43ec0a6a4ac3" />
 

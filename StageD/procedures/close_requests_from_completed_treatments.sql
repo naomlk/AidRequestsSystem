@@ -35,40 +35,6 @@ END;
 $$;
 
 
---program 2
-CREATE OR REPLACE PROCEDURE public.reset_volunteer_availability()
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    v_cursor REFCURSOR;
-    v_record RECORD;
-    v_counter INTEGER := 0;
-BEGIN
-    v_cursor := public.get_busy_volunteers_with_no_active_treatment();
-
-    LOOP
-        FETCH v_cursor INTO v_record;
-        EXIT WHEN NOT FOUND;
-
-        UPDATE public.a_volunteer
-        SET is_active = 'N'
-        WHERE volunteer_id = v_record.volunteer_id;
-
-        v_counter := v_counter + 1;
-
-        RAISE NOTICE 'Notification Yedidim : Le bénévole % % (ID: %) a été libéré de son blocage.', 
-                     v_record.first_name, v_record.last_name, v_record.volunteer_id;
-    END LOOP;
-
-    CLOSE v_cursor;
-    RAISE NOTICE 'Fin du traitement avec succès. Total de bénévoles corrigés et libérés : %', v_counter;
-
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'Erreur critique lors de l''exécution de la procédure : %', SQLERRM;
-END;
-$$;
-
 
 -- LES CURSOR  A SAVOIR
 

@@ -150,3 +150,53 @@ We can see that it worked successfully; the table is now empty.
 
 <img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />
 
+### 3 . Trigger 
+
+This trigger automatically manages a volunteer's availability in real time based on their assignments.
+
+When a volunteer is given a new mission (INSERT): The trigger checks if they are free. If they are already busy ('Y'), it blocks the action with an error. If they are free, it automatically changes their status to busy ('Y').
+
+When a mission is finished (UPDATE): As soon as the end time (completion_time) is filled in, the trigger automatically changes the volunteer's status back to available ('N') so they can take new emergency calls.
+
+```sql
+INSERT INTO public.a_treatment (
+    treatment_id, 
+    date, 
+    start_time, 
+    completion_time, 
+    feedback_notes, 
+    photo_after, 
+    delivery_id,    
+    volunteer_id,
+	request_id
+)
+VALUES (
+    25000,                        
+    CURRENT_DATE,                   
+    '14:00:00'::time,               
+    NULL,                          
+    'Test de validation du trigger',
+    'test_image.png',              
+    null,   
+	1, 
+    1                        
+);
+```
+
+TEST 1: INSERTION EVENT 
+-- (Verify that the volunteer status automatically updates to Busy 'Y')
+
+This is the status of the volunteer before : 
+<img width="889" height="322" alt="image" src="https://github.com/user-attachments/assets/20990e2a-01d8-4ec2-a47f-163dd8a71cfb" />
+
+<img width="925" height="205" alt="image" src="https://github.com/user-attachments/assets/cd03485e-b35f-49ff-90d2-43ec0a6a4ac3" />
+
+--  Check if the volunteer status automatically changed to 'Y'
+<img width="929" height="352" alt="image" src="https://github.com/user-attachments/assets/c6c67e35-d888-4b11-a831-2172936a000e" />
+
+TEST 2: UPDATE EVENT 
+-- (Verify that the volunteer status automatically reverts to Available 'N')
+ Updating the row by adding an end time, which triggers the mission closure logic
+and check if the volunteer status reverted back to 'N' 
+
+<img width="934" height="533" alt="image" src="https://github.com/user-attachments/assets/62334b58-57ea-4c28-9e80-8890d461c983" />

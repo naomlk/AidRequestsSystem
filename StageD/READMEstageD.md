@@ -94,12 +94,23 @@ finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigge
 
 ## EXEMPLE 2:
 
-### 1. Function check
+This program scans the database to find and fix data anomalies regarding volunteer availability. It identifies volunteers who are incorrectly marked as busy ('Y') despite having no active missions, and safely resets their status back to available ('N').
+
+### 1. Function check : get_busy_volunteers_with_no_active_treatment
+
+This function acts as the detector. It opens an explicit reference cursor (REFCURSOR) to query and isolate all volunteers whose status is set to busy (is_active = 'Y'), but who currently have no ongoing assignments (where completion_time IS NULL) in the treatments table.
+This function uses:
+REFCURSOR, EXPLICIT CURSOR, SELECT NOT EXISTS, EXCEPTION 
+
 <img width="985" height="170" alt="image" src="https://github.com/user-attachments/assets/5ab82ddd-93ea-4288-8843-1f8681fdf9af" />
 
 <img width="957" height="371" alt="image" src="https://github.com/user-attachments/assets/4c2cf816-a4bf-40a1-a56b-d9e6806252b0" />
 
-### 2. Procedure
+### 2. Procedure : reset_volunteer_availability
+
+This procedure is the fixer. It takes the list of blocked volunteers found by the function, loops through them one by one, and updates their status back to available ('N'). It prints a confirmation message for each volunteer and shows the total number of fixed profiles at the end.
+This procedure uses:
+REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), RAISE NOTICE, EXCEPTION 
 
 <img width="1055" height="186" alt="image" src="https://github.com/user-attachments/assets/ed426cd5-9dd4-41a1-9e17-f40ce5399127" />
 

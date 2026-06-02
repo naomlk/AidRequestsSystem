@@ -100,7 +100,39 @@ This program scans the database to find and fix data anomalies regarding volunte
 
 This function acts as the detector. It opens an explicit reference cursor (REFCURSOR) to query and isolate all volunteers whose status is set to busy (is_active = 'Y'), but who currently have no ongoing assignments (where completion_time IS NULL) in the treatments table.
 This function uses:
-REFCURSOR, EXPLICIT CURSOR, SELECT NOT EXISTS, EXCEPTION 
+REFCURSOR, EXPLICIT CURSOR, SELECT NOT EXISTS, EXCEPTION  
+
+
+CREATE OR REPLACE FUNCTION public.get_busy_volunteers_with_no_active_treatment()
+RETURNS REFCURSOR
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    volunteer_ref_cursor REFCURSOR := 'busy_volunteers_cursor';
+BEGIN
+    OPEN volunteer_ref_cursor FOR
+        SELECT 
+            v.volunteer_id,
+            v.first_name,
+            v.last_name,
+            v.is_active
+        FROM public.a_volunteer v
+        WHERE v.is_active = 'Y'
+          AND NOT EXISTS (
+              SELECT 1 
+              FROM public.a_treatment t 
+              WHERE t.volunteer_id = v.volunteer_id
+                AND t.completion_time IS NULL
+          );
+
+    RETURN volunteer_ref_cursor;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Error while opening the blocked volunteers cursor : %', SQLERRM;
+END;
+$$;  
+
 
 <img width="985" height="170" alt="image" src="https://github.com/user-attachments/assets/5ab82ddd-93ea-4288-8843-1f8681fdf9af" />
 

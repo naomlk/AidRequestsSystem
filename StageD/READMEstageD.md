@@ -144,6 +144,41 @@ This procedure is the fixer. It takes the list of blocked volunteers found by th
 This procedure uses:
 REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), RAISE NOTICE, EXCEPTION 
 
+```sql
+CREATE OR REPLACE PROCEDURE public.reset_volunteer_availability()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_cursor REFCURSOR;
+    v_record RECORD;
+    v_counter INTEGER := 0;
+BEGIN
+    v_cursor := public.get_busy_volunteers_with_no_active_treatment();
+
+    LOOP
+        FETCH v_cursor INTO v_record;
+        EXIT WHEN NOT FOUND;
+
+        UPDATE public.a_volunteer
+        SET is_active = 'N'
+        WHERE volunteer_id = v_record.volunteer_id;
+
+        v_counter := v_counter + 1;
+
+        RAISE NOTICE 'Yedidim Notification: Volunteer % % (ID: %) has been released from their block.', 
+                     v_record.first_name, v_record.last_name, v_record.volunteer_id;
+    END LOOP;
+
+    CLOSE v_cursor;
+    RAISE NOTICE 'Treatment completed successfully. Total volunteers corrected and released: %', v_counter;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Critical error during procedure execution: %', SQLERRM;
+END;
+$$;
+```
+
 <img width="1055" height="186" alt="image" src="https://github.com/user-attachments/assets/ed426cd5-9dd4-41a1-9e17-f40ce5399127" />
 
 We can see that it worked successfully; the table is now empty.  
@@ -157,6 +192,62 @@ This trigger automatically manages a volunteer's availability in real time based
 When a volunteer is given a new mission (INSERT): The trigger checks if they are free. If they are already busy ('Y'), it blocks the action with an error. If they are free, it automatically changes their status to busy ('Y').
 
 When a mission is finished (UPDATE): As soon as the end time (completion_time) is filled in, the trigger automatically changes the volunteer's status back to available ('N') so they can take new emergency calls.
+
+
+```sql
+CREATE OR REPLACE FUNCTION public.update_volunteer_status_on_treatment()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_is_active CHARACTER(1);
+BEGIN
+    SELECT is_active 
+    INTO v_is_active 
+    FROM public.a_volunteer 
+    WHERE volunteer_id = NEW.volunteer_id;
+
+    -- =====================================================================
+    -- CASE 1: Mission assignment (Insertion or modification without end time)
+    -- =====================================================================
+    IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE' AND NEW.completion_time IS NULL) THEN
+        
+        IF v_is_active = 'Y' THEN
+            RAISE EXCEPTION 'Yedidim Security: Volunteer (ID: %) is already busy on another mission!', NEW.volunteer_id;
+        ELSE
+            UPDATE public.a_volunteer
+            SET is_active = 'Y'
+            WHERE volunteer_id = NEW.volunteer_id;
+            
+            RAISE NOTICE 'Trigger Notification: Volunteer (ID: %) is now marked as Busy (Y).', NEW.volunteer_id;
+        END IF;
+
+    -- =====================================================================
+    -- CASE 2: Mission closure (The end time "completion_time" has just been added)
+    -- =====================================================================
+    ELSIF (TG_OP = 'UPDATE' AND NEW.completion_time IS NOT NULL AND OLD.completion_time IS NULL) THEN
+        UPDATE public.a_volunteer
+        SET is_active = 'N'
+        WHERE volunteer_id = NEW.volunteer_id;
+        
+        RAISE NOTICE 'Trigger Notification: Mission completed! Volunteer (ID: %) is back to Available (N).', NEW.volunteer_id;
+    END IF;
+
+    RETURN NEW;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Error in the availability management Trigger: %', SQLERRM;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER trg_treatment_status_sync
+AFTER INSERT OR UPDATE OF completion_time
+ON public.a_treatment
+FOR EACH ROW
+EXECUTE FUNCTION public.update_volunteer_status_on_treatment();
+```
+
 
 TEST 1: INSERTION EVENT 
 -- (Verify that the volunteer status automatically updates to Busy 'Y')

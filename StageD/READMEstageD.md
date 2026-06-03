@@ -85,53 +85,132 @@ we run the first query again.
 **Result:** Image 4 shows no remaining rows, meaning all completed treatments now have their requests closed.
 
 <img width="763" height="152" alt="result 4 no result after proceure calls" src="https://github.com/user-attachments/assets/97120ce3-4762-40f7-b645-0fba42dbedbc" />
-  ## TRIGGER
-  main prograù for the trigger:
+ # Test of the Trigger for Automatically Closing a Request
 
+In this part, we tested the trigger that automatically updates the status of a request when its related treatment is completed.
 
-  
+## 1. Inserting a New Family
+
+First, we inserted a new family into the `a_family` table.
+
 ```sql
-
-BEGIN;
 INSERT INTO public.a_family (
     contactperson_id,
-	contactperson_name,phone_number,
-	number_of_members,special_features)
-
-
-
-VALUES (
-    209727361,
-	'perez',
-	0503014787,
-	2,
-	NULL);
-
-
-INSERT INTO public.a_request (
-    request_id,
-date,
-image,
-incident_description,
-prioriry_level,contactperson_id,
-    category_id,
-    status_id,
-	latitude,
-    longitude
-
+    contactperson_name,
+    phone_number,
+    number_of_members,
+    special_features
 )
 VALUES (
-    30000,                          -- nouvel ID de requête
-    CURRENT_TIMESTAMP,                             -- famille qui fait la demande
-NULL,NULL,3,209727361,6,
-1,32.091564,34.840469);
-
-
+    209727361,
+    'perez',
+    0503014787,
+    2,
+    NULL
+);
 ```
 
+This family is then used as the contact person for a new aid request.
 
-finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigger agit
+## 2. Inserting a New Request
 
+Next, we inserted a new request into the `a_request` table.
+
+```sql
+INSERT INTO public.a_request (
+    request_id,
+    date,
+    image,
+    incident_description,
+    prioriry_level,
+    contactperson_id,
+    category_id,
+    status_id,
+    latitude,
+    longitude
+)
+VALUES (
+    30000,
+    CURRENT_TIMESTAMP,
+    NULL,
+    NULL,
+    3,
+    209727361,
+    6,
+    1,
+    32.091564,
+    34.840469
+);
+```
+
+The request has the ID `30000`.
+
+At this stage, `status_id = 1`, meaning that the request is still open / waiting for treatment.
+
+## 3. Inserting a Related Treatment
+
+After that, we inserted a new treatment into the `a_treatment` table.
+
+```sql
+INSERT INTO public.a_treatment (
+    treatment_id,
+    date,
+    start_time,
+    completion_time,
+    feedback_notes,
+    photo_after,
+    delivery_id,
+    volunteer_id,
+    request_id
+)
+VALUES (
+    21014,
+    CURRENT_TIMESTAMP,
+    '21:55',
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    3,
+    30000
+);
+```
+
+This treatment is linked to request `30000`.
+
+At the moment of insertion, `completion_time` is `NULL`, so the treatment is not completed yet.
+
+## 4. Updating the Treatment
+
+To simulate the completion of the treatment, we updated the `completion_time` field.
+
+```sql
+UPDATE public.a_treatment
+SET completion_time = '22:00'
+WHERE treatment_id = 21014;
+```
+
+This update activates the trigger.
+
+The trigger checks that `completion_time` is no longer `NULL`, and then automatically updates the status of the related request.
+
+## 5. Checking the Result
+
+Finally, we checked the request in the `a_request` table.
+
+```sql
+SELECT *
+FROM public.a_request
+WHERE request_id = 30000;
+```
+
+After the trigger runs, we can see that `status_id` became `3`.
+
+This means that the request was automatically closed because its treatment was completed.
+
+## Conclusion
+
+This test shows that the trigger works correctly: as soon as a treatment receives a value in `completion_time`, the related request is automatically updated to `status_id = 3`, which represents a closed request.
 
 
 ## EXEMPLE 2:

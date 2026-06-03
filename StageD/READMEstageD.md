@@ -203,15 +203,7 @@ SELECT *
 FROM public.a_request
 WHERE request_id = 30000;
 ```
-
-After the trigger runs, we can see that `status_id` became `3`.
-
-This means that the request was automatically closed because its treatment was completed.
-
-## Conclusion
-
-This test shows that the trigger works correctly: as soon as a treatment receives a value in `completion_time`, the related request is automatically updated to `status_id = 3`, which represents a closed request.
-
+<img width="1020" height="132" alt="image" src="https://github.com/user-attachments/assets/366cf99b-fed3-4cec-b061-4a7e552317a3" />
 
 ## EXEMPLE 2:
 

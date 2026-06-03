@@ -85,7 +85,49 @@ we run the first query again.
 **Result:** Image 4 shows no remaining rows, meaning all completed treatments now have their requests closed.
 
 <img width="763" height="152" alt="result 4 no result after proceure calls" src="https://github.com/user-attachments/assets/97120ce3-4762-40f7-b645-0fba42dbedbc" />
+  ## TRIGGER
+  main prograù for the trigger:
 
+
+  
+```sql
+
+BEGIN;
+INSERT INTO public.a_family (
+    contactperson_id,
+	contactperson_name,phone_number,
+	number_of_members,special_features)
+
+
+
+VALUES (
+    209727361,
+	'perez',
+	0503014787,
+	2,
+	NULL);
+
+
+INSERT INTO public.a_request (
+    request_id,
+date,
+image,
+incident_description,
+prioriry_level,contactperson_id,
+    category_id,
+    status_id,
+	latitude,
+    longitude
+
+)
+VALUES (
+    30000,                          -- nouvel ID de requête
+    CURRENT_TIMESTAMP,                             -- famille qui fait la demande
+NULL,NULL,3,209727361,6,
+1,32.091564,34.840469);
+
+
+```
 
 
 finir trigge r -ajouter une requete-pusi un taritement et voir commen tle trigger agit

@@ -61,11 +61,6 @@ WHERE request_id = treatment_record.request_id;
 
 It also prints a `NOTICE` message for each request that was closed.
 
-This procedure uses:
-
-```text
-REFCURSOR, RECORD, LOOP, FETCH, UPDATE, RAISE NOTICE, EXCEPTION
-```
 
 **Result:** Image 3 shows that the procedure ran successfully.
 <img width="668" height="124" alt="result3 of call procedure" src="https://github.com/user-attachments/assets/77c26077-b5b2-43f6-8c3b-b0565c3a9ddb" />
@@ -86,6 +81,12 @@ we run the first query again.
 
 <img width="763" height="152" alt="result 4 no result after proceure calls" src="https://github.com/user-attachments/assets/97120ce3-4762-40f7-b645-0fba42dbedbc" /> 
 
+
+This function and procedure use:
+
+```text
+REFCURSOR, CURSOR, RECORD, LOOP, FETCH, UPDATE, RAISE NOTICE, EXCEPTION
+```
 ### 5. Trigger 
 ### Test of the Trigger for Automatically Closing a Request
 
@@ -256,8 +257,7 @@ $$;
 ### 2. Procedure : reset_volunteer_availability
 
 This procedure is the fixer. It takes the list of blocked volunteers found by the function, loops through them one by one, and updates their status back to available ('N'). It prints a confirmation message for each volunteer and shows the total number of fixed profiles at the end.
-This procedure uses:
-REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), RAISE NOTICE, EXCEPTION 
+
 
 ```sql
 CREATE OR REPLACE PROCEDURE public.reset_volunteer_availability()
@@ -298,7 +298,10 @@ $$;
 
 We can see that it worked successfully; the table is now empty.  
 
-<img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />
+<img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />  
+
+This function and procedure use:
+Cursor, REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), EXCEPTION 
 
 ### 3 . Trigger 
 

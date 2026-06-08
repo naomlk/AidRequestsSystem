@@ -1,7 +1,6 @@
--- Cette procedure va parcourir ts les traitemnts et verifier si yn traitment est termine
--- avec completion time et ensuiet va actualiser la table a_request
 
--- on utilise : LOOP , FETCH ,DML, EXEPTION, CURSOR EXPLICIT
+
+-- uses : LOOP , FETCH ,DML, EXEPTION, CURSOR EXPLICIT
 CREATE OR REPLACE PROCEDURE close_requests_from_completed_treatments()
 LANGUAGE plpgsql
 AS $$
@@ -33,6 +32,14 @@ EXCEPTION
         RAISE EXCEPTION 'Error while closing requests from completed treatments: %', SQLERRM;
 END;
 $$;
+
+
+
+
+
+
+
+
 
 
 

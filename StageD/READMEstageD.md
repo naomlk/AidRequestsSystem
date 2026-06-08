@@ -256,8 +256,7 @@ $$;
 ### 2. Procedure : reset_volunteer_availability
 
 This procedure is the fixer. It takes the list of blocked volunteers found by the function, loops through them one by one, and updates their status back to available ('N'). It prints a confirmation message for each volunteer and shows the total number of fixed profiles at the end.
-This procedure uses:
-REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), RAISE NOTICE, EXCEPTION 
+
 
 ```sql
 CREATE OR REPLACE PROCEDURE public.reset_volunteer_availability()
@@ -298,7 +297,10 @@ $$;
 
 We can see that it worked successfully; the table is now empty.  
 
-<img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />
+<img width="1185" height="229" alt="image" src="https://github.com/user-attachments/assets/800a9319-22c3-409f-acda-22654b60a8e8" />  
+
+These function and procedure use:
+Cursor, REFCURSOR, RECORD, LOOP, FETCH, UPDATE (DML), EXCEPTION 
 
 ### 3 . Trigger 
 

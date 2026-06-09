@@ -215,8 +215,7 @@ This program scans the database to find and fix data anomalies regarding volunte
 ### 1. Function check : get_busy_volunteers_with_no_active_treatment
 
 This function acts as the detector. It opens an explicit reference cursor (REFCURSOR) to query and isolate all volunteers whose status is set to busy (is_active = 'Y'), but who currently have no ongoing assignments (where completion_time IS NULL) in the treatments table.
-This function uses:
-REFCURSOR, EXPLICIT CURSOR, SELECT NOT EXISTS, EXCEPTION  
+
 
 ```sql
 CREATE OR REPLACE FUNCTION public.get_busy_volunteers_with_no_active_treatment()

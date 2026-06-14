@@ -1,0 +1,43 @@
+--j ai enlevé les contraintes qui empechaient de creer des volunteer ou des request avec des coordonnes
+-- qui sont pas deja dans la table location ( c etait pas logique )
+--maintenant quand j ajoute un volontaire ou une requete ca ajoute ses coordonnees 
+--(si ils sont bons) direct dans la table location
+
+ALTER TABLE public.a_volunteer 
+DROP CONSTRAINT volunteer_latitude_longitude_fkey; 
+
+
+CREATE OR REPLACE FUNCTION public.auto_insert_location()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
+        -- We explicitly add a placeholder for the mandatory "city" column 👈
+        INSERT INTO public.a_location (latitude, longitude, city)
+        VALUES (NEW.latitude, NEW.longitude, 'Unknown')
+        ON CONFLICT DO NOTHING;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_volunteer_location_before
+BEFORE INSERT OR UPDATE OF latitude, longitude ON public.a_volunteer
+FOR EACH ROW
+EXECUTE FUNCTION public.auto_insert_location();
+
+
+
+ALTER TABLE public.a_request 
+DROP CONSTRAINT request_latitude_longitude_fkey;
+
+
+DROP TRIGGER IF EXISTS trg_request_location_before ON public.a_request;
+
+CREATE TRIGGER trg_request_location_before
+BEFORE INSERT OR UPDATE OF latitude, longitude ON public.a_request
+FOR EACH ROW
+EXECUTE FUNCTION public.auto_insert_location();
+
+--------------------------------------------------------------------
+--j ai appliqué tout ca dans le nouveau backup donc pas besoin de les relancer
+---------------------------------------------------------------------

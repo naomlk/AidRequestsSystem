@@ -141,7 +141,8 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.bottom_grid = ctk.CTkFrame(self.content_view, fg_color="transparent")
         self.bottom_grid.pack(fill="both", expand=True)
         self.bottom_grid.grid_columnconfigure(0, weight=2, pad=20) 
-        self.bottom_grid.grid_columnconfigure(1, weight=1)        
+        self.bottom_grid.grid_columnconfigure(1, weight=1)    
+        self.bottom_grid.grid_rowconfigure(0, weight=1)    
 
         # LEFT WORKSPACE PANEL: Urgent Real-Time Operational Queue Block
         self.left_panel = ctk.CTkFrame(self.bottom_grid, fg_color="transparent")

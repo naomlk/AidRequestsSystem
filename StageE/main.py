@@ -15,7 +15,7 @@ ctk.set_default_color_theme("blue")
 # POSTGRESQL DATABASE CONTEXT CONFIGURATION
 # ==========================================
 DB_HOST = "localhost"
-DB_NAME = "yedidim_integration"      
+DB_NAME = "finaldb"
 DB_USER = "ochrith"                
 DB_PASSWORD = "ochrith"             
 DB_PORT = "5432"

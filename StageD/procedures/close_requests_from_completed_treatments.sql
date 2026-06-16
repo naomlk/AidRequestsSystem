@@ -6,13 +6,13 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     treatment_cursor REFCURSOR;
-    treatment_record RECORD;
+    treatment_record RECORD;   -- is a flexible variable for an entire ligne
 BEGIN
     -- Call the function and get the cursor it returns
     treatment_cursor := get_completed_treatments_not_closed();
 
     LOOP
-        FETCH treatment_cursor INTO treatment_record;
+        FETCH treatment_cursor INTO treatment_record;  -- at this moment he know how to fill the ligne treatment_record  ( temporary line)
         EXIT WHEN NOT FOUND;
 
         UPDATE public.a_request

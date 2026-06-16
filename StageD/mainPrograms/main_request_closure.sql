@@ -30,3 +30,6 @@ SELECT get_completed_treatments_not_closed();
 FETCH ALL FROM completed_treatments_cursor;
 
 COMMIT;
+
+
+-- part of the trigger test is on the read me

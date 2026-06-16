@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION public.auto_insert_location()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
-        -- We explicitly add a placeholder for the mandatory "city" column 👈
+        -- We explicitly add a placeholder for the mandatory "city" column
         INSERT INTO public.a_location (latitude, longitude, city)
         VALUES (NEW.latitude, NEW.longitude, 'Unknown')
         ON CONFLICT DO NOTHING;

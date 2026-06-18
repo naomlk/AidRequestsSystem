@@ -17,6 +17,7 @@ from screens.volunteers_screen import VolunteersScreen
 from screens.requests_screen import RequestsScreen
 from screens.training_screen import TrainingScreen
 from screens.location_screen import LocationScreen
+from screens.delivery_screen import DeliveryScreen
 
 # General modern configuration initialization
 ctk.set_appearance_mode("Light")
@@ -26,7 +27,7 @@ ctk.set_default_color_theme("blue")
 # POSTGRESQL DATABASE CONTEXT CONFIGURATION
 # ==========================================
 DB_HOST = "localhost"
-DB_NAME = "yedidim_integration"
+DB_NAME = "yedidim_integration"    #"finaldb"
 DB_USER = "ochrith"
 DB_PASSWORD = "ochrith"
 DB_PORT = "5432"
@@ -114,6 +115,18 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         )
         self.btn_locations.pack(padx=15, pady=4, fill="x")
 
+        self.btn_deliveries = ctk.CTkButton(
+            self.sidebar,
+            text="📦   Deliveries",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_deliveries_page
+        )
+        self.btn_deliveries.pack(padx=15, pady=4, fill="x")
         # ==========================================
         # INTERACTIVE MAIN CONTENT WORKSPACE VIEW
         # ==========================================
@@ -242,6 +255,46 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             total_requests = cursor.fetchone()[0]
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
                 self.metric_labels["Total Requests"].configure(text=str(total_requests))
+
+
+
+             #donne en live
+            cursor.execute("SELECT COUNT(*) FROM public.a_request;")
+            total_requests = cursor.fetchone()[0]
+            if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
+                self.metric_labels["Total Requests"].configure(text=str(total_requests))
+
+            # --- Active Missions: treatments currently not completed ---
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NULL;
+            """)
+            active_missions = cursor.fetchone()[0]
+            if "Active Missions" in self.metric_labels and self.metric_labels["Active Missions"].winfo_exists():
+                self.metric_labels["Active Missions"].configure(
+                    text=str(active_missions),
+                    text_color="#198754"
+                )
+
+            # --- Active Missions: treatments currently not completed ---
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NULL;
+            """)
+            active_missions = cursor.fetchone()[0]
+            if "Active Missions" in self.metric_labels and self.metric_labels["Active Missions"].winfo_exists():
+                self.metric_labels["Active Missions"].configure(
+                    text=str(active_missions),
+                    text_color="#198754"
+                )
+
+            # --- Completed Today: treatments completed today ---
+            # --- Completed Today: treatments completed today ---
+
+
+
 
             # --- 2. FETCH ALL LIVE CRITICAL PENDING REQUESTS IN REAL TIME ---
             if hasattr(self, 'alerts_container') and self.alerts_container.winfo_exists():
@@ -440,7 +493,43 @@ class YedidimCleanArchitectureApp(ctk.CTk):
 
             # We intentionally load all volunteers with coordinates.
             # Python then keeps only volunteers within 15 km and with equipment.
+            # We intentionally load all volunteers with coordinates.
+            # Python then keeps only volunteers within 15 km and with equipment.
+            # Matching skill rule:
+            # a_request.category_id points to a_requestcategory,
+            # while b_skill.category_id points to b_catagory.
+            # So we map request categories to relevant skill categories before checking volunteer skills.
             cursor.execute("""
+                WITH request_skill_category_map AS (
+                    SELECT *
+                    FROM (VALUES
+                        (1, 3), -- Rescue & Emergency -> Locksmith
+                        (1, 4), -- Rescue & Emergency -> Rescue
+                        (1, 5), -- Rescue & Emergency -> Technical
+                        (1, 6), -- Rescue & Emergency -> Emergency
+
+                        (2, 3), -- Shelter & MAMD Security -> Locksmith
+                        (2, 4), -- Shelter & MAMD Security -> Rescue
+                        (2, 5), -- Shelter & MAMD Security -> Technical
+
+                        (3, 1), -- Essential Logistics -> Language
+                        (3, 2), -- Essential Logistics -> Vehicle
+
+                        (4, 5), -- Urgent Home Maintenance -> Technical
+                        (4, 6), -- Urgent Home Maintenance -> Emergency
+
+                        (5, 2), -- Flat Tire Assistance -> Vehicle
+                        (5, 5), -- Flat Tire Assistance -> Technical
+
+                        (6, 2), -- Locked Vehicle -> Vehicle
+                        (6, 3), -- Locked Vehicle -> Locksmith
+
+                        (7, 2), -- Child Locked In Car -> Vehicle
+                        (7, 3), -- Child Locked In Car -> Locksmith
+                        (7, 4), -- Child Locked In Car -> Rescue
+                        (7, 6)  -- Child Locked In Car -> Emergency
+                    ) AS m(request_category_id, skill_category_id)
+                )
                 SELECT
                     v.volunteer_id,
                     v.first_name,
@@ -459,11 +548,21 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                               AND t.completion_time IS NULL
                         )
                     ) AS is_busy,
+
                     COALESCE(string_agg(DISTINCT s.skill_name, ', '), '') AS all_skills,
+
                     COALESCE(
-                        string_agg(DISTINCT s.skill_name, ', ') FILTER (WHERE s.category_id = %s),
+                        string_agg(DISTINCT s.skill_name, ', ')
+                        FILTER (
+                            WHERE s.category_id IN (
+                                SELECT skill_category_id
+                                FROM request_skill_category_map
+                                WHERE request_category_id = %s
+                            )
+                        ),
                         ''
                     ) AS matching_skills
+
                 FROM public.a_volunteer v
                 LEFT JOIN public.b_volunteer_skill vs
                     ON vs.volunteer_id = v.volunteer_id
@@ -579,7 +678,13 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         popup.grid_columnconfigure(1, weight=1)
         popup.grid_rowconfigure(1, weight=1)
 
-        header = ctk.CTkFrame(popup, fg_color="#FFFFFF", corner_radius=12, border_width=1, border_color="#E9ECEF")
+        header = ctk.CTkFrame(
+            popup,
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_width=1,
+            border_color="#E9ECEF"
+        )
         header.grid(row=0, column=0, columnspan=2, sticky="ew", padx=16, pady=(16, 10))
 
         title = ctk.CTkLabel(
@@ -604,13 +709,31 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         )
         desc.pack(anchor="w", padx=16, pady=(0, 12))
 
-        map_frame = ctk.CTkFrame(popup, fg_color="#FFFFFF", corner_radius=12, border_width=1, border_color="#E9ECEF")
+        map_frame = ctk.CTkFrame(
+            popup,
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_width=1,
+            border_color="#E9ECEF"
+        )
         map_frame.grid(row=1, column=0, sticky="nsew", padx=(16, 8), pady=(0, 8))
 
-        info_frame = ctk.CTkFrame(popup, fg_color="#FFFFFF", corner_radius=12, border_width=1, border_color="#E9ECEF")
+        info_frame = ctk.CTkFrame(
+            popup,
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_width=1,
+            border_color="#E9ECEF"
+        )
         info_frame.grid(row=1, column=1, sticky="nsew", padx=(8, 16), pady=(0, 8))
 
-        legend_frame = ctk.CTkFrame(popup, fg_color="#FFFFFF", corner_radius=10, border_width=1, border_color="#E9ECEF")
+        legend_frame = ctk.CTkFrame(
+            popup,
+            fg_color="#FFFFFF",
+            corner_radius=10,
+            border_width=1,
+            border_color="#E9ECEF"
+        )
         legend_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=16, pady=(0, 16))
 
         legend_title = ctk.CTkLabel(
@@ -628,6 +751,14 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             text_color="#16A34A"
         )
         legend_green.pack(side="left", padx=8)
+
+        legend_gray = ctk.CTkLabel(
+            legend_frame,
+            text="● Gray: ≤ 5 km but no required skill",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#6C757D"
+        )
+        legend_gray.pack(side="left", padx=8)
 
         legend_orange = ctk.CTkLabel(
             legend_frame,
@@ -647,7 +778,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
 
         legend_note = ctk.CTkLabel(
             legend_frame,
-            text="No equipment hidden. If 2+ green: only 10 closest green shown.",
+            text="Yellow marker = request. No equipment hidden.",
             font=ctk.CTkFont(size=10, slant="italic"),
             text_color="#6C757D"
         )
@@ -665,11 +796,12 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             info_frame,
             text=(
                 "Click a volunteer on the map to see details.\n\n"
+                "Yellow = request location\n"
                 "Green = within 5 km\n"
+                "Gray = within 5 km but no required skill\n"
                 "Orange = within 10 km\n"
                 "Red = within 15 km\n"
-                "No equipment = hidden\n"
-                "If 2+ green volunteers exist: only the 10 closest green volunteers are shown."
+                "No equipment = hidden"
             ),
             font=ctk.CTkFont(size=12),
             text_color="#6C757D",
@@ -723,9 +855,9 @@ class YedidimCleanArchitectureApp(ctk.CTk):
 
         def update_info(volunteer):
             selected_holder["volunteer"] = volunteer
+
             equipment_text = "Yes" if volunteer["has_equipment"] else "No"
             distance_text = self.format_distance(volunteer.get("distance_km"))
-            busy_text = "Yes" if volunteer.get("is_busy") else "No"
             available_text = "No" if volunteer.get("is_busy") else "Yes"
             has_skill_text = "Yes" if volunteer.get("has_matching_skill") else "No"
 
@@ -781,18 +913,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         map_widget.set_position(request_data["lat"], request_data["lon"])
         map_widget.set_zoom(13)
 
-        # Bright yellow request marker.
-        # The outside color is also yellow because a red border made the request icon look red/hidden.
-        # Code corrigé
-        map_widget.set_marker(
-            request_data["lat"],
-            request_data["lon"],
-            text=f"Request #{request_data['request_id']}",  # Retrait de l'émoji textuel qui peut bugger
-            marker_color_circle="#FFCC00",  # Jaune vif pour le centre
-            marker_color_outside="#CC9900",  # Une bordure légèrement plus sombre pour le contraste
-            text_color="#000000"  # Texte en noir pour une lisibilité maximale sur la carte
-        )
-
         valid_points = [(request_data["lat"], request_data["lon"])]
 
         for volunteer in volunteers:
@@ -800,42 +920,76 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 continue
 
             distance = volunteer.get("distance_km")
+            has_required_skill = volunteer.get("has_matching_skill")
 
-            # --- DÉTECTION DU CAS OÙ LE VOLONTAIRE EST SUR LA REQUÊTE ---
-            if volunteer["lat"] == request_data["lat"] and volunteer["lon"] == request_data["lon"]:
-                circle_color = "#FFD60A"  # Jaune vif (couleur de la requête)
-                outside_color = "#16A34A"  # Vert (couleur du volontaire proche)
-                text_color = "#14532D"  # Vert foncé pour le texte
-                display_text = f"👷 (Ici) {volunteer['name']}"
+            # ========================================================
+            # VOLUNTEER MARKER COLOR RULES
+            # ========================================================
+            # Green perimeter: <= 5 km.
+            # Special rule: ONLY green volunteers without required skill become gray.
+            # Orange and red volunteers stay orange/red even if they do not have the required skill.
+            if distance is not None and distance <= 5:
+                if not has_required_skill:
+                    circle_color = "#ADB5BD"  # Gray center
+                    outside_color = "#6C757D"  # Dark gray border
+                    text_color = "#495057"
+                    display_text = f"👷 {volunteer['name']} (No required skill)"
+                else:
+                    circle_color = "#16A34A"  # Green
+                    outside_color = "#14532D"
+                    text_color = "#14532D"
+                    display_text = f"👷 {volunteer['name']}"
 
-            # --- CAS STANDARDS DE DISTANCE ---
-            elif distance is not None and distance <= 5:
-                circle_color = "#16A34A"  # Vert : très proche
-                outside_color = "#14532D"
-                text_color = "#14532D"
-                display_text = f"👷 {volunteer['name']}"
             elif distance is not None and distance <= 10:
-                circle_color = "#F59E0B"  # Orange : distance moyenne
+                circle_color = "#F59E0B"  # Orange
                 outside_color = "#B45309"
                 text_color = "#92400E"
                 display_text = f"👷 {volunteer['name']}"
+
             else:
-                circle_color = "#DC3545"  # Rouge : éloigné
+                circle_color = "#DC3545"  # Red
                 outside_color = "#741B1B"
                 text_color = "#741B1B"
                 display_text = f"👷 {volunteer['name']}"
 
-            # Ajout du marqueur mis à jour sur la carte
+            # ========================================================
+            # SAME COORDINATES FIX
+            # ========================================================
+            # If a volunteer has exactly the same coordinates as the request,
+            # we slightly move ONLY the volunteer marker.
+            # The request marker will be drawn after all volunteers, so it stays visible.
+            marker_lat = volunteer["lat"]
+            marker_lon = volunteer["lon"]
+
+            if marker_lat == request_data["lat"] and marker_lon == request_data["lon"]:
+                marker_lat += 0.00012
+                marker_lon += 0.00012
+
             map_widget.set_marker(
-                volunteer["lat"],
-                volunteer["lon"],
+                marker_lat,
+                marker_lon,
                 text=display_text,
                 marker_color_circle=circle_color,
                 marker_color_outside=outside_color,
                 text_color=text_color,
                 command=lambda marker, v=volunteer: update_info(v)
             )
-            valid_points.append((volunteer["lat"], volunteer["lon"]))
+
+            valid_points.append((marker_lat, marker_lon))
+
+        # ========================================================
+        # REQUEST MARKER ALWAYS VISIBLE
+        # ========================================================
+        # The request marker is drawn AFTER all volunteers.
+        # This guarantees the yellow request marker stays visible on top.
+        map_widget.set_marker(
+            request_data["lat"],
+            request_data["lon"],
+            text=f"Request #{request_data['request_id']}",
+            marker_color_circle="#FFCC00",
+            marker_color_outside="#CC9900",
+            text_color="#000000"
+        )
 
         if len(valid_points) > 1:
             avg_lat = sum(p[0] for p in valid_points) / len(valid_points)
@@ -1090,6 +1244,11 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.clear_view()
         self.location_screen = LocationScreen(self.content_view, self.conn)
         self.location_screen.pack(fill="both", expand=True)
+
+    def show_deliveries_page(self):
+        self.clear_view()
+        self.delivery_screen = DeliveryScreen(self.content_view, self.conn)
+        self.delivery_screen.pack(fill="both", expand=True)
 
 
 if __name__ == "__main__":

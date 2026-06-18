@@ -26,7 +26,7 @@ ctk.set_default_color_theme("blue")
 # POSTGRESQL DATABASE CONTEXT CONFIGURATION
 # ==========================================
 DB_HOST = "localhost"
-DB_NAME = "yedidim_integration"    #"finaldb"
+DB_NAME = "yedidim_integration"
 DB_USER = "ochrith"
 DB_PASSWORD = "ochrith"
 DB_PORT = "5432"
@@ -274,15 +274,16 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                                                   text_color="white", width=40, height=40, corner_radius=8)
                         alert_icon.pack(side="left", padx=20, pady=10)
 
+                        # 1. On crée le conteneur de détails (sans le packer maintenant)
                         details = ctk.CTkFrame(box, fg_color="transparent")
-                        details.pack(side="left", fill="both", expand=True, pady=10)
 
                         lbl_title = ctk.CTkLabel(details, text=f"Critical Alert #{request_id}: {short_title}",
                                                  font=ctk.CTkFont(size=14, weight="bold"), text_color="#741B1B")
                         lbl_title.pack(anchor="w")
 
+                        # Ajout du wraplength pour forcer la description à aller à la ligne
                         lbl_desc = ctk.CTkLabel(details, text=f'"{desc}"', font=ctk.CTkFont(size=12, weight="bold"),
-                                                text_color="#9B2C2C")
+                                                text_color="#9B2C2C", justify="left", wraplength=380)
                         lbl_desc.pack(anchor="w")
 
                         lbl_loc = ctk.CTkLabel(details,
@@ -290,6 +291,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                                                font=ctk.CTkFont(size=11), text_color="#E53E3E")
                         lbl_loc.pack(anchor="w", pady=(4, 0))
 
+                        # 2. On place le bouton "Dispatch" EN PREMIER tout à droite
                         btn_dispatch = ctk.CTkButton(
                             box,
                             text="Dispatch",
@@ -302,7 +304,10 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                             corner_radius=8,
                             command=lambda rid=request_id: self.open_dispatch_map_for_request(rid)
                         )
-                        btn_dispatch.pack(side="right", padx=20)
+                        btn_dispatch.pack(side="right", padx=20, pady=10)
+
+                        # 3. On affiche enfin le bloc de texte à gauche, sur la place restante
+                        details.pack(side="left", fill="both", expand=True, padx=10, pady=10)
                 else:
                     # Safe fallbacks layout configuration rendered when queue reads empty
                     box = ctk.CTkFrame(self.alerts_container, fg_color="#F0FDF4", corner_radius=12, border_width=1,

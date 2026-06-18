@@ -18,6 +18,7 @@ from screens.requests_screen import RequestsScreen
 from screens.training_screen import TrainingScreen
 from screens.location_screen import LocationScreen
 from screens.delivery_screen import DeliveryScreen
+from screens.treatments_screen import TreatmentsScreen
 
 # General modern configuration initialization
 ctk.set_appearance_mode("Light")
@@ -114,6 +115,19 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             command=self.show_locations_page
         )
         self.btn_locations.pack(padx=15, pady=4, fill="x")
+
+        self.btn_treatments = ctk.CTkButton(
+            self.sidebar,
+            text="🎬   Missions Treatments",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_treatments_page
+        )
+        self.btn_treatments.pack(padx=15, pady=4, fill="x")
 
         self.btn_deliveries = ctk.CTkButton(
             self.sidebar,
@@ -1249,6 +1263,11 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.clear_view()
         self.delivery_screen = DeliveryScreen(self.content_view, self.conn)
         self.delivery_screen.pack(fill="both", expand=True)
+
+    def show_treatments_page(self):
+        self.clear_view()
+        self.treatments_screen = TreatmentsScreen(self.content_view, self.conn)
+        self.treatments_screen.pack(fill="both", expand=True)
 
 
 if __name__ == "__main__":

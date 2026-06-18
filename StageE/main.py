@@ -256,6 +256,46 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
                 self.metric_labels["Total Requests"].configure(text=str(total_requests))
 
+
+
+             #donne en live
+            cursor.execute("SELECT COUNT(*) FROM public.a_request;")
+            total_requests = cursor.fetchone()[0]
+            if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
+                self.metric_labels["Total Requests"].configure(text=str(total_requests))
+
+            # --- Active Missions: treatments currently not completed ---
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NULL;
+            """)
+            active_missions = cursor.fetchone()[0]
+            if "Active Missions" in self.metric_labels and self.metric_labels["Active Missions"].winfo_exists():
+                self.metric_labels["Active Missions"].configure(
+                    text=str(active_missions),
+                    text_color="#198754"
+                )
+
+            # --- Active Missions: treatments currently not completed ---
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NULL;
+            """)
+            active_missions = cursor.fetchone()[0]
+            if "Active Missions" in self.metric_labels and self.metric_labels["Active Missions"].winfo_exists():
+                self.metric_labels["Active Missions"].configure(
+                    text=str(active_missions),
+                    text_color="#198754"
+                )
+
+            # --- Completed Today: treatments completed today ---
+            # --- Completed Today: treatments completed today ---
+
+
+
+
             # --- 2. FETCH ALL LIVE CRITICAL PENDING REQUESTS IN REAL TIME ---
             if hasattr(self, 'alerts_container') and self.alerts_container.winfo_exists():
                 # Query matches all status_id=1 (Pending) and prioriry_level>=4 (Critical) entries

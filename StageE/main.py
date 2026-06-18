@@ -26,7 +26,7 @@ ctk.set_default_color_theme("blue")
 # POSTGRESQL DATABASE CONTEXT CONFIGURATION
 # ==========================================
 DB_HOST = "localhost"
-DB_NAME = "yedidim_integration"    #"finaldb"
+DB_NAME = "finaldb"
 DB_USER = "ochrith"
 DB_PASSWORD = "ochrith"
 DB_PORT = "5432"
@@ -177,7 +177,8 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             card.grid(row=0, column=i, sticky="nsew")
             card.grid_propagate(False)
 
-            val_lbl = ctk.CTkLabel(card, text="--", font=ctk.CTkFont(size=28, weight="bold"), text_color="#212529")
+            value_color = "#198754" if title == "Active Missions" else "#212529"
+            val_lbl = ctk.CTkLabel(card, text="--", font=ctk.CTkFont(size=28, weight="bold"), text_color=value_color)
             val_lbl.pack(side="bottom", anchor="w", padx=20, pady=(0, 15))
 
             self.metric_labels[title] = val_lbl
@@ -242,6 +243,28 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             total_requests = cursor.fetchone()[0]
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
                 self.metric_labels["Total Requests"].configure(text=str(total_requests))
+
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NULL;
+            """)
+            active_missions = cursor.fetchone()[0]
+            if "Active Missions" in self.metric_labels and self.metric_labels["Active Missions"].winfo_exists():
+                self.metric_labels["Active Missions"].configure(
+                    text=str(active_missions),
+                    text_color="#198754"
+                )
+
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM public.a_treatment
+                WHERE completion_time IS NOT NULL
+                  AND date = CURRENT_DATE;
+            """)
+            completed_today = cursor.fetchone()[0]
+            if "Completed Today" in self.metric_labels and self.metric_labels["Completed Today"].winfo_exists():
+                self.metric_labels["Completed Today"].configure(text=str(completed_today))
 
             # --- 2. FETCH ALL LIVE CRITICAL PENDING REQUESTS IN REAL TIME ---
             if hasattr(self, 'alerts_container') and self.alerts_container.winfo_exists():

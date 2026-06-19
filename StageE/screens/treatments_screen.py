@@ -191,40 +191,66 @@ class TreatmentsScreen(ctk.CTkFrame):
         self.all_treatments_data.clear()
         try:
             cursor = self.conn.cursor()
+            # On récupère aussi la description de l'incident (r.incident_description) pour enrichir la liste
             cursor.execute("""
                 SELECT 
                     t.treatment_id, t.date, t.start_time, t.completion_time, 
                     t.feedback_notes, t.photo_after, t.delivery_id, t.volunteer_id, 
-                    t.request_id, r.status_id
+                    t.request_id, r.status_id, r.incident_description
                 FROM public.a_treatment t
                 LEFT JOIN public.a_request r ON r.request_id = t.request_id
                 ORDER BY t.treatment_id DESC;
             """)
             self.all_treatments_data = cursor.fetchall()
             cursor.close()
+
+            # 🚀 RECHERCHE INTÉRESSANTE : Construit un aperçu visuel pour chaque ligne du menu déroulant
+            search_suggestions = []
+            for row in self.all_treatments_data:
+                t_id, date, _, _, _, _, _, _, _, _, incident_desc = row
+                desc_short = incident_desc[:30] + "..." if incident_desc and len(incident_desc) > 30 else (incident_desc or "No desc")
+                
+                # Format ultra-pro : "ID #20053 | 2026-06-04 | Flat tire on Route 1..."
+                suggestion_string = f"ID #{t_id} | {date} | {desc_short}"
+                search_suggestions.append(suggestion_string)
+
+            # Injecte ces suggestions dans la flèche du ComboBox
+            self.entry_search.configure(values=search_suggestions)
+
             self.filter_search_table()
         except Exception as e:
             print(f"❌ SQL Engine load failure: {e}")
 
     def filter_search_table(self, event=None):
-        search_keyword = self.entry_search._entry.get().strip().lower()
-        if search_keyword == "search by id, date, status or item type...":
+        raw_keyword = self.entry_search._entry.get().strip().lower()
+        
+        # Si l'utilisateur a sélectionné une ligne du menu, on extrait juste le numéro d'ID
+        if "id #" in raw_keyword:
+            # Découpe pour récupérer ce qu'il y a entre "id #" et le premier espace ou pipe
+            search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
+        elif raw_keyword == "search by id, date, status or item type...":
             search_keyword = ""
+        else:
+            search_keyword = raw_keyword
             
         selected_status_filter = self.combo_status.get()
         self.tree.delete(*self.tree.get_children())
         
         shown_count = 0
         for row in self.all_treatments_data:
-            t_id, date, start, completion, feedback, photo, del_id, vol_id, req_id, req_status_id = row
+            # Attention : on extrait r.status_id qui est le 10ème élément (index 9)
+            t_id, date, start, completion, feedback, photo, del_id, vol_id, req_id, req_status_id = row[:10]
             
+            # Application du filtre par statut de la requête associée
             if selected_status_filter == "Pending" and req_status_id != 1: continue
             if selected_status_filter == "In Progress" and req_status_id != 2: continue
             if selected_status_filter == "Completed" and req_status_id != 3: continue
 
             match_string = f"{t_id} {feedback} {vol_id} {req_id} {date}".lower()
             if search_keyword in match_string:
-                clean_row_values = [str(item) if item is not None else "" for item in row[:-1]]
+                # On ne garde que les 9 premiers éléments pour l'affichage dans le Treeview
+                clean_row_values = [str(item) if item is not None else "" for item in row[:9]]
+                
                 row_tag = "evenrow" if shown_count % 2 == 0 else "oddrow"
                 self.tree.insert("", "end", values=clean_row_values, tags=(row_tag,))
                 shown_count += 1
@@ -364,27 +390,27 @@ class TreatmentsScreen(ctk.CTkFrame):
         entry_date.pack(padx=15, pady=(0, 8))
         entry_date.insert(0, current_date)
 
-        ctk.CTkLabel(scroll, text="Start Clock Execution Time Tracking Parameter:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
+        ctk.CTkLabel(scroll, text="Start Time:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
         entry_start = ctk.CTkEntry(scroll, width=360, height=32)
         entry_start.pack(padx=15, pady=(0, 8))
         entry_start.insert(0, current_start)
 
-        ctk.CTkLabel(scroll, text="Completion Operational Clock (HH:MM:SS / Clear if active):", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
+        ctk.CTkLabel(scroll, text="Completion Time:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
         entry_comp = ctk.CTkEntry(scroll, width=360, height=32)
         entry_comp.pack(padx=15, pady=(0, 8))
         entry_comp.insert(0, current_comp)
 
-        ctk.CTkLabel(scroll, text="Operational Feedback Narrative Context:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
+        ctk.CTkLabel(scroll, text="Feedback Notes:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
         entry_feed = ctk.CTkEntry(scroll, width=360, height=32)
         entry_feed.pack(padx=15, pady=(0, 8))
         entry_feed.insert(0, current_feed)
 
-        ctk.CTkLabel(scroll, text="Resource Address Reference Photo After Link Key:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
+        ctk.CTkLabel(scroll, text="Photo After:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
         entry_photo = ctk.CTkEntry(scroll, width=360, height=32)
         entry_photo.pack(padx=15, pady=(0, 8))
         entry_photo.insert(0, current_photo)
 
-        ctk.CTkLabel(scroll, text="Mutable Relation Reference Primary Key Link ID Delivery Mapping:", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
+        ctk.CTkLabel(scroll, text=" ID Delivery :", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15, pady=(4, 2))
         entry_del = ctk.CTkEntry(scroll, width=360, height=32)
         entry_del.pack(padx=15, pady=(0, 15))
         entry_del.insert(0, current_del)

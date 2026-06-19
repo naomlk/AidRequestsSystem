@@ -6,16 +6,70 @@ class RequestsScreen(ctk.CTkFrame):
     def __init__(self, parent, db_connection):
         super().__init__(parent, fg_color="transparent")
         self.conn = db_connection
+        self.all_requests_data = []
 
-        # --- HEADER SECTION ---
+        # --- HEADER SECTION (Style 1:1 avec Deliveries) ---
         self.header_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.header_frame.pack(fill="x", pady=(0, 20))
+        self.header_frame.pack(fill="x", pady=(0, 15))
 
         title = ctk.CTkLabel(self.header_frame, text="📋 Requests Management System", font=ctk.CTkFont(size=20, weight="bold"), text_color="#0F4C81")
         title.pack(side="left", anchor="w")
 
         btn_add = ctk.CTkButton(self.header_frame, text="➕ Create New Request", font=ctk.CTkFont(size=13, weight="bold"), fg_color="#1A62E8", hover_color="#1452C7", height=38, corner_radius=8, command=self.open_request_form)
         btn_add.pack(side="right")
+
+        # ========================================================
+        # NOUVELLE SECTION : SEARCH BAR (Style Harmonisé 1:1)
+        # ========================================================
+        self.search_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.search_frame.pack(fill="x", padx=20, pady=(18, 8))
+
+        search_label = ctk.CTkLabel(
+            self.search_frame,
+            text="Search request:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#495057"
+        )
+        search_label.pack(side="left", padx=(0, 8))
+
+        # ComboBox de recherche dynamique textuelle intéressante
+        self.entry_search = ctk.CTkComboBox(
+            self.search_frame,
+            values=[],  # Rempli dynamiquement par la BDD
+            width=330,
+            height=34,
+            command=self.filter_search_table
+        )
+        self.entry_search.pack(side="left", padx=(0, 10))
+        self.entry_search.set("Search by ID, status, description or coordinates...")
+        self.entry_search.bind("<KeyRelease>", self.filter_search_table)
+
+        # Filtre ComboBox pour le Statut de la requête
+        self.combo_status = ctk.CTkComboBox(
+            self.search_frame,
+            values=["All Statuses", "Pending", "In Progress", "Completed"],
+            width=145,
+            height=34,
+            command=self.filter_search_table
+        )
+        self.combo_status.pack(side="left", padx=(0, 10))
+        self.combo_status.set("All Statuses")
+
+        btn_show_all = ctk.CTkButton(
+            self.search_frame,
+            text="Show All",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#6C757D",
+            hover_color="#5C636A",
+            width=90,
+            height=34,
+            corner_radius=7,
+            command=self.clear_search_filter
+        )
+        btn_show_all.pack(side="left")
+
+        self.lbl_counter = ctk.CTkLabel(self.search_frame, text="0 request(s) shown", font=ctk.CTkFont(size=12, slant="italic"), text_color="#6C757D")
+        self.lbl_counter.pack(side="right", padx=5)
 
         # Main Data Container Card
         self.container_box = ctk.CTkFrame(self, fg_color="#FFFFFF", corner_radius=12, border_width=1, border_color="#E9ECEF")
@@ -25,10 +79,10 @@ class RequestsScreen(ctk.CTkFrame):
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("Treeview", background="#FFFFFF", foreground="#212529", rowheight=35, fieldbackground="#FFFFFF", borderwidth=0, font=("Segoe UI", 11))
-        style.configure("Treeview.Heading", background="#F1F3F5", foreground="#495057", font=("Segoe UI", 11, "bold"), borderwidth=0, relief="flat")
+        style.configure("Treeview.Heading", background="#E6E9ED", foreground="#434A54", font=("Segoe UI", 11, "bold"), borderwidth=0, relief="flat")
         style.map("Treeview", background=[('selected', '#1A62E8')], foreground=[('selected', '#FFFFFF')])
 
-        # 🛠️ NOUVEAU CONTENEUR POUR ACCUEILLIR LES BARRES DE DÉFILEMENT
+        # CONTENEUR POUR ACCUEILLIR LES BARRES DE DÉFILEMENT
         table_frame = ctk.CTkFrame(self.container_box, fg_color="transparent")
         table_frame.pack(fill="both", expand=True, padx=20, pady=(20, 5))
 
@@ -40,7 +94,7 @@ class RequestsScreen(ctk.CTkFrame):
         )
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings")
         
-        # 🛠️ AJOUT DES BARRES COULISSANTES (SCROLLBARS)
+        # BARRES COULISSANTES (SCROLLBARS)
         scrollbar_y = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
         scrollbar_x = ttk.Scrollbar(table_frame, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
@@ -62,7 +116,7 @@ class RequestsScreen(ctk.CTkFrame):
         self.tree.heading("latitude", text="Latitude")
         self.tree.heading("longitude", text="Longitude")
 
-        # Column Formatting (Largeurs minimales définies pour permettre le glissement horizontal)
+        # Column Formatting
         self.tree.column("request_id", width=60, minwidth=50, anchor="center")
         self.tree.column("date", width=110, minwidth=90, anchor="center")
         self.tree.column("image", width=130, minwidth=100, anchor="w")
@@ -93,9 +147,13 @@ class RequestsScreen(ctk.CTkFrame):
         # Initial Load
         self.load_requests_from_db()
 
+    # ========================================================
+    # LOGIQUE RECHERCHE ET CHARGEMENT DYNAMIQUE HÉDITÉE 
+    # ========================================================
     def load_requests_from_db(self):
         if not self.conn:
             return
+        self.all_requests_data.clear()
         try:
             cursor = self.conn.cursor()
             query = """
@@ -103,23 +161,63 @@ class RequestsScreen(ctk.CTkFrame):
                        prioriry_level, contactperson_id, category_id, 
                        status_id, latitude, longitude 
                 FROM public.a_request 
-                ORDER BY request_id;
+                ORDER BY request_id DESC;
             """
             cursor.execute(query)
-            rows = cursor.fetchall()
-
-            for item in self.tree.get_children():
-                self.tree.delete(item)
-
-            for i, row in enumerate(rows):
-                if i % 2 == 0:
-                    self.tree.insert("", "end", values=row, tags=('evenrow',))
-                else:
-                    self.tree.insert("", "end", values=row, tags=('oddrow',))
-
+            self.all_requests_data = cursor.fetchall()
             cursor.close()
+
+            # 🚀 AJOUT GRAPHOU : suggestions textuelles riches pour la flèche
+            search_suggestions = []
+            for row in self.all_requests_data:
+                r_id, _, _, desc, priority, _, _, _, _, _ = row
+                desc_clean = desc or "No description"
+                desc_short = desc_clean[:30] + "..." if len(desc_clean) > 30 else desc_clean
+                
+                suggestion_string = f"ID #{r_id} | Prio: {priority} | {desc_short}"
+                search_suggestions.append(suggestion_string)
+
+            self.entry_search.configure(values=search_suggestions)
+            self.filter_search_table()
         except Exception as e:
             messagebox.showerror("SQL Database Error", f"Failed to retrieve requests:\n{e}")
+
+    def filter_search_table(self, event=None):
+        raw_keyword = self.entry_search._entry.get().strip().lower()
+        
+        # Extraction de l'ID si sélectionné via la flèche
+        if "id #" in raw_keyword:
+            search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
+        elif raw_keyword == "search by id, status, description or coordinates...":
+            search_keyword = ""
+        else:
+            search_keyword = raw_keyword
+            
+        selected_status_filter = self.combo_status.get()
+        self.tree.delete(*self.tree.get_children())
+        
+        shown_count = 0
+        for row in self.all_requests_data:
+            r_id, req_date, img, desc, priority, cp_id, cat_id, status_id, lat, lon = row
+            
+            # Filtre par statut (1 = Pending, 2 = In Progress, 3 = Completed)
+            if selected_status_filter == "Pending" and status_id != 1: continue
+            if selected_status_filter == "In Progress" and status_id != 2: continue
+            if selected_status_filter == "Completed" and status_id != 3: continue
+
+            # Moteur de filtrage global adaptatif
+            match_string = f"{r_id} {str(desc).lower()} {lat} {lon} {req_date}".lower()
+            if search_keyword in match_string:
+                row_tag = "evenrow" if shown_count % 2 == 0 else "oddrow"
+                self.tree.insert("", "end", values=row, tags=(row_tag,))
+                shown_count += 1
+                
+        self.lbl_counter.configure(text=f"{shown_count} request(s) shown")
+
+    def clear_search_filter(self):
+        self.entry_search._entry.delete(0, "end")
+        self.combo_status.set("All Statuses")
+        self.filter_search_table()
 
     def delete_selected_request(self):
         selected_item = self.tree.selection()
@@ -218,12 +316,9 @@ class RequestsScreen(ctk.CTkFrame):
         ctk.CTkLabel(fields_container, text="Status ID reference", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
         entry_status = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 1")
         entry_status.pack(padx=20, pady=(0, 8))
-        
         if edit_mode:
             entry_status.insert(0, data[7])
-           
         else:
-        
             entry_status.insert(0, "1")
             entry_status.configure(state="disabled", fg_color="#F1F3F5")
 
@@ -234,7 +329,7 @@ class RequestsScreen(ctk.CTkFrame):
         if edit_mode and data[8] and data[8] != 'None': entry_lat.insert(0, data[8])
 
         # 10. Longitude
-        ctk.CTkLabel(fields_container, text="Longitude coordinates (Israel)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
+        ctk.CTkLabel(fields_container, text="Longitude coordinates (Israel)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 15))
         entry_lon = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 35.2137")
         entry_lon.pack(padx=20, pady=(0, 15))
         if edit_mode and data[9] and data[9] != 'None': entry_lon.insert(0, data[9])
@@ -252,7 +347,7 @@ class RequestsScreen(ctk.CTkFrame):
             lat = entry_lat.get().strip()
             lon = entry_lon.get().strip()
 
-            if not r_id  or not prio or not cp_id or not cat or not stat:
+            if not r_id or not prio or not cp_id or not cat or not stat:
                 messagebox.showwarning("Validation Error", "Please fill out all required transactional key properties.", parent=form_window)
                 return
 

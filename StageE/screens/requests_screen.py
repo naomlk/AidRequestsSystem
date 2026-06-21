@@ -8,7 +8,7 @@ class RequestsScreen(ctk.CTkFrame):
         self.conn = db_connection
         self.all_requests_data = []
 
-        # --- HEADER SECTION (Style 1:1 avec Deliveries) ---
+        # --- HEADER SECTION ---
         self.header_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.header_frame.pack(fill="x", pady=(0, 15))
 
@@ -19,7 +19,7 @@ class RequestsScreen(ctk.CTkFrame):
         btn_add.pack(side="right")
 
         # ========================================================
-        # NOUVELLE SECTION : SEARCH BAR (Style Harmonisé 1:1)
+        # SEARCH BAR SECTION
         # ========================================================
         self.search_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.search_frame.pack(fill="x", padx=20, pady=(18, 8))
@@ -32,10 +32,9 @@ class RequestsScreen(ctk.CTkFrame):
         )
         search_label.pack(side="left", padx=(0, 8))
 
-        # ComboBox de recherche dynamique textuelle intéressante
         self.entry_search = ctk.CTkComboBox(
             self.search_frame,
-            values=[],  # Rempli dynamiquement par la BDD
+            values=[],
             width=330,
             height=34,
             command=self.filter_search_table
@@ -43,8 +42,10 @@ class RequestsScreen(ctk.CTkFrame):
         self.entry_search.pack(side="left", padx=(0, 10))
         self.entry_search.set("Search by ID, status, description or coordinates...")
         self.entry_search.bind("<KeyRelease>", self.filter_search_table)
+        # 🚀 Focus Management event bindings for the search field
+        self.entry_search._entry.bind("<FocusIn>", self.clear_placeholder_on_click)
+      
 
-        # Filtre ComboBox pour le Statut de la requête
         self.combo_status = ctk.CTkComboBox(
             self.search_frame,
             values=["All Statuses", "Pending", "In Progress", "Completed"],
@@ -82,24 +83,21 @@ class RequestsScreen(ctk.CTkFrame):
         style.configure("Treeview.Heading", background="#E6E9ED", foreground="#434A54", font=("Segoe UI", 11, "bold"), borderwidth=0, relief="flat")
         style.map("Treeview", background=[('selected', '#1A62E8')], foreground=[('selected', '#FFFFFF')])
 
-        # CONTENEUR POUR ACCUEILLIR LES BARRES DE DÉFILEMENT
         table_frame = ctk.CTkFrame(self.container_box, fg_color="transparent")
         table_frame.pack(fill="both", expand=True, padx=20, pady=(20, 5))
 
-        # Data Grid Layout Configuration
+        # Adjusted columns sequence layout schema map tracking names
         columns = (
             "request_id", "date", "image", "incident_description", 
-            "prioriry_level", "contactperson_id", "category_id", 
-            "status_id", "latitude", "longitude"
+            "prioriry_level", "contactperson_id", "category_name", 
+            "status_label", "latitude", "longitude"
         )
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings")
         
-        # BARRES COULISSANTES (SCROLLBARS)
         scrollbar_y = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
         scrollbar_x = ttk.Scrollbar(table_frame, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
 
-        # Placement des barres et du tableau dans le sous-conteneur
         scrollbar_y.pack(side="right", fill="y")
         scrollbar_x.pack(side="bottom", fill="x")
         self.tree.pack(side="left", fill="both", expand=True)
@@ -111,8 +109,8 @@ class RequestsScreen(ctk.CTkFrame):
         self.tree.heading("incident_description", text="Description")
         self.tree.heading("prioriry_level", text="Priority")
         self.tree.heading("contactperson_id", text="Family ID")
-        self.tree.heading("category_id", text="Category ID")
-        self.tree.heading("status_id", text="Status ID")
+        self.tree.heading("category_name", text="Category Name")
+        self.tree.heading("status_label", text="Status")
         self.tree.heading("latitude", text="Latitude")
         self.tree.heading("longitude", text="Longitude")
 
@@ -123,8 +121,8 @@ class RequestsScreen(ctk.CTkFrame):
         self.tree.column("incident_description", width=250, minwidth=180, anchor="w")
         self.tree.column("prioriry_level", width=80, minwidth=60, anchor="center")
         self.tree.column("contactperson_id", width=110, minwidth=80, anchor="center")
-        self.tree.column("category_id", width=110, minwidth=80, anchor="center")
-        self.tree.column("status_id", width=110, minwidth=80, anchor="center")
+        self.tree.column("category_name", width=140, minwidth=100, anchor="w")
+        self.tree.column("status_label", width=110, minwidth=80, anchor="center")
         self.tree.column("latitude", width=110, minwidth=80, anchor="center")
         self.tree.column("longitude", width=110, minwidth=80, anchor="center")
 
@@ -141,14 +139,11 @@ class RequestsScreen(ctk.CTkFrame):
         hint_lbl = ctk.CTkLabel(self.footer_frame, text="💡 Tip: Double-click on any active incident row to update its status or description.", font=ctk.CTkFont(size=11, slant="italic"), text_color="#6C757D")
         hint_lbl.pack(side="right", pady=5)
 
-        # Bindings
         self.tree.bind("<Double-1>", self.on_row_double_click)
-
-        # Initial Load
         self.load_requests_from_db()
 
     # ========================================================
-    # LOGIQUE RECHERCHE ET CHARGEMENT DYNAMIQUE HÉDITÉE 
+    # LOGIQUE RECHERCHE ET CHARGEMENT DYNAMIQUE
     # ========================================================
     def load_requests_from_db(self):
         if not self.conn:
@@ -156,18 +151,20 @@ class RequestsScreen(ctk.CTkFrame):
         self.all_requests_data.clear()
         try:
             cursor = self.conn.cursor()
+            # SQL Query joined with request category and status data mapping references nodes
             query = """
-                SELECT request_id, date, image, incident_description, 
-                       prioriry_level, contactperson_id, category_id, 
-                       status_id, latitude, longitude 
-                FROM public.a_request 
-                ORDER BY request_id DESC;
+                SELECT r.request_id, r.date, r.image, r.incident_description, 
+                       r.prioriry_level, r.contactperson_id, c.category_name, 
+                       s.status_label, r.latitude, r.longitude 
+                FROM public.a_request r
+                LEFT JOIN public.a_requestcategory c ON r.category_id = c.category_id
+                LEFT JOIN public.a_status s ON r.status_id = s.status_id
+                ORDER BY r.request_id DESC;
             """
             cursor.execute(query)
             self.all_requests_data = cursor.fetchall()
             cursor.close()
 
-            # 🚀 AJOUT GRAPHOU : suggestions textuelles riches pour la flèche
             search_suggestions = []
             for row in self.all_requests_data:
                 r_id, _, _, desc, priority, _, _, _, _, _ = row
@@ -184,33 +181,35 @@ class RequestsScreen(ctk.CTkFrame):
 
     def filter_search_table(self, event=None):
         raw_keyword = self.entry_search._entry.get().strip().lower()
+        is_exact_id_match = False
+        search_keyword = raw_keyword
         
-        # Extraction de l'ID si sélectionné via la flèche
         if "id #" in raw_keyword:
             search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
+            is_exact_id_match = True
         elif raw_keyword == "search by id, status, description or coordinates...":
             search_keyword = ""
-        else:
-            search_keyword = raw_keyword
             
         selected_status_filter = self.combo_status.get()
         self.tree.delete(*self.tree.get_children())
         
         shown_count = 0
         for row in self.all_requests_data:
-            r_id, req_date, img, desc, priority, cp_id, cat_id, status_id, lat, lon = row
+            r_id, req_date, img, desc, priority, cp_id, cat_name, status_name, lat, lon = row
             
-            # Filtre par statut (1 = Pending, 2 = In Progress, 3 = Completed)
-            if selected_status_filter == "Pending" and status_id != 1: continue
-            if selected_status_filter == "In Progress" and status_id != 2: continue
-            if selected_status_filter == "Completed" and status_id != 3: continue
+            # Filtering validation using text mapping properties indices
+            if selected_status_filter != "All Statuses" and str(status_label) != selected_status_filter:
+                continue
 
-            # Moteur de filtrage global adaptatif
-            match_string = f"{r_id} {str(desc).lower()} {lat} {lon} {req_date}".lower()
-            if search_keyword in match_string:
-                row_tag = "evenrow" if shown_count % 2 == 0 else "oddrow"
-                self.tree.insert("", "end", values=row, tags=(row_tag,))
-                shown_count += 1
+            if is_exact_id_match:
+                if str(r_id) != search_keyword: continue
+            else:
+                match_string = f"{r_id} {str(desc).lower()} {lat} {lon} {req_date}".lower()
+                if search_keyword not in match_string: continue
+
+            row_tag = "evenrow" if shown_count % 2 == 0 else "oddrow"
+            self.tree.insert("", "end", values=row, tags=(row_tag,))
+            shown_count += 1
                 
         self.lbl_counter.configure(text=f"{shown_count} request(s) shown")
 
@@ -218,6 +217,12 @@ class RequestsScreen(ctk.CTkFrame):
         self.entry_search._entry.delete(0, "end")
         self.combo_status.set("All Statuses")
         self.filter_search_table()
+
+    def clear_placeholder_on_click(self, event):
+        """Clears the baseline placeholder text automatically upon gaining focus"""
+        current_text = self.entry_search.get().strip()
+        if current_text == "Search by ID, status, description or coordinates...":
+            self.entry_search.set("")
 
     def delete_selected_request(self):
         selected_item = self.tree.selection()
@@ -243,15 +248,39 @@ class RequestsScreen(ctk.CTkFrame):
 
     def on_row_double_click(self, event):
         selected_item = self.tree.selection()
-        if not selected_item:
-            return
+        if not selected_item: return
         row_values = self.tree.item(selected_item, "values")
         self.open_request_form(edit_mode=True, data=row_values)
 
     # ========================================================
-    # FORM DIALOG MODAL (CREATE / UPDATE)
+    # FORM DIALOG MODAL (CREATE / UPDATE WITH MAPPED COMBOBOXES)
     # ========================================================
     def open_request_form(self, edit_mode=False, data=None):
+        categories_map = {}
+        statuses_map = {}
+        next_id = None
+
+        try:
+            cursor = self.conn.cursor()
+            # Fetch relational configuration mapping dictionaries categories variables indicators properties
+            cursor.execute("SELECT category_id, category_name FROM public.a_requestcategory ORDER BY category_name;")
+            for cid, cname in cursor.fetchall():
+                categories_map[cname] = cid
+
+            cursor.execute("SELECT status_id, status_label FROM public.a_status ORDER BY status_id;")
+            for sid, sname in cursor.fetchall():
+                statuses_map[sname] = sid
+
+            # Sequence lookup tracker calculations algorithm sequence loop context node
+            if not edit_mode:
+                cursor.execute("SELECT COALESCE(MAX(request_id), 0) + 1 FROM public.a_request;")
+                next_id = cursor.fetchone()[0]
+
+            cursor.close()
+        except Exception as e:
+            messagebox.showerror("Relational Sync Error", f"Failed to pre-fetch options schemas indicators maps:\n{e}")
+            return
+
         form_window = ctk.CTkToplevel(self)
         form_window.title("Edit Request Information" if edit_mode else "File New Assistance Request")
         form_window.geometry("520x640")
@@ -265,22 +294,22 @@ class RequestsScreen(ctk.CTkFrame):
         fields_container = ctk.CTkScrollableFrame(form_window, fg_color="#FFFFFF", corner_radius=8, border_width=1, border_color="#E9ECEF")
         fields_container.pack(fill="both", expand=True, padx=25, pady=(0, 15))
 
-        # 1. Request ID
-        ctk.CTkLabel(fields_container, text="Request ID (Primary Key)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(10, 2))
-        entry_id = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 8001")
+        # 1. Request ID (Calculated dynamically on create sequence tracking)
+        ctk.CTkLabel(fields_container, text="Request ID (Primary Key Reference Pointer)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(10, 2))
+        entry_id = ctk.CTkEntry(fields_container, width=400, height=32)
         entry_id.pack(padx=20, pady=(0, 8))
         if edit_mode:
             entry_id.insert(0, data[0])
-            entry_id.configure(state="disabled", fg_color="#F1F3F5")
+        else:
+            entry_id.insert(0, str(next_id))
+        entry_id.configure(state="disabled", fg_color="#F1F3F5")
 
         # 2. Date
         ctk.CTkLabel(fields_container, text="Incident Date (YYYY-MM-DD)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
         entry_date = ctk.CTkEntry(fields_container, width=400, height=32)
         entry_date.pack(padx=20, pady=(0, 8))
-        if edit_mode:
-            entry_date.insert(0, data[1])
-        else:
-            entry_date.insert(0, str(datetime_date.today()))
+        if edit_mode: entry_date.insert(0, data[1])
+        else: entry_date.insert(0, str(datetime_date.today()))
 
         # 3. Image URL/Path
         ctk.CTkLabel(fields_container, text="Incident Image File Path", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
@@ -294,11 +323,12 @@ class RequestsScreen(ctk.CTkFrame):
         entry_desc.pack(padx=20, pady=(0, 8))
         if edit_mode and data[3]: entry_desc.insert(0, data[3])
 
-        # 5. Priority Level
-        ctk.CTkLabel(fields_container, text="Priority Level (Integer 1-5)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
-        entry_priority = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 5 (Life Critical)")
+        # 5. Priority Level ComboBox (Restricted integer range constraints 1-5 selection node)
+        ctk.CTkLabel(fields_container, text="Priority Level Mapping Scope:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
+        entry_priority = ctk.CTkComboBox(fields_container, values=["1", "2", "3", "4", "5"], width=400, height=32)
         entry_priority.pack(padx=20, pady=(0, 8))
-        if edit_mode: entry_priority.insert(0, data[4])
+        if edit_mode: entry_priority.set(data[4])
+        else: entry_priority.set("1")
 
         # 6. Contact Person ID
         ctk.CTkLabel(fields_container, text="Associated Family ID (contactperson_id)", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
@@ -306,20 +336,22 @@ class RequestsScreen(ctk.CTkFrame):
         entry_cp_id.pack(padx=20, pady=(0, 8))
         if edit_mode: entry_cp_id.insert(0, data[5])
 
-        # 7. Category ID
-        ctk.CTkLabel(fields_container, text="Category ID reference", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
-        entry_cat = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 1")
+        # 7. Category Name ComboBox 
+        ctk.CTkLabel(fields_container, text="Category Assignment Branch:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
+        category_options = list(categories_map.keys())
+        entry_cat = ctk.CTkComboBox(fields_container, values=category_options, width=400, height=32)
         entry_cat.pack(padx=20, pady=(0, 8))
-        if edit_mode: entry_cat.insert(0, data[6])
+        if edit_mode and data[6]: entry_cat.set(data[6])
 
-        # 8. Status ID 
-        ctk.CTkLabel(fields_container, text="Status ID reference", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
-        entry_status = ctk.CTkEntry(fields_container, width=400, height=32, placeholder_text="e.g., 1")
+        # 8. Status Name ComboBox
+        ctk.CTkLabel(fields_container, text="Status Management Registry State:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#6C757D").pack(anchor="w", padx=20, pady=(5, 2))
+        status_options = list(statuses_map.keys())
+        entry_status = ctk.CTkComboBox(fields_container, values=status_options, width=400, height=32)
         entry_status.pack(padx=20, pady=(0, 8))
-        if edit_mode:
-            entry_status.insert(0, data[7])
+        if edit_mode and data[7]: 
+            entry_status.set(data[7])
         else:
-            entry_status.insert(0, "1")
+            entry_status.set("Pending")
             entry_status.configure(state="disabled", fg_color="#F1F3F5")
 
         # 9. Latitude
@@ -336,37 +368,43 @@ class RequestsScreen(ctk.CTkFrame):
 
         # Process Submission
         def save_form_data():
-            r_id = entry_id.get().strip()
             r_date = entry_date.get().strip()
             img = entry_img.get().strip()
             desc = entry_desc.get().strip()
             prio = entry_priority.get().strip()
             cp_id = entry_cp_id.get().strip()
-            cat = entry_cat.get().strip()
-            stat = entry_status.get().strip()
+            selected_cat_name = entry_cat.get()
+            selected_stat_name = entry_status.get()
             lat = entry_lat.get().strip()
             lon = entry_lon.get().strip()
 
-            if not r_id or not prio or not cp_id or not cat or not stat:
-                messagebox.showwarning("Validation Error", "Please fill out all required transactional key properties.", parent=form_window)
+            if not prio or not cp_id or not selected_cat_name or not selected_stat_name:
+                messagebox.showwarning("Validation Error", "Please fill out all required key attributes properties options.", parent=form_window)
                 return
+
+            cat_id = categories_map.get(selected_cat_name)
+            stat_id = statuses_map.get(selected_stat_name)
 
             try:
                 cursor = self.conn.cursor()
                 if edit_mode:
+                    r_id = data[0]
                     sql = """
                         UPDATE public.a_request 
                         SET date = %s, image = %s, incident_description = %s, prioriry_level = %s, 
                             contactperson_id = %s, category_id = %s, status_id = %s, latitude = %s, longitude = %s 
                         WHERE request_id = %s;
                     """
-                    cursor.execute(sql, (r_date, img if img else None, desc, int(prio), int(cp_id), int(cat), int(stat), float(lat) if lat else None, float(lon) if lon else None, int(r_id)))
+                    cursor.execute(sql, (r_date, img if img else None, desc, int(prio), int(cp_id), int(cat_id), int(stat_id), float(lat) if lat else None, float(lon) if lon else None, int(r_id)))
                 else:
+                    cursor.execute("SELECT COALESCE(MAX(request_id), 0) + 1 FROM public.a_request;")
+                    final_generated_id = cursor.fetchone()[0]
+
                     sql = """
                         INSERT INTO public.a_request (request_id, date, image, incident_description, prioriry_level, contactperson_id, category_id, status_id, latitude, longitude) 
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                     """
-                    cursor.execute(sql, (int(r_id), r_date, img if img else None, desc, int(prio), int(cp_id), int(cat), int(stat), float(lat) if lat else None, float(lon) if lon else None))
+                    cursor.execute(sql, (int(final_generated_id), r_date, img if img else None, desc, int(prio), int(cp_id), int(cat_id), int(stat_id), float(lat) if lat else None, float(lon) if lon else None))
                 
                 self.conn.commit()
                 cursor.close()
@@ -374,7 +412,7 @@ class RequestsScreen(ctk.CTkFrame):
                 form_window.destroy()
                 self.load_requests_from_db()
             except Exception as e:
-                self.conn.rollback()
+                if self.conn: self.conn.rollback()
                 messagebox.showerror("SQL Transaction Error", f"Database engine refused execution:\n{e}", parent=form_window)
 
         btn_save = ctk.CTkButton(form_window, text="💾 Save Request Details", font=ctk.CTkFont(size=13, weight="bold"), fg_color="#198754", hover_color="#146C43", height=38, corner_radius=6, command=save_form_data)

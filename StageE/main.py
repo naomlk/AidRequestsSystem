@@ -19,6 +19,9 @@ from screens.training_screen import TrainingScreen
 from screens.location_screen import LocationScreen
 from screens.delivery_screen import DeliveryScreen
 from screens.treatments_screen import TreatmentsScreen
+from screens.skills_screen import SkillsScreen
+from screens.category_skills_screen import SkillCategoryScreen
+from screens.request_category_screen import RequestCategoryScreen
 
 # General modern configuration initialization
 ctk.set_appearance_mode("Light")
@@ -91,18 +94,20 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                                           height=40, anchor="w", command=self.show_requests_page)
         self.btn_requests.pack(padx=15, pady=4, fill="x")
 
-        self.btn_training = ctk.CTkButton(
+  
+        self.btn_req_categories = ctk.CTkButton(
             self.sidebar,
-            text="🎓   Trainings",
+            text="🔖   Request's Categories",
             font=ctk.CTkFont(size=14),
             fg_color="transparent",
             text_color="#6C757D",
             hover_color="#F8F9FA",
             height=40,
             anchor="w",
-            command=self.show_training_page
+            command=self.show_request_categories_page
         )
-        self.btn_training.pack(padx=15, pady=4, fill="x")
+        self.btn_req_categories.pack(padx=15, pady=4, fill="x")
+
         self.btn_locations = ctk.CTkButton(
             self.sidebar,
             text="📍   Locations",
@@ -141,6 +146,50 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             command=self.show_deliveries_page
         )
         self.btn_deliveries.pack(padx=15, pady=4, fill="x")
+        
+        self.btn_training = ctk.CTkButton(
+            self.sidebar,
+            text="🎓   Trainings",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_training_page
+        )
+        self.btn_training.pack(padx=15, pady=4, fill="x")
+       
+
+        
+
+        self.btn_skills = ctk.CTkButton(
+            self.sidebar,
+            text="🎓   Skills Registry",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_skills_page
+        )
+        self.btn_skills.pack(padx=15, pady=4, fill="x")
+
+        # Button Node for Skill Categories Management
+        self.btn_skill_categories = ctk.CTkButton(
+            self.sidebar,
+            text="📁   Skill's Categories",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_skill_categories_page
+        )
+        self.btn_skill_categories.pack(padx=15, pady=4, fill="x")
+
         # ==========================================
         # INTERACTIVE MAIN CONTENT WORKSPACE VIEW
         # ==========================================
@@ -271,8 +320,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 self.metric_labels["Total Requests"].configure(text=str(total_requests))
 
 
-
-             #donne en live
             cursor.execute("SELECT COUNT(*) FROM public.a_request;")
             total_requests = cursor.fetchone()[0]
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
@@ -305,8 +352,16 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 )
 
             # --- Completed Today: treatments completed today ---
-            # --- Completed Today: treatments completed today ---
-
+    
+            # Calculates total treatments finished on current system date node
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM public.a_treatment 
+                WHERE date = CURRENT_DATE AND completion_time IS NOT NULL;
+            """)
+            completed_today = cursor.fetchone()[0]
+            if "Completed Today" in self.metric_labels and self.metric_labels["Completed Today"].winfo_exists():
+                self.metric_labels["Completed Today"].configure(text=str(completed_today))
 
 
 
@@ -1269,6 +1324,21 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.treatments_screen = TreatmentsScreen(self.content_view, self.conn)
         self.treatments_screen.pack(fill="both", expand=True)
 
+    def show_skills_page(self):
+        self.clear_view()
+        self.skills_screen = SkillsScreen(self.content_view, self.conn)
+        self.skills_screen.pack(fill="both", expand=True)
+
+    def show_skill_categories_page(self):
+        self.clear_view()
+        self.skill_cat_screen = SkillCategoryScreen(self.content_view, self.conn)
+        self.skill_cat_screen.pack(fill="both", expand=True)
+
+    def show_request_categories_page(self):
+        """Clears active content view workspace panel and mounts the RequestCategoryScreen layout node"""
+        self.clear_view()
+        self.request_cat_screen = RequestCategoryScreen(self.content_view, self.conn)
+        self.request_cat_screen.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
     app = YedidimCleanArchitectureApp()

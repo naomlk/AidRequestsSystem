@@ -78,6 +78,7 @@ class DeliveryScreen(ctk.CTkFrame):
         self.search_combo.set("Search by ID, date, status or item type...")
         self.search_combo.bind("<KeyRelease>", self.on_search_typing)
         self.search_combo.bind("<Return>", self.select_first_search_match)
+        self.search_combo._entry.bind("<FocusIn>", self.clear_placeholder_on_click)
 
         self.status_filter = ctk.CTkComboBox(
             self.search_frame,
@@ -254,6 +255,12 @@ class DeliveryScreen(ctk.CTkFrame):
 
     def on_search_typing(self, event=None):
         self.apply_filters()
+
+    def clear_placeholder_on_click(self, event):
+        """Clears the baseline placeholder text automatically upon gaining focus"""
+        current_text = self.search_combo.get().strip() # 🚀 Fixed variable name
+        if current_text == "Search by ID, date, status or item type...":
+            self.search_combo.set("")
 
     def apply_filters(self):
         query = self.search_combo.get().strip().lower()

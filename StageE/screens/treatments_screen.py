@@ -56,9 +56,12 @@ class TreatmentsScreen(ctk.CTkFrame):
             command=self.filter_search_table
         )
         self.entry_search.pack(side="left", padx=(0, 10))
-        self.entry_search.set("Search by ID, date, status or item type...")
+        self.entry_search.set("Search by ID, date, request_id...") # 🚀 Fixed placeholder string
         self.entry_search.bind("<KeyRelease>", self.filter_search_table)
-
+        
+        # 🚀 Focus Management event bindings for the search field
+        self.entry_search._entry.bind("<FocusIn>", self.clear_placeholder_on_click)
+        self.entry_search._entry.bind("<FocusOut>", self.restore_placeholder_on_leave)
         self.combo_status = ctk.CTkComboBox(
             self.search_frame,
             values=["All Statuses", "Pending", "In Progress", "Completed"],
@@ -224,12 +227,11 @@ class TreatmentsScreen(ctk.CTkFrame):
     def filter_search_table(self, event=None):
         raw_keyword = self.entry_search._entry.get().strip().lower()
         
-        # Si l'utilisateur a sélectionné une ligne du menu, on extrait juste le numéro d'ID
-        if "id #" in raw_keyword:
-            # Découpe pour récupérer ce qu'il y a entre "id #" et le premier espace ou pipe
-            search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
-        elif raw_keyword == "search by id, date, status or item type...":
+        # 🚀 Fix: If the raw keyword matches the lowercased placeholder or is empty, show everything
+        if raw_keyword == "search by id, date, request_id..." or raw_keyword == "":
             search_keyword = ""
+        elif "id #" in raw_keyword:
+            search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
         else:
             search_keyword = raw_keyword
             
@@ -238,17 +240,14 @@ class TreatmentsScreen(ctk.CTkFrame):
         
         shown_count = 0
         for row in self.all_treatments_data:
-            # Attention : on extrait r.status_id qui est le 10ème élément (index 9)
             t_id, date, start, completion, feedback, photo, del_id, vol_id, req_id, req_status_id = row[:10]
             
-            # Application du filtre par statut de la requête associée
             if selected_status_filter == "Pending" and req_status_id != 1: continue
             if selected_status_filter == "In Progress" and req_status_id != 2: continue
             if selected_status_filter == "Completed" and req_status_id != 3: continue
 
             match_string = f"{t_id} {feedback} {vol_id} {req_id} {date}".lower()
             if search_keyword in match_string:
-                # On ne garde que les 9 premiers éléments pour l'affichage dans le Treeview
                 clean_row_values = [str(item) if item is not None else "" for item in row[:9]]
                 
                 row_tag = "evenrow" if shown_count % 2 == 0 else "oddrow"
@@ -261,6 +260,19 @@ class TreatmentsScreen(ctk.CTkFrame):
         self.entry_search._entry.delete(0, "end")
         self.combo_status.set("All Statuses")
         self.filter_search_table()
+
+    def clear_placeholder_on_click(self, event):
+        """Clears the baseline placeholder text automatically upon gaining focus"""
+        current_text = self.entry_search.get().strip()
+        if current_text == "Search by ID, date, request_id...": # 🚀 Matches perfectly
+            self.entry_search.set("")
+
+    def restore_placeholder_on_leave(self, event):
+        """Restores the baseline placeholder text if the entry field is left empty"""
+        current_text = self.entry_search.get().strip()
+        if not current_text:
+            self.entry_search.set("Search by ID, date, request_id...")
+            self.filter_search_table() # Trigger refresh to show rows again
 
     # ========================================================
     # POPUPS & MODALS (CREATION / MODIFICATION / SUPPRESSION)

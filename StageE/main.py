@@ -31,7 +31,7 @@ ctk.set_default_color_theme("blue")
 # POSTGRESQL DATABASE CONTEXT CONFIGURATION
 # ==========================================
 DB_HOST = "localhost"
-DB_NAME = "yedidim_integration"    #"finaldb"
+DB_NAME = "finaldb"  # finaldb
 DB_USER = "ochrith"
 DB_PASSWORD = "ochrith"
 DB_PORT = "5432"
@@ -94,7 +94,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                                           height=40, anchor="w", command=self.show_requests_page)
         self.btn_requests.pack(padx=15, pady=4, fill="x")
 
-  
         self.btn_req_categories = ctk.CTkButton(
             self.sidebar,
             text="🔖   Request's Categories",
@@ -146,7 +145,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             command=self.show_deliveries_page
         )
         self.btn_deliveries.pack(padx=15, pady=4, fill="x")
-        
+
         self.btn_training = ctk.CTkButton(
             self.sidebar,
             text="🎓   Trainings",
@@ -159,9 +158,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             command=self.show_training_page
         )
         self.btn_training.pack(padx=15, pady=4, fill="x")
-       
-
-        
 
         self.btn_skills = ctk.CTkButton(
             self.sidebar,
@@ -276,7 +272,8 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         alert_title.pack(anchor="w", pady=(0, 15))
 
         # Dynamic Scrollable Container to stack multiple real-time alert modules seamlessly
-        self.alerts_container = ctk.CTkScrollableFrame(self.left_panel, fg_color="transparent", height=700)  #change HERE
+        self.alerts_container = ctk.CTkScrollableFrame(self.left_panel, fg_color="transparent",
+                                                       height=700)  # change HERE
         self.alerts_container.pack(fill="both", expand=True)
 
         # RIGHT WORKSPACE PANEL: Dynamic Scrollable Hall of Fame Card
@@ -319,7 +316,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
                 self.metric_labels["Total Requests"].configure(text=str(total_requests))
 
-
             cursor.execute("SELECT COUNT(*) FROM public.a_request;")
             total_requests = cursor.fetchone()[0]
             if "Total Requests" in self.metric_labels and self.metric_labels["Total Requests"].winfo_exists():
@@ -352,7 +348,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 )
 
             # --- Completed Today: treatments completed today ---
-    
+
             # Calculates total treatments finished on current system date node
             cursor.execute("""
                 SELECT COUNT(*) 
@@ -362,8 +358,6 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             completed_today = cursor.fetchone()[0]
             if "Completed Today" in self.metric_labels and self.metric_labels["Completed Today"].winfo_exists():
                 self.metric_labels["Completed Today"].configure(text=str(completed_today))
-
-
 
             # --- 2. FETCH ALL LIVE CRITICAL PENDING REQUESTS IN REAL TIME ---
             if hasattr(self, 'alerts_container') and self.alerts_container.winfo_exists():
@@ -561,44 +555,13 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 return
 
             # We intentionally load all volunteers with coordinates.
-            # Python then keeps only volunteers within 15 km and with equipment.
-            # We intentionally load all volunteers with coordinates.
-            # Python then keeps only volunteers within 15 km and with equipment.
+            # Python prioritizes nearby volunteers first, but if fewer than 10 are available
+            # inside 15 km, it completes the list with farther equipped volunteers.
             # Matching skill rule:
-            # a_request.category_id points to a_requestcategory,
-            # while b_skill.category_id points to b_catagory.
-            # So we map request categories to relevant skill categories before checking volunteer skills.
+            # The mapping is now stored in public.request_category_required_skill.
+            # It maps each request category directly to exact skill_id values.
+            # This is more precise than matching broad skill categories such as Technical.
             cursor.execute("""
-                WITH request_skill_category_map AS (
-                    SELECT *
-                    FROM (VALUES
-                        (1, 3), -- Rescue & Emergency -> Locksmith
-                        (1, 4), -- Rescue & Emergency -> Rescue
-                        (1, 5), -- Rescue & Emergency -> Technical
-                        (1, 6), -- Rescue & Emergency -> Emergency
-
-                        (2, 3), -- Shelter & MAMD Security -> Locksmith
-                        (2, 4), -- Shelter & MAMD Security -> Rescue
-                        (2, 5), -- Shelter & MAMD Security -> Technical
-
-                        (3, 1), -- Essential Logistics -> Language
-                        (3, 2), -- Essential Logistics -> Vehicle
-
-                        (4, 5), -- Urgent Home Maintenance -> Technical
-                        (4, 6), -- Urgent Home Maintenance -> Emergency
-
-                        (5, 2), -- Flat Tire Assistance -> Vehicle
-                        (5, 5), -- Flat Tire Assistance -> Technical
-
-                        (6, 2), -- Locked Vehicle -> Vehicle
-                        (6, 3), -- Locked Vehicle -> Locksmith
-
-                        (7, 2), -- Child Locked In Car -> Vehicle
-                        (7, 3), -- Child Locked In Car -> Locksmith
-                        (7, 4), -- Child Locked In Car -> Rescue
-                        (7, 6)  -- Child Locked In Car -> Emergency
-                    ) AS m(request_category_id, skill_category_id)
-                )
                 SELECT
                     v.volunteer_id,
                     v.first_name,
@@ -618,17 +581,18 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                         )
                     ) AS is_busy,
 
-                    COALESCE(string_agg(DISTINCT s.skill_name, ', '), '') AS all_skills,
+                    -- Display all volunteer skills using only b_skill.skill_name.
+                    COALESCE(
+                        string_agg(DISTINCT s.skill_name, ', '),
+                        ''
+                    ) AS all_skills,
 
+                    -- Matching skills are now based on the new DB mapping table:
+                    -- public.request_category_required_skill(request_category_id, skill_id)
+                    -- This avoids broad category matches like Technical => Certified Electrician for MAMD.
                     COALESCE(
                         string_agg(DISTINCT s.skill_name, ', ')
-                        FILTER (
-                            WHERE s.category_id IN (
-                                SELECT skill_category_id
-                                FROM request_skill_category_map
-                                WHERE request_category_id = %s
-                            )
-                        ),
+                            FILTER (WHERE rrs.skill_id IS NOT NULL),
                         ''
                     ) AS matching_skills
 
@@ -637,6 +601,9 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                     ON vs.volunteer_id = v.volunteer_id
                 LEFT JOIN public.b_skill s
                     ON s.skill_id = vs.skill_id
+                LEFT JOIN public.request_category_required_skill rrs
+                    ON rrs.skill_id = s.skill_id
+                   AND rrs.request_category_id = %s
                 WHERE v.latitude IS NOT NULL
                   AND v.longitude IS NOT NULL
                 GROUP BY
@@ -684,8 +651,9 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                 volunteer_lon = self.safe_float(lon)
                 distance_km = self.haversine_km(req_lat, req_lon, volunteer_lat, volunteer_lon)
 
-                # In the dispatch popup we show only volunteers within 15 km from the request.
-                if distance_km is None or distance_km > 15:
+                # We keep volunteers farther than 15 km only as a fallback,
+                # used if there are fewer than 10 equipped volunteers inside 15 km.
+                if distance_km is None:
                     continue
 
                 # New rule: do not display volunteers without equipment for this request.
@@ -709,23 +677,50 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                     "distance_km": distance_km
                 })
 
-            # Sort by real distance so the map stays readable and the closest volunteers are prioritized.
-            volunteers.sort(key=lambda v: v["distance_km"] if v["distance_km"] is not None else 999999)
-
-            green_volunteers = [
-                v for v in volunteers
-                if v.get("distance_km") is not None and v["distance_km"] <= 5
-            ]
-
             # Display rule requested:
-            # If there are several very-close volunteers, keep only the 10 closest green ones
-            # and hide orange/red markers to avoid invading the map.
-            if len(green_volunteers) > 1:
-                volunteers_to_display = green_volunteers[:10]
-                request_data["display_rule"] = "Showing the 10 closest green volunteers only. Orange/red volunteers are hidden."
+            # Always show up to 10 volunteer icons around the request.
+            # We fill the list by distance perimeters, not by a global color sort:
+            #   1) first perimeter:  <= 5 km
+            #   2) second perimeter: <= 10 km
+            #   3) third perimeter:  <= 15 km
+            #   4) fallback: farther than 15 km, only if needed to reach 10 icons
+            # Inside EACH perimeter, volunteers with a matching skill come first,
+            # then volunteers without a matching skill. Inside each subgroup, closest first.
+            def perimeter_index(volunteer):
+                distance = volunteer.get("distance_km")
+                if distance is None:
+                    return 99
+                if distance <= 5:
+                    return 0
+                if distance <= 10:
+                    return 1
+                if distance <= 15:
+                    return 2
+                return 3
+
+            def dispatch_perimeter_priority(volunteer):
+                distance = volunteer.get("distance_km")
+                has_skill = volunteer.get("has_matching_skill")
+
+                if distance is None:
+                    return (99, 1, 999999)
+
+                # skill_priority: matching skill first inside the same perimeter
+                skill_priority = 0 if has_skill else 1
+                return (perimeter_index(volunteer), skill_priority, distance)
+
+            volunteers.sort(key=dispatch_perimeter_priority)
+            volunteers_to_display = volunteers[:10]
+
+            if len(volunteers) > 10:
+                request_data["display_rule"] = (
+                    "Showing 10 volunteers by perimeter: <=5 km first, then <=10 km, then <=15 km, "
+                    "then farther volunteers if needed; inside each perimeter, matching skills first."
+                )
             else:
-                volunteers_to_display = volunteers
-                request_data["display_rule"] = "Showing equipped volunteers within 15 km, colored by distance."
+                request_data["display_rule"] = (
+                    f"Showing {len(volunteers)} equipped volunteer(s). If fewer than 10 are near the request, farther volunteers are included."
+                )
 
             self.show_dispatch_popup(request_data, volunteers_to_display)
 
@@ -1002,7 +997,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
                     circle_color = "#ADB5BD"  # Gray center
                     outside_color = "#6C757D"  # Dark gray border
                     text_color = "#495057"
-                    display_text = f"👷 {volunteer['name']} (No required skill)"
+                    display_text = f"👷 {volunteer['name']}"
                 else:
                     circle_color = "#16A34A"  # Green
                     outside_color = "#14532D"
@@ -1339,6 +1334,7 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.clear_view()
         self.request_cat_screen = RequestCategoryScreen(self.content_view, self.conn)
         self.request_cat_screen.pack(fill="both", expand=True)
+
 
 if __name__ == "__main__":
     app = YedidimCleanArchitectureApp()

@@ -441,6 +441,10 @@ Screenshot:
 
 ![Trainings screen](images/trainings.png)
 
+Clicking 'Manage Volunteers' for a selected Training ID will display a dedicated list of all volunteers who have been registered for that specific training course.
+
+<img width="730" height="473" alt="image" src="https://github.com/user-attachments/assets/fb14a67d-5f0a-4a9f-9c80-d7ce956f58d2" />
+
 ---
 
 

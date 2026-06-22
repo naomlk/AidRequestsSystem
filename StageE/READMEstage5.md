@@ -118,7 +118,8 @@ a_family(
 )
 ```
 
-![Families screen](images/families.png)
+![Families screen](images/families.png)  
+
 
 Double-clicking on a family in the list will open a dedicated update window, allowing you to modify their profile details.
 

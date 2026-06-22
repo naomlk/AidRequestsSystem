@@ -127,7 +127,7 @@ Double-clicking on a family in the list will open a dedicated update window, all
 
 familiesTestOfInsertFamiliyAlreadyInTheTable.png
 Test The form "add family";
-![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png.png)
+![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
 ---
 
 ## 7. Volunteers Screen

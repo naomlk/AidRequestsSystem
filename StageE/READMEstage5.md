@@ -127,7 +127,9 @@ Double-clicking on a family in the list will open a dedicated update window, all
 
 familiesTestOfInsertFamiliyAlreadyInTheTable.png
 Test The form "add family";
+
 ![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
+
 ---
 
 ## 7. Volunteers Screen
@@ -371,8 +373,15 @@ When a treatment is completed, the completion time is filled and the request can
 
 Screenshot:
 Search treatment with his number or his volunteer name:
+
 ![Treatments screen](images/treatments.png)
+
+When creating a new treatment, you must associate it with an existing pending request by selecting it from the combo box  menu. Then, simply fill in the required details, and the new record will be added to the management list.
+
+<img width="350" height="454" alt="image" src="https://github.com/user-attachments/assets/580d936e-84c9-4ac5-8f35-6a387a7ff02a" />
+
 ![Treatments screen](images/treatmentWithName.png)
+
 ---
 
 ## 14. Deliveries Screen

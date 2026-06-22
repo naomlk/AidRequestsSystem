@@ -240,8 +240,10 @@ class TreatmentsScreen(ctk.CTkFrame):
     def filter_search_table(self, event=None):
         raw_keyword = self.entry_search._entry.get().strip().lower()
 
-        # 🚀 Fix: If the raw keyword matches the lowercased placeholder or is empty, show everything
-        if raw_keyword == "search by id, date, request_id..." or raw_keyword == "":
+        # 🟢 CORRECTION : Correspondance exacte avec le vrai placeholder configuré dans le __init__
+        placeholder_text = "Search by ID, date, request_id, volunteer name...".lower()
+
+        if raw_keyword == placeholder_text or raw_keyword == "":
             search_keyword = ""
         elif "id #" in raw_keyword:
             search_keyword = raw_keyword.split("id #")[1].split(" ")[0].strip()
@@ -263,7 +265,6 @@ class TreatmentsScreen(ctk.CTkFrame):
             if selected_status_filter == "Completed" and req_status_id != 3:
                 continue
 
-            # Search works by treatment ID, date, request ID, volunteer ID, volunteer name, feedback, and incident description.
             match_string = f"{t_id} {feedback} {vol_id} {volunteer_name} {req_id} {date} {incident_desc}".lower()
             if search_keyword in match_string:
                 display_values = [t_id, date, start, completion, feedback, photo, del_id, vol_id, req_id]
@@ -274,6 +275,7 @@ class TreatmentsScreen(ctk.CTkFrame):
                 shown_count += 1
 
         self.lbl_counter.configure(text=f"{shown_count} treatment(s) shown")
+
 
     def clear_search_filter(self):
         self.entry_search._entry.delete(0, "end")

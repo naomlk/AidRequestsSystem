@@ -467,6 +467,14 @@ class VolunteersScreen(ctk.CTkFrame):
         combo_available_skills.grid(row=1, column=0, padx=(15, 5), sticky="w")
         combo_available_skills.set("Choose skill context register row...")
 
+        lbl_cert_hint = ctk.CTkLabel(
+        footer_crud_panel, 
+        text="Has Certificate?", 
+        font=ctk.CTkFont(size=10, slant="italic"), 
+        text_color="#6C757D"
+        )
+        lbl_cert_hint.grid(row=0, column=1, padx=5, sticky="w")
+
         combo_add_cert = ctk.CTkComboBox(footer_crud_panel, values=["Y", "N"], width=70, height=30)
         combo_add_cert.grid(row=1, column=1, padx=5, sticky="w")
         combo_add_cert.set("N")

@@ -44,14 +44,6 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         )
         title.pack(anchor="w")
 
-        subtitle = ctk.CTkLabel(
-            title_box,
-            text="Stage B analytical queries + Stage D database function/procedure",
-            font=ctk.CTkFont(size=12),
-            text_color="#6C757D"
-        )
-        subtitle.pack(anchor="w", pady=(2, 0))
-
     def _build_main_layout(self):
         self.body = ctk.CTkFrame(self, fg_color="transparent")
         self.body.pack(fill="both", expand=True)
@@ -83,7 +75,6 @@ class ReportsProceduresScreen(ctk.CTkFrame):
 
         self._build_stage_b_section()
         self._build_stage_d_section()
-        self._build_trigger_note_section()
 
     def _section_title(self, text):
         lbl = ctk.CTkLabel(
@@ -111,7 +102,7 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         return btn
 
     def _build_stage_b_section(self):
-        self._section_title("🔎 Stage B Queries")
+        self._section_title("🔎 Queries")
 
         self._action_button(
             "Top 15 Families by Requests",
@@ -160,48 +151,21 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         run_date_btn.pack(fill="x", padx=12, pady=(6, 12))
 
     def _build_stage_d_section(self):
-        self._section_title("⚙️ Stage D Function / Procedure")
+        self._section_title("⚙️ Function / Procedure")
 
         self._action_button(
-            "Show Blocked Busy Volunteers",
-            self.run_busy_without_active_treatment_function,
-            color="#6F42C1",
-            hover="#5A32A3"
+            "Batch Close Completed Requests",
+            self.run_close_requests_procedure,
+            color="#10B981",
+            hover="#059669"
         )
 
         self._action_button(
-            "Reset Volunteer Availability",
+            "Sync & Release Idle Volunteers",
             self.run_reset_volunteer_availability_procedure,
             color="#198754",
             hover="#146C43"
         )
-
-    def _build_trigger_note_section(self):
-        note = ctk.CTkFrame(self.actions_panel, fg_color="#FFF3CD", corner_radius=10)
-        note.pack(fill="x", padx=18, pady=(18, 18))
-
-        title = ctk.CTkLabel(
-            note,
-            text="🔔 Trigger Demonstration",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#7A5B00"
-        )
-        title.pack(anchor="w", padx=12, pady=(10, 2))
-
-        body = ctk.CTkLabel(
-            note,
-            text=(
-                "The trigger trg_treatment_status_sync runs automatically "
-                "when a treatment is inserted or when completion_time is updated.\n\n"
-                "Demo: create or complete a treatment in the Treatments / Dispatch screen, "
-                "then check the volunteer availability here."
-            ),
-            font=ctk.CTkFont(size=11),
-            text_color="#7A5B00",
-            justify="left",
-            wraplength=255
-        )
-        body.pack(anchor="w", padx=12, pady=(0, 12))
 
     def _build_results_table(self):
         self.result_title = ctk.CTkLabel(
@@ -281,18 +245,16 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         self.display_results(
             title="Reports & Procedures Center",
             subtitle=(
-                "This screen was created for Stage E. It runs selected Stage B analytical queries "
-                "and Stage D database subprograms directly from the graphical interface."
+                ""
             ),
             columns=[("message", "Available Actions")],
             rows=[
-                ("Stage B: Top 15 Families by Requests",),
-                ("Stage B: Monthly Requests Summary",),
-                ("Stage B: Top Volunteers Above Average",),
-                ("Stage B: Treatments by Date Range",),
-                ("Stage D Function: get_busy_volunteers_with_no_active_treatment()",),
-                ("Stage D Procedure: reset_volunteer_availability()",),
-                ("Stage D Trigger: trg_treatment_status_sync is demonstrated through Treatments/Dispatch",),
+                ("Top 15 Families by Requests",),
+                ("Monthly Requests Summary",),
+                ("Top Volunteers Above Average",),
+                ("Treatments by Date Range",),
+                ("Procedure: close_requests_from_completed_treatments()",),
+                ("Procedure: reset_volunteer_availability()",),
             ]
         )
 
@@ -306,7 +268,7 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         for col_key, col_title in columns:
             self.tree.heading(col_key, text=col_title, anchor="center")
             width = 150
-            if "name" in col_key.lower() or "message" in col_key.lower():
+            if "name" in col_key.lower() or "message" in col_key.lower() or "contact" in col_key.lower():
                 width = 260
             if "description" in col_key.lower() or "feedback" in col_key.lower():
                 width = 330
@@ -352,21 +314,28 @@ class ReportsProceduresScreen(ctk.CTkFrame):
     def run_top_families_query(self):
         query = """
             SELECT
+                f.contactperson_id,
                 f.contactperson_name AS family_contact,
+                f.phone_number,
                 COUNT(r.request_id) AS total_requests
             FROM public.a_family f
             JOIN public.a_request r
                 ON f.contactperson_id = r.contactperson_id
-            GROUP BY f.contactperson_id, f.contactperson_name
+            GROUP BY f.contactperson_id, f.contactperson_name, f.phone_number
             ORDER BY total_requests DESC
             LIMIT 15;
         """
         self.execute_select_query(
             query=query,
             params=None,
-            title="Top 15 Families by Number of Requests",
-            subtitle="Stage B query using JOIN between a_family and a_request. Foreign key IDs are replaced by the family contact name.",
-            columns=[("family_contact", "Family Contact"), ("total_requests", "Total Requests")]
+            title="Top 15 Registered Families Profiles Ranking Dataset",
+            subtitle="Displays families with the highest request counts alongside contact details.",
+            columns=[
+                ("id", "Contact ID"),
+                ("family_contact", "Contact Person Name"), 
+                ("phone", "Phone Number"), 
+                ("total_requests", "Total Requests Vol")
+            ]
         )
 
     def run_monthly_requests_summary(self):
@@ -382,9 +351,9 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         self.execute_select_query(
             query=query,
             params=None,
-            title="Monthly Requests Summary",
-            subtitle="Stage B query summarizing requests by month and year.",
-            columns=[("month_name", "Month"), ("year_nb", "Year"), ("nb_requests", "Requests")]
+            title="Help Tickets Volume Metrics Distributed by Calendar Nodes",
+            subtitle="Displays the total number of help requests grouped by month and year.",
+            columns=[("month_name", "Month Name"), ("year_nb", "Year Index"), ("nb_requests", "Total Requests Dispatched")]
         )
 
     def run_top_volunteers_above_average(self):
@@ -434,7 +403,7 @@ class ReportsProceduresScreen(ctk.CTkFrame):
             query=query,
             params=(from_date, to_date),
             title="Filtered Treatments by Date Range",
-            subtitle="Stage B query adapted with JOINs, showing volunteer names and request descriptions instead of IDs.",
+            subtitle="Displays a chronological timeline of interventions within the chosen dates.",
             columns=[
                 ("date", "Date"),
                 ("volunteer_name", "Volunteer"),
@@ -444,89 +413,38 @@ class ReportsProceduresScreen(ctk.CTkFrame):
         )
 
     # ========================================================
-    # STAGE D FUNCTION / PROCEDURE
+    # STAGE D PROCEDURES (DIRECT EXECUTION PIEPLINES)
     # ========================================================
-    def run_busy_without_active_treatment_function(self):
-        """Runs get_busy_volunteers_with_no_active_treatment(), which returns a REFCURSOR."""
+    def run_close_requests_procedure(self):
         if not self.conn:
             messagebox.showerror("Database Error", "No database connection available.")
             return
-
+        
+        self.conn.rollback()
         try:
             cursor = self.conn.cursor()
-            cursor.execute("SELECT public.get_busy_volunteers_with_no_active_treatment();")
-            cursor_name = cursor.fetchone()[0]
-
-            # The cursor name is created by our own function, but we still quote it safely.
-            safe_cursor_name = str(cursor_name).replace('"', '')
-            cursor.execute(f'FETCH ALL FROM "{safe_cursor_name}";')
-            rows = cursor.fetchall()
-            cursor.execute(f'CLOSE "{safe_cursor_name}";')
-
-            cursor.close()
+            cursor.execute("CALL close_requests_from_completed_treatments();")
             self.conn.commit()
-
-            self.display_results(
-                title="Busy Volunteers With No Active Treatment",
-                subtitle=(
-                    "Stage D function: get_busy_volunteers_with_no_active_treatment(). "
-                    "It finds volunteers marked as busy although they do not have an active treatment."
-                ),
-                columns=[
-                    ("volunteer_id", "Volunteer ID"),
-                    ("first_name", "First Name"),
-                    ("last_name", "Last Name"),
-                    ("is_active", "Busy Flag")
-                ],
-                rows=rows
-            )
-
+            cursor.close()
+            
+            messagebox.showinfo("Yedidim Notification Center", "Success!\nAll requests linked to finished interventions are now set to Status 3 (Closed).")
         except Exception as e:
-            try:
-                self.conn.rollback()
-            except Exception:
-                pass
-            messagebox.showerror("Function Error", f"Failed to execute Stage D function:\n{e}")
+            self.conn.rollback()
+            messagebox.showerror("Stored Procedure Refusal", f"Database transaction pipeline failed execution instructions:\n{e}")
 
     def run_reset_volunteer_availability_procedure(self):
         if not self.conn:
             messagebox.showerror("Database Error", "No database connection available.")
             return
 
-        confirm = messagebox.askyesno(
-            "Confirm Procedure Execution",
-            "This will run reset_volunteer_availability() and set inconsistent busy volunteers back to available.\n\nContinue?"
-        )
-        if not confirm:
-            return
-
+        self.conn.rollback()
         try:
-            # Clear old server notices before running the procedure.
-            try:
-                self.conn.notices.clear()
-            except Exception:
-                pass
-
             cursor = self.conn.cursor()
             cursor.execute("CALL public.reset_volunteer_availability();")
-            cursor.close()
             self.conn.commit()
+            cursor.close()
 
-            notices = [notice.strip() for notice in getattr(self.conn, "notices", []) if notice.strip()]
-            rows = [(notice,) for notice in notices] if notices else [("Procedure completed successfully. No PostgreSQL notices were returned.",)]
-
-            self.display_results(
-                title="Reset Volunteer Availability Procedure",
-                subtitle="Stage D procedure: reset_volunteer_availability(). It calls the cursor function and corrects blocked volunteers.",
-                columns=[("notice", "PostgreSQL Notice / Result")],
-                rows=rows
-            )
-
-            messagebox.showinfo("Procedure Completed", "Volunteer availability reset procedure completed successfully.")
-
+            messagebox.showinfo("Yedidim Notification Center", "Success!\nIdle volunteers have been reset and released back to available status ('N').")
         except Exception as e:
-            try:
-                self.conn.rollback()
-            except Exception:
-                pass
-            messagebox.showerror("Procedure Error", f"Failed to execute Stage D procedure:\n{e}")
+            self.conn.rollback()
+            messagebox.showerror("Procedure Error", f"Database transaction pipeline failed execution instructions:\n{e}")

@@ -408,8 +408,10 @@ Screenshot:
 
 ![Deliveries screen](images/deliveries.png)
 
-Add delivery: in the field of treatment_id , the form propose automatically  only active treatment!
+When creating a new delivery, you must associate it with an existing active treatment by selecting it from the combo box  menu. Then, simply fill in the required details, and the new record will be added to the management list.
+
 ![Deliveries screen](images/deliveryForm.png)
+
 ---
 
 ## 15. Trainings Screen

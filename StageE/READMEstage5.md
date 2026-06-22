@@ -120,6 +120,9 @@ a_family(
 
 ![Families screen](images/families.png)
 
+Double-clicking on a family in the list will open a dedicated update window, allowing you to modify their profile details.
+
+<img width="366" height="493" alt="image" src="https://github.com/user-attachments/assets/d731a97d-6e67-446d-85b4-e01e542439f2" />
 
 familiesTestOfInsertFamiliyAlreadyInTheTable.png
 Test The form "add family";
@@ -156,7 +159,7 @@ Screenshot:
 
 Test add skill to volunteer:
 
-![Volunteers screen](images/addSkillToVolunteer.png.png)
+![Volunteers screen](images/addSkillToVolunteer.png)
 ---
 
 ## 8. Requests Management Screen

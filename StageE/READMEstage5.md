@@ -247,6 +247,12 @@ Screenshots:
 
 ![Skills screen](images/skills.png)
 
+Double-click any skill row to open a window displaying all volunteers who possess that specific skill.
+
+<img width="435" height="338" alt="image" src="https://github.com/user-attachments/assets/f97193a8-cccc-4b04-af56-63a62eab3170" />
+
+The Skill Category view simply displays each skill category alongside its corresponding category name
+
 ![Skill categories screen](images/skill_categories.png)
 
 ---

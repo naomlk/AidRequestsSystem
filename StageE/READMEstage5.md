@@ -743,30 +743,7 @@ This effect can be observed through:
 
 ---
 
-## 20. CRUD Summary
 
-The application supports CRUD operations directly or indirectly for the main database tables.
-
-| Table                             | Read | Create | Update | Delete | Screen                            |
-| --------------------------------- | ---- | ------ | ------ | ------ | --------------------------------- |
-| `a_family`                        | Yes  | Yes    | Yes    | Yes    | Families                          |
-| `a_volunteer`                     | Yes  | Yes    | Yes    | Yes    | Volunteers                        |
-| `a_request`                       | Yes  | Yes    | Yes    | Yes    | Requests Management               |
-| `a_treatment`                     | Yes  | Yes    | Yes    | Yes    | Missions Treatments / Dispatch    |
-| `a_delivery`                      | Yes  | Yes    | Yes    | Yes    | Deliveries                        |
-| `a_requestcategory`               | Yes  | Yes    | Yes    | Yes    | Request's Categories              |
-| `b_skill`                         | Yes  | Yes    | Yes    | Yes    | Skills Registry                   |
-| `b_catagory`                      | Yes  | Yes    | Yes    | Yes    | Skill's Categories                |
-| `b_training`                      | Yes  | Yes    | Yes    | Yes    | Trainings                         |
-| `b_scheduled`                     | Yes  | Yes    | Yes    | Yes    | Trainings                         |
-| `b_volunteer_training`            | Yes  | Yes    | Yes    | Yes    | Trainings                         |
-| `b_volunteer_skill`               | Yes  | Yes    | Yes    | Yes    | Volunteers                        |
-| `request_category_required_skill` | Yes  | Yes    | Yes    | Yes    | Request category / dispatch logic |
-
-Some tables are not always managed through a separate screen, but through related screens.
-For example, `b_volunteer_skill` is managed through the Volunteers screen, and `b_volunteer_training` is managed through the Trainings screen.
-
----
 
 ## 21. Foreign Keys and User-Friendly Display
 
@@ -804,23 +781,6 @@ A typical workflow in the system:
 
 This workflow demonstrates the interaction between the graphical interface, SQL queries, foreign keys, procedures and triggers.
 
----
-
-## 23. Design Choices
-
-The interface was designed to be user-friendly and visually clear.
-
-Design elements include:
-
-* Sidebar navigation
-* Separate screens for each module
-* Search bars and combo boxes
-* Colored markers on the dispatch map
-* Clear update and delete buttons
-* Confirmation messages before destructive actions
-* Error handling using message boxes
-* Tables with readable column names
-* Automatic refresh of important dashboard metrics
 
 ---
 

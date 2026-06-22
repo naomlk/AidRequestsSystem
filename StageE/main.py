@@ -22,6 +22,7 @@ from screens.treatments_screen import TreatmentsScreen
 from screens.skills_screen import SkillsScreen
 from screens.category_skills_screen import SkillCategoryScreen
 from screens.request_category_screen import RequestCategoryScreen
+from screens.reports_procedures_screen import ReportsProceduresScreen
 
 # General modern configuration initialization
 ctk.set_appearance_mode("Light")
@@ -185,6 +186,19 @@ class YedidimCleanArchitectureApp(ctk.CTk):
             command=self.show_skill_categories_page
         )
         self.btn_skill_categories.pack(padx=15, pady=4, fill="x")
+
+        self.btn_reports = ctk.CTkButton(
+            self.sidebar,
+            text="📈   Reports & Procedures",
+            font=ctk.CTkFont(size=14),
+            fg_color="transparent",
+            text_color="#6C757D",
+            hover_color="#F8F9FA",
+            height=40,
+            anchor="w",
+            command=self.show_reports_procedures_page
+        )
+        self.btn_reports.pack(padx=15, pady=4, fill="x")
 
         # ==========================================
         # INTERACTIVE MAIN CONTENT WORKSPACE VIEW
@@ -1335,6 +1349,10 @@ class YedidimCleanArchitectureApp(ctk.CTk):
         self.request_cat_screen = RequestCategoryScreen(self.content_view, self.conn)
         self.request_cat_screen.pack(fill="both", expand=True)
 
+    def show_reports_procedures_page(self):
+        self.clear_view()
+        self.reports_screen = ReportsProceduresScreen(self.content_view, self.conn)
+        self.reports_screen.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
     app = YedidimCleanArchitectureApp()

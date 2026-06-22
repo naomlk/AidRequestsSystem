@@ -1,0 +1,785 @@
+# Stage E – Graphical User Interface for the Database
+
+## Yedidim Family Assistance System
+
+## 1. Introduction
+
+This project implements a graphical user interface for the Yedidim Family Assistance database system.
+The application was developed in **Python** using **CustomTkinter** for the graphical interface and **psycopg2** for the connection to a **PostgreSQL** database.
+
+---
+
+## 2. Technologies Used
+
+* **Python**
+* **CustomTkinter**
+* **Tkinter Treeview**
+* **PostgreSQL**
+* **psycopg2**
+* **tkintermapview**
+* **Docker / pgAdmin** for database management
+* **Git / GitHub** for version control
+
+---
+
+## 3. Application Structure
+
+The application starts from a main dashboard and includes a sidebar menu that allows the user to navigate between all system screens.
+
+Main screens:
+
+* Dashboard
+* Families
+* Volunteers
+* Requests Management
+* Request's Categories
+* Locations / Dispatch Map
+* Missions Treatments
+* Deliveries
+* Trainings
+* Skills Registry
+* Skill's Categories
+* Reports & Procedures
+
+Screenshot of the main navigation:
+
+![Main sidebar navigation](images/sidebar.png)
+
+---
+
+## 4. Database Connection
+
+The application connects to the PostgreSQL database using a shared connection object.
+
+Example configuration:
+
+```python
+DB_HOST = "localhost"
+DB_NAME = "finaldb"
+DB_USER = "ochrith"
+DB_PASSWORD = "ochrith"
+DB_PORT = "5432"
+```
+
+The connection is created once in the main application and passed to each screen.
+This allows all screens to work with the same database connection.
+
+---
+
+## 5. Dashboard Screen
+
+The Dashboard is the main entry screen of the system.
+It displays live operational information about the database.
+
+The dashboard includes:
+
+* Total number of requests
+* Number of active missions
+* Total number of volunteers
+* Number of completed treatments today
+* Critical pending alerts
+* Top 10 volunteers by number of completed missions
+
+The dashboard refreshes automatically and reflects changes made in other screens.
+
+For example, when a new treatment is created through the dispatch system, the number of active missions is updated.
+
+Screenshot:
+
+![Dashboard screen](images/dashboard.png)
+
+---
+
+## 6. Families Screen
+
+The Families screen allows the user to manage the `a_family` table.
+
+Supported operations:
+
+* Read families from the database
+* Add a new family
+* Update an existing family
+* Delete a family
+* Search by family ID, contact person name, or phone number
+
+The user can manually enter the family ID.
+If the entered family ID already exists, the form displays an error message in red.
+The same validation exists for duplicate phone numbers.
+
+The table used:
+
+```sql
+a_family(
+    contactperson_id,
+    contactperson_name,
+    phone_number,
+    number_of_members,
+    special_features
+)
+```
+
+![Families screen](images/families.png)
+
+
+familiesTestOfInsertFamiliyAlreadyInTheTable.png
+Test The form "add family";
+![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png.png)
+---
+
+## 7. Volunteers Screen
+
+The Volunteers screen manages the `a_volunteer` table.
+
+Supported operations:
+
+* Read volunteers
+* Add a new volunteer
+* Update volunteer details
+* Delete a volunteer
+* Search volunteer by ID, first name or last name
+* View and manage the volunteer's skills
+
+The screen also provides access to the volunteer skills relation through the `b_volunteer_skill` table.
+This allows assigning or removing skills from a volunteer.
+
+Related tables:
+
+```sql
+a_volunteer
+b_volunteer_skill
+b_skill
+```
+
+Screenshot:
+
+![Volunteers screen](images/volunteers.png)
+
+Test add skill to volunteer:
+
+![Volunteers screen](images/addSkillToVolunteer.png.png)
+---
+
+## 8. Requests Management Screen
+
+The Requests screen manages assistance requests in the system.
+
+Supported operations:
+
+* Read requests
+* Add new request
+* Update request information
+* Delete request
+* Search and filter requests
+
+The request table is connected to families and request categories using foreign keys.
+Instead of relying only on numeric IDs, the interface uses joins to display meaningful information such as contact person and category names when relevant.
+
+Main table:
+
+```sql
+a_request
+```
+Screenshot:
+
+![Requests screen](images/requests.png)
+
+---
+
+## 9. Request Categories Screen
+
+The Request Categories screen manages the types of requests handled by the system.
+
+Examples of request categories:
+
+* Rescue & Emergency
+* Shelter & MAMD Security
+* Essential Logistics
+* Urgent Home Maintenance
+* Flat Tire Assistance
+* Locked Vehicle
+* Child Locked In Car
+
+This screen allows the user to view and manage request categories.
+
+Related table:
+
+```sql
+a_requestcategory
+```
+
+Screenshot:
+
+![Request categories screen](images/request_categories.png)
+
+---
+
+## 10. Skills Registry and Skill Categories Screens
+
+The Skills Registry screen manages the `b_skill` table.
+The Skill Categories screen manages the skill category table.
+
+Main skill categories:
+
+* Language
+* Vehicle
+* Locksmith
+* Rescue
+* Technical
+* Emergency
+
+The Skills Registry includes skills such as:
+Related tables:
+
+```sql
+b_skill
+b_catagory
+```
+
+Screenshots:
+
+![Skills screen](images/skills.png)
+
+![Skill categories screen](images/skill_categories.png)
+
+---
+
+## 11. Required Skills Mapping
+
+In order to improve the dispatch logic, we added a dedicated table that maps request categories to exact required skills.
+
+Instead of using only broad skill categories such as “Technical”, the system now uses exact `skill_id` values.
+
+Table:
+
+```sql
+request_category_required_skill(
+    request_category_id,
+    skill_id
+)
+```
+
+This prevents incorrect matches.
+For example, a Certified Electrician should not automatically match a MAMD shelter request only because both are technical.
+Instead, a MAMD request requires specific skills such as:
+
+* Heavy Duty Locksmith / MAMAD Specialist
+* Locksmith skills
+* Emergency response
+* Hydraulic Tools Expert
+
+This makes volunteer matching more accurate and more logical.
+
+---
+
+## 12. Location and Dispatch Map Screen
+
+The Location / Dispatch feature is one of the main operational features of the application.
+
+When a critical pending request appears in the dashboard, the user can click the **Dispatch** button.
+The system opens a map showing volunteers around the request location.
+
+The dispatch logic checks:
+
+* Volunteer distance from the request
+* Volunteer equipment availability
+* Volunteer busy status
+* Matching skills based on `request_category_required_skill`
+* Existing active treatments
+
+The map displays up to 10 volunteers.
+The selection is done by distance perimeters:
+
+1. Volunteers within 5 km
+2. Volunteers within 10 km
+3. Volunteers within 15 km
+4. If there are still fewer than 10 volunteers, the system completes with farther volunteers
+
+Inside each perimeter, volunteers with matching skills are prioritized.
+
+Marker colors:
+
+* Green: close volunteer with required skill
+* Gray: close volunteer without required skill
+* Orange: medium-distance volunteer
+* Red: farther volunteer
+* Yellow: request location
+
+When the user clicks a volunteer marker, the system displays:
+
+* Volunteer name
+* Phone number
+* Distance from the request
+* Availability status
+* Matching skills
+* All volunteer skills
+
+The user can assign the selected volunteer to the request.
+This creates a new treatment and updates the request status to “In Progress”.
+
+Related tables:
+
+```sql
+a_request
+a_volunteer
+a_treatment
+b_volunteer_skill
+b_skill
+request_category_required_skill
+```
+
+Screenshot:
+
+![Dispatch map](images/dispatch_map.png)
+
+---
+
+## 13. Missions Treatments Screen
+
+The Treatments screen manages missions that were assigned to volunteers.
+
+Supported operations:
+
+* Read treatments
+* Create new treatment
+* Update treatment
+* Delete treatment
+* Search by treatment ID, request ID, volunteer ID, volunteer name, date, feedback or description
+
+The screen uses joins with volunteers and requests in order to display meaningful information and support easier search.
+
+Main table:
+
+```sql
+a_treatment
+```
+When a treatment is created, the related request can move to “In Progress”.
+When a treatment is completed, the completion time is filled and the request can become completed.
+
+Screenshot:
+Search treatment with his number or his volunteer name:
+![Treatments screen](images/treatments.png)
+![Treatments screen](images/treatmentWithName.png)
+---
+
+## 14. Deliveries Screen
+
+The Deliveries screen manages deliveries linked to treatments.
+
+Supported operations:
+
+* Read deliveries
+* Create delivery
+* Update delivery
+* Delete delivery
+* Search and filter by status or item type
+* Assign delivery to an active treatment
+
+Main table:
+
+```sql
+a_delivery
+```
+The screen verifies that a delivery is linked to an active treatment when needed.
+
+Screenshot:
+
+![Deliveries screen](images/deliveries.png)
+
+Add delivery: in the field of treatment_id , the form propose automatically  only active treatment!
+![Deliveries screen](images/deliveryForm.png)
+---
+
+## 15. Trainings Screen
+
+The Trainings screen manages volunteer trainings and schedules.
+
+Supported operations:
+
+* Read trainings
+* Add training
+* Update training
+* Delete training
+* Show schedule information
+* Add or remove volunteers from trainings
+
+Related tables:
+
+```sql
+b_training
+b_scheduled
+b_volunteer_training
+```
+
+This screen allows indirect management of training schedules and volunteer participation.
+
+Screenshot:
+
+![Trainings screen](images/trainings.png)
+
+---
+
+## 16. Reports & Procedures Screen
+
+The Reports & Procedures screen was created specifically for Stage E requirements.
+
+It allows the user to run analytical queries from Stage B and database subprograms from Stage D directly from the graphical interface.
+
+The screen is divided into two parts:
+
+1. Stage B analytical queries
+2. Stage D functions and procedures
+
+The results are displayed in a user-friendly table.
+
+Screenshot:
+
+![Reports and procedures screen](images/reports_procedures.png)
+Procedure 1:
+[Reports and procedures screen](images/reportTopVolunteer.png)
+
+---
+
+## 17. Stage B Queries Implemented in the Interface
+
+### Query 1: Top 15 Families by Number of Requests
+
+This query displays the families that created the highest number of requests.
+
+```sql
+SELECT 
+    f.contactperson_id,
+    f.contactperson_name,
+    COUNT(r.request_id) AS total_requests
+FROM public.a_family f
+JOIN public.a_request r 
+    ON f.contactperson_id = r.contactperson_id
+GROUP BY f.contactperson_id, f.contactperson_name
+ORDER BY total_requests DESC
+LIMIT 15;
+```
+
+Displayed columns:
+
+* Contact person ID
+* Contact person name
+* Total requests
+
+Purpose: identify families that require frequent assistance.
+
+---
+
+### Query 2: Monthly Requests Summary
+
+This query groups requests by month and year.
+
+```sql
+SELECT 
+    TO_CHAR(date, 'Month') AS month_name,
+    EXTRACT(YEAR FROM date) AS year_nb,
+    COUNT(*) AS nb_requests
+FROM public.a_request
+GROUP BY year_nb, month_name, EXTRACT(MONTH FROM date)
+ORDER BY year_nb DESC, EXTRACT(MONTH FROM date) DESC;
+```
+
+Displayed columns:
+
+* Month
+* Year
+* Number of requests
+
+Purpose: analyze request activity over time.
+
+---
+
+### Additional Query: Top Performing Volunteers
+
+This query displays volunteers whose mission counter is above the average.
+
+```sql
+SELECT first_name, last_name, counter
+FROM public.a_volunteer
+WHERE counter > (SELECT AVG(counter) FROM public.a_volunteer)
+ORDER BY counter DESC;
+```
+
+Purpose: identify high-performing volunteers.
+
+---
+
+### Additional Query: Treatments by Date Range
+
+This query allows the user to search treatments between two dates.
+
+```sql
+SELECT 
+    t.treatment_id,
+    t.date,
+    t.feedback_notes,
+    v.first_name || ' ' || v.last_name AS volunteer_name
+FROM public.a_treatment t
+JOIN public.a_volunteer v 
+    ON v.volunteer_id = t.volunteer_id
+WHERE t.date BETWEEN %s AND %s
+ORDER BY t.date ASC;
+```
+
+Purpose: review treatments performed during a selected period.
+
+---
+
+## 18. Stage D Function and Procedure Used in the Interface
+
+### Function: get_busy_volunteers_with_no_active_treatment()
+
+This function returns volunteers that are marked as busy but do not actually have an active treatment.
+
+A volunteer is considered incorrectly blocked if:
+
+```text
+a_volunteer.is_active = 'Y'
+AND
+there is no active treatment with completion_time IS NULL
+```
+
+Function:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_busy_volunteers_with_no_active_treatment()
+RETURNS REFCURSOR
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    volunteer_ref_cursor REFCURSOR := 'busy_volunteers_cursor';
+BEGIN
+    OPEN volunteer_ref_cursor FOR
+        SELECT 
+            v.volunteer_id,
+            v.first_name,
+            v.last_name,
+            v.is_active
+        FROM public.a_volunteer v
+        WHERE v.is_active = 'Y'
+          AND NOT EXISTS (
+              SELECT 1 
+              FROM public.a_treatment t 
+              WHERE t.volunteer_id = v.volunteer_id
+                AND t.completion_time IS NULL
+          );
+
+    RETURN volunteer_ref_cursor;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Error while opening the blocked volunteers cursor : %', SQLERRM;
+END;
+$$;
+```
+
+In the graphical interface, the button **Show Blocked Busy Volunteers** runs this function and displays the result.
+
+---
+
+### Procedure: reset_volunteer_availability()
+
+This procedure calls the function above and fixes the inconsistent volunteers.
+
+For each blocked volunteer, it updates:
+
+```sql
+is_active = 'N'
+```
+
+Procedure:
+
+```sql
+CREATE OR REPLACE PROCEDURE public.reset_volunteer_availability()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_cursor REFCURSOR;
+    v_record RECORD;
+    v_counter INTEGER := 0;
+BEGIN
+    v_cursor := public.get_busy_volunteers_with_no_active_treatment();
+
+    LOOP
+        FETCH v_cursor INTO v_record;
+        EXIT WHEN NOT FOUND;
+
+        UPDATE public.a_volunteer
+        SET is_active = 'N'
+        WHERE volunteer_id = v_record.volunteer_id;
+
+        v_counter := v_counter + 1;
+
+        RAISE NOTICE 'Yedidim Notification: Volunteer % % (ID: %) has been released from their block.',
+                     v_record.first_name, v_record.last_name, v_record.volunteer_id;
+    END LOOP;
+
+    CLOSE v_cursor;
+
+    RAISE NOTICE 'Procedure completed successfully. Total volunteers corrected and released: %', v_counter;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Critical error during procedure execution: %', SQLERRM;
+END;
+$$;
+```
+
+In the interface, the button **Reset Volunteer Availability** executes the procedure and displays PostgreSQL notices returned by `RAISE NOTICE`.
+
+---
+
+## 19. Trigger Used in the System
+
+The system also includes a trigger that synchronizes volunteer availability with treatments.
+
+Trigger function:
+
+```sql
+update_volunteer_status_on_treatment()
+```
+
+Trigger:
+
+```sql
+trg_treatment_status_sync
+```
+
+It runs after insert or update of `completion_time` on `a_treatment`.
+
+Behavior:
+
+* When a treatment is inserted without completion time, the volunteer becomes busy:
+
+  ```sql
+  is_active = 'Y'
+  ```
+
+* When the treatment receives a completion time, the volunteer becomes available:
+
+  ```sql
+  is_active = 'N'
+  ```
+
+This trigger is not executed manually from the interface.
+It is activated automatically when the user creates or updates a treatment.
+
+This effect can be observed through:
+
+* Dispatch screen
+* Treatments screen
+* Volunteers screen
+* Dashboard active missions counter
+
+---
+
+## 20. CRUD Summary
+
+The application supports CRUD operations directly or indirectly for the main database tables.
+
+| Table                             | Read | Create | Update | Delete | Screen                            |
+| --------------------------------- | ---- | ------ | ------ | ------ | --------------------------------- |
+| `a_family`                        | Yes  | Yes    | Yes    | Yes    | Families                          |
+| `a_volunteer`                     | Yes  | Yes    | Yes    | Yes    | Volunteers                        |
+| `a_request`                       | Yes  | Yes    | Yes    | Yes    | Requests Management               |
+| `a_treatment`                     | Yes  | Yes    | Yes    | Yes    | Missions Treatments / Dispatch    |
+| `a_delivery`                      | Yes  | Yes    | Yes    | Yes    | Deliveries                        |
+| `a_requestcategory`               | Yes  | Yes    | Yes    | Yes    | Request's Categories              |
+| `b_skill`                         | Yes  | Yes    | Yes    | Yes    | Skills Registry                   |
+| `b_catagory`                      | Yes  | Yes    | Yes    | Yes    | Skill's Categories                |
+| `b_training`                      | Yes  | Yes    | Yes    | Yes    | Trainings                         |
+| `b_scheduled`                     | Yes  | Yes    | Yes    | Yes    | Trainings                         |
+| `b_volunteer_training`            | Yes  | Yes    | Yes    | Yes    | Trainings                         |
+| `b_volunteer_skill`               | Yes  | Yes    | Yes    | Yes    | Volunteers                        |
+| `request_category_required_skill` | Yes  | Yes    | Yes    | Yes    | Request category / dispatch logic |
+
+Some tables are not always managed through a separate screen, but through related screens.
+For example, `b_volunteer_skill` is managed through the Volunteers screen, and `b_volunteer_training` is managed through the Trainings screen.
+
+---
+
+## 21. Foreign Keys and User-Friendly Display
+
+The interface avoids showing only numeric foreign key values when possible.
+Instead, it uses joins to show meaningful information.
+
+Examples:
+
+* Volunteer ID is displayed with volunteer name
+* Request category ID is displayed with category name
+* Treatment search supports volunteer names
+* Dispatch map displays volunteer names and skills
+* Training participants are shown by volunteer details
+
+This improves readability and makes the system easier to use.
+
+---
+
+## 22. Example Workflow
+
+A typical workflow in the system:
+
+1. A family is registered in the Families screen.
+2. A new emergency request is created in Requests Management.
+3. The request appears in the Dashboard if it is critical and pending.
+4. The user clicks Dispatch.
+5. The map opens and displays suitable volunteers.
+6. The user selects a volunteer.
+7. The system creates a new treatment.
+8. The request status becomes In Progress.
+9. The volunteer becomes busy.
+10. When the mission is completed, the treatment is updated with a completion time.
+11. The volunteer becomes available again.
+12. The dashboard counters are refreshed.
+
+This workflow demonstrates the interaction between the graphical interface, SQL queries, foreign keys, procedures and triggers.
+
+---
+
+## 23. Design Choices
+
+The interface was designed to be user-friendly and visually clear.
+
+Design elements include:
+
+* Sidebar navigation
+* Separate screens for each module
+* Search bars and combo boxes
+* Colored markers on the dispatch map
+* Clear update and delete buttons
+* Confirmation messages before destructive actions
+* Error handling using message boxes
+* Tables with readable column names
+* Automatic refresh of important dashboard metrics
+
+---
+
+## 24. Error Handling and Validation
+
+The application includes validation and error handling.
+
+Examples:
+
+* Preventing duplicate family ID
+* Preventing duplicate phone number
+* Checking required fields before insert
+* Confirming delete operations
+* Handling foreign key constraints
+* Preventing assignment of a busy volunteer
+* Checking if a request already has an active treatment
+* Displaying database errors in message boxes
+
+---
+
+## 25. Conclusion
+
+Stage E provides a complete graphical interface for the Yedidim Family Assistance database system.
+
+The application allows users to manage the main database tables, perform CRUD operations, run analytical queries from Stage B, and execute functions and procedures from Stage D.
+
+The system also includes an advanced dispatch map that helps choose volunteers according to distance, equipment, availability and required skills.
+
+Overall, the project demonstrates the connection between a relational PostgreSQL database and a practical graphical application.

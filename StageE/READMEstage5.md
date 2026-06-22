@@ -418,6 +418,73 @@ Screenshot:
 
 ---
 
+
+## Location Screen – Active Field Missions Map
+
+The Location screen provides a real-time geographic view of the active missions currently taking place in the field.
+
+This screen is different from the Dispatch popup.
+The Dispatch popup is used to assign a volunteer to a pending request, while the Location screen is used to monitor missions that are already active.
+
+The Location screen displays active treatments from the database, meaning treatments where:
+
+```sql
+completion_time IS NULL
+```
+
+For each active treatment, the system retrieves information from several related tables:
+
+```sql
+a_treatment
+a_volunteer
+a_request
+a_requestcategory
+```
+
+The screen displays both the volunteer location and the request location on a map.
+This allows the operator to see where volunteers are currently working and how far they are from the families or requests they are helping.
+
+The screen includes:
+
+* A list of active missions
+* A map showing field locations
+* Volunteer markers
+* Request markers
+* Distance calculation between volunteer and request
+* Mission duration calculation
+* Filters for priority, long missions and missing coordinates
+* Search by volunteer name, phone number, request ID or treatment information
+
+The distance between the volunteer and the request is calculated using the Haversine formula.
+This helps the system estimate how far the volunteer is from the request location.
+
+The Location screen also uses visual indicators:
+
+* Critical priority missions are highlighted in red
+* Long treatments are highlighted in yellow/orange
+* Active normal treatments are highlighted in green
+* Missions with missing coordinates are highlighted in gray
+* The request marker is displayed clearly so that it remains visible on the map
+
+This screen is useful for operational supervision.
+It helps the system administrator understand which volunteers are currently active, where they are located, and which requests are being handled in real time.
+
+Screenshot:
+
+![Locations screen](images/locations.png)
+The Location screen also provides interactive map actions. 
+Each volunteer marker can be clicked. 
+When the operator clicks on a volunteer, the system displays the volunteer's details, including name, phone number,
+current treatment, request information and distance from the request location. 
+The map also automatically centers and zooms in on the selected volunteer's position, allowing the operator to 
+quickly locate them on the field map. 
+From the details panel, the operator can use the call option to contact the volunteer directly from the interface.
+![Locations screen](images/call_volunteer.png)
+
+![Locations screen](images/zoomOnVolunteer.png)
+
+
+
 ## 16. Reports & Procedures Screen
 
 The Reports & Procedures screen was created specifically for Stage E requirements.

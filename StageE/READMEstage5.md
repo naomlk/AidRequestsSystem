@@ -158,7 +158,7 @@ Screenshot:
 
 ![Volunteers screen](images/volunteers.png)
 
-Test add skill to volunteer:
+Double-clicking a volunteer opens a dedicated management window that displays all their registered skills, allowing you to seamlessly add, update, or delete them.
 
 ![Volunteers screen](images/addSkillToVolunteer.png)
 ---
@@ -186,6 +186,10 @@ a_request
 Screenshot:
 
 ![Requests screen](images/requests.png)
+
+Double-clicking on a request in the list will open a dedicated update window, allowing you to modify their details.
+
+<img width="398" height="511" alt="image" src="https://github.com/user-attachments/assets/a1554137-d9d3-46d3-8c00-f4c437c622c6" />
 
 ---
 

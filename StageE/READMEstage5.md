@@ -125,8 +125,7 @@ Double-clicking on a family in the list will open a dedicated update window, all
 
 <img width="366" height="493" alt="image" src="https://github.com/user-attachments/assets/d731a97d-6e67-446d-85b4-e01e542439f2" />
 
-familiesTestOfInsertFamiliyAlreadyInTheTable.png
-Test The form "add family";
+We can also add or delete a family by clicking the associated button.
 
 ![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
 

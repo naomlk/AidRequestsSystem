@@ -129,6 +129,8 @@ We can also add or delete a family by clicking the associated button. The delete
 
 ![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
 
+The delete action only works if the family is not linked to any request.
+
 <img width="591" height="317" alt="image" src="https://github.com/user-attachments/assets/70a36ddc-efce-4f56-b431-7d9c9d573afa" />
 
 
@@ -160,7 +162,10 @@ b_skill
 
 Screenshot:
 
-![Volunteers screen](images/volunteers.png)
+![Volunteers screen](images/volunteers.png) 
+
+<img width="606" height="523" alt="image" src="https://github.com/user-attachments/assets/7977243c-54a2-4709-bfdf-ab30640a19cb" />
+
 
 Double-clicking a volunteer opens a dedicated management window that displays all their registered skills, allowing you to seamlessly add, update, or delete them. We also added a button to automatically redirect the user from the volunteer profile popup to the main skills screen.
 
@@ -191,6 +196,7 @@ a_request
 Screenshot:
 
 ![Requests screen](images/requests.png)
+
 
 Double-clicking on a request in the list will open a dedicated update window, allowing you to modify their details.
 

@@ -415,6 +415,8 @@ When creating a new treatment, you must associate it with an existing pending re
 
 <img width="343" height="440" alt="image" src="https://github.com/user-attachments/assets/89c80019-c0a9-4cff-be96-6f4be0e3089b" />
 
+If a treatment is deleted, the associated request automatically goes back to 'Pending'. Also, if you update a treatment by removing the completion time, the request's status is updated back to 'In Progress' instead of 'Completed'.
+
 ---
 
 ## 14. Deliveries Screen

@@ -298,6 +298,61 @@ class TreatmentsScreen(ctk.CTkFrame):
     # ========================================================
     # POPUPS & MODALS (CREATION / MODIFICATION / SUPPRESSION)
     # ========================================================
+
+    def load_nearby_volunteers_for_request(self, request_id, current_volunteer_id=None):
+        """
+        Returns up to 10 volunteers close to the request of the selected treatment.
+        Rule used here: available volunteers only (is_active = 'N'), plus the current assigned volunteer
+        so the existing value can still appear in the update ComboBox.
+        """
+        nearby_volunteers = []
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                WITH request_location AS (
+                    SELECT request_id, latitude AS req_latitude, longitude AS req_longitude
+                    FROM public.a_request
+                    WHERE request_id = %s
+                ),
+                ranked_volunteers AS (
+                    SELECT
+                        v.volunteer_id,
+                        COALESCE(v.first_name, '') AS first_name,
+                        COALESCE(v.last_name, '') AS last_name,
+                        v.is_active,
+                        ROUND((
+                            6371 * ACOS(
+                                LEAST(1, GREATEST(-1,
+                                    COS(RADIANS(r.req_latitude))
+                                    * COS(RADIANS(v.latitude))
+                                    * COS(RADIANS(v.longitude) - RADIANS(r.req_longitude))
+                                    + SIN(RADIANS(r.req_latitude))
+                                    * SIN(RADIANS(v.latitude))
+                                ))
+                            )
+                        )::numeric, 2) AS distance_km
+                    FROM public.a_volunteer v
+                    CROSS JOIN request_location r
+                    WHERE r.req_latitude IS NOT NULL
+                      AND r.req_longitude IS NOT NULL
+                      AND v.latitude IS NOT NULL
+                      AND v.longitude IS NOT NULL
+                      AND (v.is_active = 'N' OR v.volunteer_id = %s)
+                )
+                SELECT volunteer_id, first_name, last_name, is_active, distance_km
+                FROM ranked_volunteers
+                WHERE distance_km <= 15
+                ORDER BY distance_km ASC
+                LIMIT 10;
+            """, (int(request_id), int(current_volunteer_id) if current_volunteer_id else -1))
+
+            nearby_volunteers = cursor.fetchall()
+            cursor.close()
+        except Exception as e:
+            print(f"❌ Nearby volunteer lookup failed: {e}")
+
+        return nearby_volunteers
+
     def open_create_treatment_modal(self):
         if not self.conn: return
         pending_requests = []
@@ -334,10 +389,54 @@ class TreatmentsScreen(ctk.CTkFrame):
         combo_req.pack(padx=15, pady=(0, 8))
         combo_req.set("Choose target request...")
 
-        ctk.CTkLabel(scroll, text="Target Assigned Volunteer ID:", font=ctk.CTkFont(size=11, weight="bold")).pack(
-            anchor="w", padx=15, pady=(4, 2))
-        entry_vol = ctk.CTkEntry(scroll, placeholder_text="Enter volunteer ID...", width=360, height=32)
-        entry_vol.pack(padx=15, pady=(0, 8))
+        ctk.CTkLabel(
+            scroll,
+            text="Target Assigned Volunteer ID:",
+            font=ctk.CTkFont(size=11, weight="bold")
+        ).pack(anchor="w", padx=15, pady=(4, 2))
+
+        create_volunteer_options_map = {}
+        combo_vol = ctk.CTkComboBox(
+            scroll,
+            values=["Choose a request first..."],
+            width=360,
+            height=32
+        )
+        combo_vol.pack(padx=15, pady=(0, 8))
+        combo_vol.set("Choose a request first...")
+
+        def refresh_create_volunteers(selected_request_text=None):
+            req_text = selected_request_text or combo_req.get()
+            create_volunteer_options_map.clear()
+
+            if req_text.startswith("Choose"):
+                combo_vol.configure(values=["Choose a request first..."])
+                combo_vol.set("Choose a request first...")
+                return
+
+            try:
+                target_request_id = int(req_text.split(" - ")[0].strip())
+            except Exception:
+                combo_vol.configure(values=["Invalid request selection"])
+                combo_vol.set("Invalid request selection")
+                return
+
+            nearby_volunteers = self.load_nearby_volunteers_for_request(target_request_id)
+
+            volunteer_options = []
+            for vid, first_name, last_name, is_active, distance_km in nearby_volunteers:
+                full_name = f"{first_name} {last_name}".strip() or "Unknown volunteer"
+                option_text = f"{vid} - {full_name} | {distance_km} km | Available"
+                volunteer_options.append(option_text)
+                create_volunteer_options_map[option_text] = int(vid)
+
+            if not volunteer_options:
+                volunteer_options = ["No available volunteers within 15 km"]
+
+            combo_vol.configure(values=volunteer_options)
+            combo_vol.set(volunteer_options[0])
+
+        combo_req.configure(command=refresh_create_volunteers)
 
         ctk.CTkLabel(scroll, text="Date Token (YYYY-MM-DD):", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w",
                                                                                                              padx=15,
@@ -372,13 +471,19 @@ class TreatmentsScreen(ctk.CTkFrame):
 
         def commit_creation():
             req_val = combo_req.get()
-            vol_val = entry_vol.get().strip()
-            if req_val.startswith("Choose") or not vol_val:
-                messagebox.showwarning("Validation Error", "Please check fields values.", parent=modal)
+            vol_val = combo_vol.get().strip()
+
+            if req_val.startswith("Choose") or vol_val in ["Choose a request first...", "No available volunteers within 15 km", "Invalid request selection"]:
+                messagebox.showwarning("Validation Error", "Please select a request and an available volunteer.", parent=modal)
                 return
+
             try:
                 target_rid = int(req_val.split(" - ")[0])
-                target_vid = int(vol_val)
+                target_vid = create_volunteer_options_map.get(vol_val)
+
+                if target_vid is None:
+                    # Fallback if the user manually typed only the ID or pasted an option.
+                    target_vid = int(vol_val.split(" - ")[0].strip())
 
                 cursor = self.conn.cursor()
                 cursor.execute("SELECT 1 FROM public.a_volunteer WHERE volunteer_id = %s;", (target_vid,))
@@ -473,8 +578,35 @@ class TreatmentsScreen(ctk.CTkFrame):
         ctk.CTkLabel(scroll, text=" ID Delivery :", font=ctk.CTkFont(size=11, weight="bold")).pack(anchor="w", padx=15,
                                                                                                    pady=(4, 2))
         entry_del = ctk.CTkEntry(scroll, width=360, height=32)
-        entry_del.pack(padx=15, pady=(0, 15))
+        entry_del.pack(padx=15, pady=(0, 8))
         entry_del.insert(0, current_del)
+
+        ctk.CTkLabel(
+            scroll,
+            text="Target Volunteer ID:",
+            font=ctk.CTkFont(size=11, weight="bold")
+        ).pack(anchor="w", padx=15, pady=(4, 2))
+
+        nearby_volunteers = self.load_nearby_volunteers_for_request(req_id, vol_id)
+        self.update_volunteer_options_map = {}
+
+        volunteer_options = []
+        for vid, first_name, last_name, is_active, distance_km in nearby_volunteers:
+            full_name = f"{first_name} {last_name}".strip() or "Unknown volunteer"
+            status_label = "Current" if str(vid) == str(vol_id) else "Available"
+            option_text = f"{vid} - {full_name} | {distance_km} km | {status_label}"
+            volunteer_options.append(option_text)
+            self.update_volunteer_options_map[option_text] = int(vid)
+
+        if not volunteer_options:
+            volunteer_options = [f"{vol_id} - current volunteer | no nearby alternatives found"]
+            self.update_volunteer_options_map[volunteer_options[0]] = int(vol_id)
+
+        combo_vol = ctk.CTkComboBox(scroll, values=volunteer_options, width=360, height=32)
+        combo_vol.pack(padx=15, pady=(0, 15))
+
+        current_option = next((opt for opt in volunteer_options if opt.startswith(f"{vol_id} -")), volunteer_options[0])
+        combo_vol.set(current_option)
 
         def execute_patch():
             try:
@@ -488,6 +620,12 @@ class TreatmentsScreen(ctk.CTkFrame):
                 p_after = entry_photo.get().strip() or None
                 d_id = int(entry_del.get().strip()) if entry_del.get().strip().isdigit() else None
 
+                selected_volunteer_text = combo_vol.get().strip()
+                target_vid = self.update_volunteer_options_map.get(selected_volunteer_text)
+                if target_vid is None:
+                    # Fallback if the user typed only the ID manually in the ComboBox.
+                    target_vid = int(selected_volunteer_text.split(" - ")[0].strip())
+
                 # Important: do not update completion_time when it did not change.
                 # This prevents active treatments from being blocked by triggers that run on UPDATE OF completion_time.
                 if completion_changed:
@@ -498,10 +636,11 @@ class TreatmentsScreen(ctk.CTkFrame):
                             completion_time = %s,
                             feedback_notes = %s,
                             photo_after = %s,
-                            delivery_id = %s
+                            delivery_id = %s,
+                            volunteer_id = %s
                         WHERE treatment_id = %s;
                     """, (entry_date.get().strip(), entry_start.get().strip(), c_time, f_notes, p_after, d_id,
-                          int(t_id)))
+                          target_vid, int(t_id)))
 
                     new_status = 3 if c_time else 2
                     cursor.execute("UPDATE public.a_request SET status_id = %s WHERE request_id = %s;",
@@ -513,9 +652,10 @@ class TreatmentsScreen(ctk.CTkFrame):
                             start_time = %s,
                             feedback_notes = %s,
                             photo_after = %s,
-                            delivery_id = %s
+                            delivery_id = %s,
+                            volunteer_id = %s
                         WHERE treatment_id = %s;
-                    """, (entry_date.get().strip(), entry_start.get().strip(), f_notes, p_after, d_id, int(t_id)))
+                    """, (entry_date.get().strip(), entry_start.get().strip(), f_notes, p_after, d_id, target_vid, int(t_id)))
 
                 self.conn.commit()
                 cursor.close()

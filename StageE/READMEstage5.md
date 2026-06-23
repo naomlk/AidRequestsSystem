@@ -243,6 +243,10 @@ Screenshot:
 
 ![Request categories screen](images/request_categories.png)
 
+This is the formular to add a new category.
+
+<img width="834" height="504" alt="image" src="https://github.com/user-attachments/assets/b651e7ce-c2dc-47d5-9814-8594d409a8ed" />
+
 ---
 
 ## 10. Skills Registry and Skill Categories Screens

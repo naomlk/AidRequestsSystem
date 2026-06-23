@@ -201,7 +201,7 @@ We have a search bar to filter requests by any attribute, and also a combo box t
 
 <img width="644" height="455" alt="image" src="https://github.com/user-attachments/assets/beff264d-6f6d-447c-8b87-024850eda91b" />
 
-This is the formular to add a volunteer. 
+This is the formular to add a request. 
 
 <img width="406" height="515" alt="image" src="https://github.com/user-attachments/assets/8224c562-ab00-4587-9380-12ea1a8ed1cf" />
 
@@ -209,6 +209,8 @@ This is the formular to add a volunteer.
 Double-clicking on a request in the list will open a dedicated update window, allowing you to modify their details.
 
 <img width="398" height="511" alt="image" src="https://github.com/user-attachments/assets/a1554137-d9d3-46d3-8c00-f4c437c622c6" />
+
+When deleting, this message is displayed.
 
 <img width="656" height="463" alt="image" src="https://github.com/user-attachments/assets/955f973a-2552-4c08-8139-797f39ae7f8b" />
 

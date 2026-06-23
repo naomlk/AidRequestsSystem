@@ -406,11 +406,14 @@ Search treatment with his number or his volunteer name:
 
 ![Treatments screen](images/treatments.png)
 
-When creating a new treatment, you must associate it with an existing pending request by selecting it from the combo box  menu. Then, simply fill in the required details, and the new record will be added to the management list.
+When creating a new treatment, you must associate it with an existing pending request by selecting it from the combo box menu. There is a second combo box to choose the assigned volunteer who is available now. Next, simply fill in the required details, and the new record will be added to the management list.
 
 <img width="350" height="454" alt="image" src="https://github.com/user-attachments/assets/580d936e-84c9-4ac5-8f35-6a387a7ff02a" />
 
-![Treatments screen](images/treatmentWithName.png)
+
+<img width="355" height="444" alt="image" src="https://github.com/user-attachments/assets/c8a17efb-2cee-403c-aac3-6c257aba698a" />
+
+<img width="343" height="440" alt="image" src="https://github.com/user-attachments/assets/89c80019-c0a9-4cff-be96-6f4be0e3089b" />
 
 ---
 

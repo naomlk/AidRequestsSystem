@@ -309,6 +309,19 @@ class VolunteersScreen(ctk.CTkFrame):
                                   font=ctk.CTkFont(size=15, weight="bold"), text_color="#0F4C81")
         lbl_header.pack(pady=12)
 
+        btn_go_to_skills = ctk.CTkButton(
+            profile_win,
+            text="⚙️ Open Global Skills Dashboard",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#0F4C81",
+            hover_color="#0A365C",
+            height=32,
+            corner_radius=6,
+            command=lambda: self.redirect_to_global_skills(profile_win)
+        )
+        btn_go_to_skills.pack(pady=(0, 15))
+
+
         main_box = ctk.CTkScrollableFrame(profile_win, fg_color="#FFFFFF", corner_radius=10, border_width=1,
                                           border_color="#E9ECEF")
         main_box.pack(fill="both", expand=True, padx=20, pady=(0, 10))
@@ -368,6 +381,8 @@ class VolunteersScreen(ctk.CTkFrame):
             selected_row_data["desc"] = description
             selected_row_data["cert"] = "Y" if str(certificate).strip().upper() in ["Y", "TRUE", "1"] else "N"
             lbl_selected_status.configure(text=f"🎯 Selected: {skill_name} (ID: #{skill_id})", text_color="#1A62E8")
+ 
+        
 
         def add_new_skill():
             selected_string = combo_available_skills.get()
@@ -718,3 +733,22 @@ class VolunteersScreen(ctk.CTkFrame):
         btn_save = ctk.CTkButton(form_window, text="💾 Save Profile Changes", font=ctk.CTkFont(size=13, weight="bold"),
                                  fg_color="#198754", hover_color="#146C43", height=38, corner_radius=6, command=save_form_data)
         btn_save.pack(fill="x", padx=25, pady=(0, 15))
+
+    def redirect_to_global_skills(self, current_popup):
+        """Ferme la pop-up actuelle et redirige l'application vers l'écran global des compétences"""
+        # 1. Ferme proprement la fenêtre pop-up de résumé
+        current_popup.destroy()
+        
+        # 2. Déclenche la navigation directe via le callback de main.py
+        if hasattr(self, 'show_skills_callback') and self.show_skills_callback:
+            self.show_skills_callback()
+        else:
+            # Sécurité alternative au cas où le callback n'est pas encore lié
+            main_app = self.master
+            while main_app and not hasattr(main_app, "show_skills_page"):
+                main_app = main_app.master
+                
+            if main_app and hasattr(main_app, "show_skills_page"):
+                main_app.show_skills_page()
+            else:
+                messagebox.showerror("Navigation Error", "Could not resolve the redirection to Skills Dashboard.")

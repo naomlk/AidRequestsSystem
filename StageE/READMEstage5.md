@@ -129,7 +129,8 @@ We can also add or delete a family by clicking the associated button. The delete
 
 ![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
 
-<img width="641" height="284" alt="image" src="https://github.com/user-attachments/assets/f9851daa-ae59-4f2e-9580-2641febc9466" />
+<img width="591" height="317" alt="image" src="https://github.com/user-attachments/assets/70a36ddc-efce-4f56-b431-7d9c9d573afa" />
+
 
 ---
 

@@ -275,6 +275,10 @@ Screenshots:
 
 ![Skills screen](images/skills.png)
 
+This is the formular to add a new request category. The ID is automatically generated. 
+
+<img width="665" height="521" alt="image" src="https://github.com/user-attachments/assets/c1e0c2bf-f133-4acb-9a2c-cc70185d23d6" />
+
 Double-click any skill row to open a window displaying all volunteers who possess that specific skill.
 
 <img width="435" height="338" alt="image" src="https://github.com/user-attachments/assets/f97193a8-cccc-4b04-af56-63a62eab3170" />

@@ -198,7 +198,7 @@ class RequestsScreen(ctk.CTkFrame):
             r_id, req_date, img, desc, priority, cp_id, cat_name, status_name, lat, lon = row
             
             # Filtering validation using text mapping properties indices
-            if selected_status_filter != "All Statuses" and str(status_label) != selected_status_filter:
+            if selected_status_filter != "All Statuses" and str(status_name) != selected_status_filter:
                 continue
 
             if is_exact_id_match:

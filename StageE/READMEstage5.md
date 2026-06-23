@@ -160,9 +160,10 @@ Screenshot:
 
 ![Volunteers screen](images/volunteers.png)
 
-Double-clicking a volunteer opens a dedicated management window that displays all their registered skills, allowing you to seamlessly add, update, or delete them.
+Double-clicking a volunteer opens a dedicated management window that displays all their registered skills, allowing you to seamlessly add, update, or delete them. We also added a button to automatically redirect the user from the volunteer profile popup to the main skills screen.
 
-![Volunteers screen](images/addSkillToVolunteer.png)
+<img width="809" height="499" alt="image" src="https://github.com/user-attachments/assets/b4019dc7-8837-4d6c-9e70-24d118d339fd" />
+
 ---
 
 ## 8. Requests Management Screen

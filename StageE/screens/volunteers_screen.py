@@ -178,6 +178,13 @@ class VolunteersScreen(ctk.CTkFrame):
         except Exception as e:
             messagebox.showerror("SQL Database Error", f"Failed to retrieve data rows from public.a_volunteer:\n{e}")
 
+       
+        volunteer_suggestions = []
+        for row in self.all_volunteer_rows:
+           suggestion_string = f"{row[0]} - {row[1]} {row[2]}" 
+           volunteer_suggestions.append(suggestion_string)
+        self.search_combo.configure(values=volunteer_suggestions)
+
     # ========================================================
     # VOLUNTEER SEARCH BAR HELPERS & PLACEHOLDER ROUTINES
     # ========================================================

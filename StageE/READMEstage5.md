@@ -125,9 +125,11 @@ Double-clicking on a family in the list will open a dedicated update window, all
 
 <img width="366" height="493" alt="image" src="https://github.com/user-attachments/assets/d731a97d-6e67-446d-85b4-e01e542439f2" />
 
-We can also add or delete a family by clicking the associated button.
+We can also add or delete a family by clicking the associated button. The delete action only works if the family is not linked to any request.
 
 ![Families screen](images/familiesTestOfInsertFamiliyAlreadyInTheTable.png)
+
+<img width="641" height="284" alt="image" src="https://github.com/user-attachments/assets/f9851daa-ae59-4f2e-9580-2641febc9466" />
 
 ---
 
